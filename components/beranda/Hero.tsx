@@ -1,131 +1,97 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
-import { useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { Chip } from '@/components/ui/Chip'
-import { Eyebrow, SectionEyebrow } from '@/components/ui/Eyebrow'
-import { cn } from '@/lib/cn'
-import { areaChips, hero, vacantRooms, type VacantRoom } from '@/lib/content/beranda'
-import { routes } from '@/lib/routes'
-
-/** Availability, stated as a date. Green reinforces it; the words carry it. */
-function VacancyPill({ children }: { children: string }) {
-  return (
-    <span className="rounded-badge bg-available px-2 py-[3px] font-figure text-[11px] font-medium whitespace-nowrap text-white">
-      {children}
-    </span>
-  )
-}
-
-function VacantRoomRow({ room, first }: { room: VacantRoom; first: boolean }) {
-  return (
-    <Link
-      href={routes.detail}
-      aria-label={`Kamar ${room.room} ${room.type} di Kostella ${room.building}, ${room.price} per bulan, ${room.vacancy}`}
-      className={cn(
-        'flex items-center gap-2.5 py-2.5 font-figure text-[13px] text-ink',
-        !first && 'border-t border-line',
-      )}
-    >
-      <span aria-hidden className="numeral min-w-10 text-[17px]">
-        {room.building}
-      </span>
-      <span aria-hidden className="truncate text-ink-soft">
-        {room.room} · {room.type}
-      </span>
-      <span aria-hidden className="ml-auto font-medium whitespace-nowrap">
-        {room.price}
-      </span>
-      <span aria-hidden>
-        <VacancyPill>{room.vacancy}</VacancyPill>
-      </span>
-    </Link>
-  )
-}
+import { useMemo, useState } from 'react'
+import { SectionEyebrow } from '@/components/ui/Eyebrow'
+import { AvailabilityCard, type EmptyReason } from './AvailabilityCard'
+import { BudgetPanel } from './BudgetPanel'
+import { areaChips, budget, hero, vacantRooms } from '@/lib/content/beranda'
 
 /**
- * The page opens on inventory, not atmosphere: the rooms that are genuinely
- * empty today, listed with their prices. That claim is the whole brand, so it
- * sits above the fold beside the headline rather than further down the page.
+ * The hero is a live demonstration, not a description.
+ *
+ * The brand's two claims are that it knows which rooms are genuinely empty and
+ * exactly what they cost. So the visitor sets a budget and the inventory answers
+ * immediately — the proof happens in front of them, which is something no
+ * aggregator reselling someone else's listings could show.
+ *
+ * It reads as two bands: the argument and its control on stone, then the
+ * building itself running edge to edge with the live list floating over it.
  */
 export function Hero() {
-  const [selectedArea, setSelectedArea] = useState<string>(areaChips[0])
+  const [area, setArea] = useState(areaChips[0].label)
+  const [amount, setAmount] = useState<number>(budget.initial)
+
+  const inArea = useMemo(() => vacantRooms.filter((room) => room.area === area), [area])
+  const matches = useMemo(() => inArea.filter((room) => room.rent <= amount), [inArea, amount])
+
+  const selectedChip = areaChips.find((chip) => chip.label === area)
+  const cheapestInArea = inArea[0]
+
+  let emptyReason: EmptyReason | null = null
+  if (inArea.length === 0 && selectedChip?.nearest) {
+    emptyReason = { kind: 'area', area, nearest: selectedChip.nearest }
+  } else if (matches.length === 0 && cheapestInArea) {
+    emptyReason = { kind: 'budget', cheapest: cheapestInArea }
+  }
+
+  const fixEmpty = () => {
+    if (emptyReason?.kind === 'area') setArea(emptyReason.nearest)
+    if (emptyReason?.kind === 'budget') setAmount(emptyReason.cheapest.rent)
+  }
 
   return (
-    <section className="overflow-hidden bg-stone">
-      <div className="wrap grid gap-12 pt-14 pb-14 sm:pt-22 sm:pb-24 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-        <div>
+    <section className="bg-stone">
+      <div className="wrap grid items-start gap-10 pt-14 pb-12 sm:pt-20 lg:grid-cols-[1fr_1fr] lg:gap-16">
+        <div className="lg:pt-2">
           <SectionEyebrow>{hero.eyebrow}</SectionEyebrow>
 
           <h1 className="mt-5 text-[clamp(2rem,5vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.015em] text-balance">
             {hero.heading}
           </h1>
 
-          <p className="mt-5 mb-9 max-w-[500px] text-[17px] leading-[1.65] text-ink-soft">
+          <p className="mt-5 max-w-[460px] text-[17px] leading-[1.65] text-ink-soft">
             {hero.intro}
           </p>
-
-          <p id="pilih-kawasan" className="mb-3 text-[15px] leading-[1.6] font-semibold">
-            {hero.chipPrompt}
-          </p>
-          <div
-            role="group"
-            aria-labelledby="pilih-kawasan"
-            className="flex max-w-[520px] flex-wrap gap-2"
-          >
-            {areaChips.map((chip) => (
-              <Chip
-                key={chip}
-                selected={selectedArea === chip}
-                onClick={() => setSelectedArea(chip)}
-              >
-                {chip}
-              </Chip>
-            ))}
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button href={routes.pencarian} size="lg">
-              Lihat kamar kosong
-            </Button>
-            <Button href={routes.survei} variant="secondary" size="lg">
-              Jadwalkan survei
-            </Button>
-          </div>
         </div>
 
-        {/* At lg the photo bleeds past the column and the availability card
-            overlaps it. Below that the two stack in normal flow. */}
-        <div className="relative lg:min-h-[520px] lg:self-stretch">
-          <div className="relative aspect-3/2 overflow-hidden rounded-card border border-line lg:absolute lg:-top-6 lg:-right-12 lg:bottom-[120px] lg:left-[72px] lg:aspect-auto">
-            <Image
-              src={hero.photo.src}
-              alt={hero.photo.alt}
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-          </div>
+        <BudgetPanel
+          area={area}
+          onAreaChange={setArea}
+          amount={amount}
+          onAmountChange={setAmount}
+          matchCount={matches.length}
+          totalCount={inArea.length}
+        />
+      </div>
 
-          <div className="mt-6 rounded-card border border-line bg-paper p-5 shadow-float lg:absolute lg:right-12 lg:bottom-0 lg:left-0 lg:mt-0">
-            <div className="mb-2 flex items-baseline justify-between gap-3">
-              <Eyebrow>{hero.availability.eyebrow}</Eyebrow>
-              <span className="flex items-center gap-1.5 font-figure text-[12px] text-ink-soft">
-                <span aria-hidden className="size-[7px] rounded-full bg-available" />
-                {hero.availability.updated}
-              </span>
-            </div>
-            <ul className="flex flex-col">
-              {vacantRooms.map((room, i) => (
-                <li key={`${room.building}-${room.room}`}>
-                  <VacantRoomRow room={room} first={i === 0} />
-                </li>
-              ))}
-            </ul>
-          </div>
+      {/* The building, edge to edge. The list sits on it because the photo is
+          the promise and the list is the proof — they belong in one frame. */}
+      <div className="relative">
+        <div className="relative aspect-3/2 w-full sm:aspect-21/9 lg:h-[460px] lg:aspect-auto">
+          <Image
+            src={hero.photo.src}
+            alt={hero.photo.alt}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          {/* Keeps the floating card's edge readable against a bright photo. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink/25 to-transparent to-40%"
+          />
+        </div>
+
+        <div className="wrap relative -mt-16 pb-4 sm:-mt-24 lg:mt-0 lg:pb-0">
+          <AvailabilityCard
+            rooms={matches}
+            area={area}
+            emptyReason={emptyReason}
+            onFixEmpty={fixEmpty}
+            className="lg:absolute lg:right-8 lg:bottom-10 lg:w-[440px]"
+          />
         </div>
       </div>
     </section>

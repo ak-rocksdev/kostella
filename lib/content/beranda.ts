@@ -26,6 +26,7 @@ export const hero = {
   intro:
     '31 gedung di Jakarta, Bandung, dan Bali. Kamar yang tampil di sini benar-benar kosong hari ini.',
   chipPrompt: 'Kamu kuliah atau kerja di mana?',
+  budgetPrompt: 'Budget maksimal per bulan',
   photo: { src: '/images/ruang-bersama.jpg', alt: 'Ruang bersama di salah satu gedung Kostella' },
   availability: {
     eyebrow: 'Kosong sekarang',
@@ -33,28 +34,54 @@ export const hero = {
   },
 } as const
 
-export const areaChips = [
-  'Trisakti/Untar',
-  'Kelapa Gading',
-  'Setiabudi',
-  'Kebayoran',
-  'Bandung',
-  'Nusa Dua',
-] as const
+/**
+ * The budget control.
+ *
+ * Cost is the brand's second claim, so the search starts from what you can pay
+ * rather than from a map. The range brackets the real rents (Rp1.550.000 to
+ * Rp2.100.000) with enough room either side that both ends of the slider mean
+ * something: drag it down far enough and you genuinely run out of rooms.
+ */
+export const budget = {
+  min: 1_200_000,
+  max: 3_000_000,
+  step: 50_000,
+  initial: 2_100_000,
+} as const
+
+export type AreaChip = {
+  label: string
+  /** Areas without inventory get the designed empty state, not a blank list. */
+  nearest?: string
+}
+
+export const areaChips: AreaChip[] = [
+  { label: 'Trisakti/Untar' },
+  { label: 'Kelapa Gading', nearest: 'Trisakti/Untar' },
+  { label: 'Setiabudi', nearest: 'Trisakti/Untar' },
+  { label: 'Kebayoran', nearest: 'Trisakti/Untar' },
+  { label: 'Bandung', nearest: 'Trisakti/Untar' },
+  { label: 'Nusa Dua', nearest: 'Trisakti/Untar' },
+]
 
 export type VacantRoom = {
   building: string
   room: string
   type: string
-  price: string
+  /** Numeric so the budget filter compares figures, not formatted strings. */
+  rent: number
   vacancy: string
+  area: string
 }
 
+/** Cheapest first, so raising the budget adds rooms to the bottom of the list. */
 export const vacantRooms: VacantRoom[] = [
-  { building: '362', room: '205', type: 'Superior', price: 'Rp1.950.000', vacancy: 'kosong 1 Agu' },
-  { building: '362', room: '105', type: 'Standard', price: 'Rp1.650.000', vacancy: 'kosong hari ini' },
-  { building: '351', room: '302', type: 'Standard', price: 'Rp1.550.000', vacancy: 'kosong hari ini' },
-  { building: '2A3', room: '108', type: 'Pojok', price: 'Rp2.100.000', vacancy: 'kosong 5 Agu' },
+  { building: '351', room: '302', type: 'Standard', rent: 1_550_000, vacancy: 'kosong hari ini', area: 'Trisakti/Untar' },
+  { building: '362', room: '105', type: 'Standard', rent: 1_650_000, vacancy: 'kosong hari ini', area: 'Trisakti/Untar' },
+  { building: '362', room: '211', type: 'Standard', rent: 1_650_000, vacancy: 'kosong 1 Agu', area: 'Trisakti/Untar' },
+  { building: '351', room: '108', type: 'Superior', rent: 1_950_000, vacancy: 'kosong 3 Agu', area: 'Trisakti/Untar' },
+  { building: '362', room: '205', type: 'Superior', rent: 1_950_000, vacancy: 'kosong 1 Agu', area: 'Trisakti/Untar' },
+  { building: '2A3', room: '108', type: 'Pojok', rent: 2_100_000, vacancy: 'kosong 5 Agu', area: 'Trisakti/Untar' },
 ]
 
 export const proofPoints = [

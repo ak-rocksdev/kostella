@@ -120,6 +120,54 @@
   }
 }
 
+/* The budget slider.
+   The track and its filled portion are drawn as elements behind a transparent
+   native input, rather than as a gradient on the track — the system forbids
+   gradients, and a real input keeps arrow keys, Home/End, and screen readers
+   working for free. */
+.budget-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.budget-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: var(--color-paper);
+  border: 2px solid var(--color-plum);
+  box-shadow: var(--shadow-max);
+}
+
+.budget-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: var(--color-paper);
+  border: 2px solid var(--color-plum);
+  box-shadow: var(--shadow-max);
+}
+
+.budget-range:focus-visible {
+  outline: none;
+}
+
+.budget-range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-plum);
+  outline-offset: 2px;
+}
+
+.budget-range:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-plum);
+  outline-offset: 2px;
+}
+
 /* Motion rule two of three: floor-grid cells stagger in per floor, 40ms apart.
    The delay is set per cell by FloorGrid. */
 @keyframes kst-cell-in {

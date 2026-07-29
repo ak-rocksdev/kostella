@@ -204,6 +204,57 @@ everything needed and asks that the prototypes not be rendered unless requested.
 - **Photos are placeholders.** The brand brief forbids stock photos and expects real
   Kostella photography. The four images ship from the bundle as-is.
 
+## Hero redesign — budget-led search
+
+Added after the first build, at the client's request: guide visitors toward a
+search driven by budget, and let the photo run full width.
+
+**The problem with the ported hero.** It described the brand's claim and then
+offered two buttons. The area chips held state but led nowhere, the left column
+ran out before the right one did — leaving dead space — and the photo sat boxed
+inside a column, cropped awkwardly.
+
+**The thesis now.** Every competitor opens its search with a location box.
+Kostella can open with money, because it owns its buildings and therefore knows
+every rent exactly. So the hero asks for a budget, and the inventory answers
+immediately. The claim is demonstrated rather than asserted — something an
+aggregator reselling other people's listings could not show.
+
+**Structure.** Two bands:
+
+1. Stone. Eyebrow, headline, and intro on the left; the budget panel on the
+   right. The panel holds the area chips, the budget control, and a primary
+   action whose label carries the live count.
+2. The building, edge to edge, with the "Kosong sekarang" card floating over it.
+   The photo is the promise and the list is the proof, so they share one frame.
+
+**The signature** is the budget figure itself, set in Archivo Expanded at
+`clamp(1.75rem, 4vw, 2.25rem)` — the same treatment as the building plates. The
+visitor's own number joins the brand's numeral language. That is the one bold
+element; everything around it stays quiet.
+
+**The slider** is a real `<input type="range">` so arrow keys, Home/End, and
+screen readers work without reimplementation. Its track and fill are drawn as
+elements behind a transparent native track, because the system forbids gradients
+and a gradient is the usual way to fill a range track.
+
+**Empty states are designed, not accidental.** Two can occur, and each offers
+the way out rather than a dead end:
+
+- Budget below every rent → "Yang termurah Rp1.550.000 di gedung 351", with a
+  button that raises the budget to exactly that figure.
+- An area with no inventory → "Yang terdekat ada di Trisakti/Untar", with a
+  button that switches to it.
+
+With no match the primary action becomes "Lihat semua kamar" rather than
+counting to zero, and the "n dari m" line is suppressed when the area holds
+nothing, since "0 dari 0" says nothing.
+
+The vacant-room list grew from four entries to six so the budget filter visibly
+does something. Rents stay on the brief's real tiers (Standard Rp1.650.000,
+Superior Rp1.950.000, Pojok Rp2.100.000) and are stored numerically, so the
+filter compares figures rather than parsing formatted strings.
+
 ## Outcome
 
 Built and verified on 2026-07-29. `tsc --noEmit`, `next build`, and `eslint` all pass
