@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState, type CSSProperties } from 'react'
+import Image from 'next/image'
+import { useMemo, useState } from 'react'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { BudgetPanel, type EmptyReason } from './BudgetPanel'
 import { areaChips, budget, hero, vacantRooms } from '@/lib/content/beranda'
@@ -44,22 +45,29 @@ export function Hero() {
 
   return (
     <section aria-label="Cari kamar" className="relative isolate bg-ink">
-      {/* Phones get the ink surface; everything wider gets the photograph. The
-          cut is at md, not lg: between 768 and 1023 the viewport is wide enough
-          that a bare dark block reads as a missing image rather than a choice.
-          See .hero-backdrop in globals.css for why this is a background and not
-          an <img>. */}
-      <div
-        aria-hidden
-        style={{ '--hero-photo': `url(${hero.photo.src})` } as CSSProperties}
-        className="hero-backdrop absolute inset-0 -z-10"
-      >
+      {/* The photograph runs at every width. It was hidden below a breakpoint
+          for a while, which only moved the seam around: whatever width the cut
+          sat at, the image vanished there in one frame and read as broken.
+          With nothing hidden, next/image is the right tool again — responsive
+          variants, modern formats, and the preload for what is the LCP here. */}
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src={hero.photo.src}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
         {/* The type spans the full width until lg, so an even wash is the only
             one that holds there — the left-weighted ramp measured 4.26:1 on the
             lead paragraph, under the 4.5 floor. At lg the type returns to the
             left half and the ramp comes back, keeping the right side readable
             as a photograph rather than flattening it. */}
-        <div className="absolute inset-0 md:bg-ink/78 lg:bg-transparent lg:bg-linear-to-r lg:from-ink/90 lg:from-5% lg:via-ink/70 lg:to-ink/35" />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-ink/78 lg:bg-transparent lg:bg-linear-to-r lg:from-ink/90 lg:from-5% lg:via-ink/70 lg:to-ink/35"
+        />
       </div>
 
       <div className="wrap grid items-center gap-10 py-14 sm:py-20 lg:min-h-[620px] lg:grid-cols-[1fr_minmax(0,460px)] lg:gap-16 lg:py-24">

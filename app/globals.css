@@ -120,24 +120,6 @@
   }
 }
 
-/* The hero backdrop.
-   Decorative, and shown only from md up. This is a background rather than an
-   <img> for one measured reason: a display:none image is still downloaded, and
-   at the *largest* srcset candidate, because with no layout box the browser
-   cannot resolve `sizes`. The hidden next/image was pulling the 3840px variant
-   onto a 390px phone and then not showing it. A media-query'd background is the
-   one form that genuinely is not fetched below the breakpoint.
-   The file itself comes from --hero-photo, set inline from content, so the path
-   stays with the copy instead of being duplicated here. A custom property is
-   inert until used, so declaring it below md costs nothing. */
-@media (width >= 48rem) {
-  .hero-backdrop {
-    background-image: var(--hero-photo);
-    background-size: cover;
-    background-position: center;
-  }
-}
-
 /* The budget slider.
    The track and its filled portion are drawn as elements behind a transparent
    native input, rather than as a gradient on the track — the system forbids
