@@ -42,10 +42,11 @@ export const hero = {
    * suit the brand better still, but the only one on hand is 500px wide and
    * would break up full-bleed — a high-resolution facade is an asset request.
    *
-   * Decorative alt: this is a placeholder from the design bundle, not a real
-   * Kostella room, so describing it as one would be false.
+   * Rendered as a decorative CSS background, not an <img>: it carries no
+   * information a screen reader needs, and it is a placeholder from the design
+   * bundle rather than a real Kostella room, so naming it would be false.
    */
-  photo: { src: '/images/kamar-standard.jpg', alt: '' },
+  photo: { src: '/images/kamar-standard.jpg' },
 } as const
 
 /**
