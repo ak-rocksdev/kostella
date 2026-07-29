@@ -74,6 +74,39 @@ disagree with each other.
   (56px mobile, 96px desktop) so the page does not stop against the viewport
   edge.
 
+## Typeface change: figures move from IBM Plex Mono to Archivo
+
+The design system specifies IBM Plex Mono for prices, room codes, and receipts,
+on the argument that tabular figures make cost tables read like receipts rather
+than marketing. The client rejected the face and asked for a sans-serif with real
+weight range.
+
+Five candidates were measured in the browser, digit by digit, for tabular
+support. All five align perfectly under `font-variant-numeric: tabular-nums`;
+they differ only in their defaults (IBM Plex Sans is tabular out of the box,
+Archivo nearly so, Inter and Manrope and Plus Jakarta Sans are proportional). So
+alignment was never the deciding factor — any of them could do it.
+
+The client then confirmed that figures only need to align in the receipt.
+
+**Archivo was chosen over Inter**, which the client had suggested, because:
+
+- It is already loaded. Archivo renders the brand's identity numerals — `362`,
+  `31`, `2008` — so a price now speaks with the same voice as the building
+  number it belongs to. Inter would have been a fourth family.
+- The two roles are distinguished by width rather than by being unrelated fonts:
+  Expanded (`wdth` 125, weight 700) for display numerals, normal width for
+  figures. That is a typographic relationship rather than an accident.
+- Inter is the most widely used UI face on the web and would read as a default.
+  For a brand whose whole premise is not being like the aggregators, that is a
+  real if subtle cost.
+
+Dropping Plex Mono takes the app from three typefaces to two.
+
+The token was renamed `--font-mono` → `--font-figure`, since it no longer points
+at a monospaced face and the old name would have been a lie. `tabular-nums` is
+applied in `ReceiptTable` and nowhere else.
+
 ## Known limitations
 
 - **`/detail` is one property.** All four Beranda cards and every search result

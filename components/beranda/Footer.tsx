@@ -25,7 +25,7 @@ export function Footer() {
                 {footer.buildings.map((building) => (
                   <li
                     key={building.number}
-                    className="flex items-baseline gap-2 font-mono text-[13px] leading-[1.5] text-ink-soft"
+                    className="flex items-baseline gap-2 font-figure text-[13px] leading-[1.5] text-ink-soft"
                   >
                     <span className="numeral min-w-[34px] text-[15px] text-ink">
                       {building.number}
@@ -41,7 +41,7 @@ export function Footer() {
               <SectionEyebrow>{footer.contactEyebrow}</SectionEyebrow>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <MessageCircle size={22} strokeWidth={1.5} aria-hidden className="text-plum" />
-                <span className="font-mono text-[22px] font-medium whitespace-nowrap text-ink">
+                <span className="font-figure text-[22px] font-medium whitespace-nowrap text-ink">
                   {footer.phone}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-badge bg-plum-soft px-2.5 py-1 text-[12px] font-semibold text-plum">

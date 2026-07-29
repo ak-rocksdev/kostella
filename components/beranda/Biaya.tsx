@@ -29,7 +29,7 @@ export function Biaya() {
         </div>
 
         <div className="rounded-card border border-line border-t-[3px] border-t-plum bg-paper p-6 shadow-max sm:p-8">
-          <p className="mb-4 font-mono text-[13px] font-medium text-ink-soft">{biaya.example}</p>
+          <p className="mb-4 font-figure text-[13px] font-medium text-ink-soft">{biaya.example}</p>
           <ReceiptTable rows={biaya.rows} total={biaya.total} />
         </div>
       </div>

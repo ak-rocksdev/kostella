@@ -16,21 +16,22 @@ export type MapMarker = {
   kind?: 'building' | 'landmark'
 }
 
-/**
- * A building plate. The same treatment as everywhere else in the system: the
- * number is the identity, set in mono on a solid fill.
- *
- * DivIcon defaults to a 12×12 box that would clip the number, so the size is
- * cleared and the plate sizes to its own label.
- */
 /* With iconSize cleared, Leaflet anchors the element by its top-left corner, so
    the plate would sit down and to the right of the place it marks. Centring it
    on the coordinate is the honest position. */
 const CENTRED = 'transform:translate(-50%,-50%);'
 
+/**
+ * A building plate — the same treatment as everywhere else in the system: the
+ * number is the identity, set in the figure face on a solid fill.
+ *
+ * DivIcon defaults to a 12×12 box that would clip the number, so the size is
+ * cleared and the plate sizes to its own label.
+ */
+
 function buildingHtml(label: string, active: boolean) {
   const background = active ? 'var(--color-plum)' : 'var(--color-ink)'
-  return `<div style="${CENTRED}background:${background};color:#fff;font:500 12px var(--font-mono);padding:3px 7px;border-radius:var(--radius-badge);white-space:nowrap;box-shadow:0 1px 3px rgba(22,23,26,.3)">${label}</div>`
+  return `<div style="${CENTRED}background:${background};color:#fff;font:500 12px var(--font-figure);padding:3px 7px;border-radius:var(--radius-badge);white-space:nowrap;box-shadow:0 1px 3px rgba(22,23,26,.3)">${label}</div>`
 }
 
 function landmarkHtml(label: string) {

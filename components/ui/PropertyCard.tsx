@@ -59,12 +59,11 @@ export function PropertyCard({
 
         {/* Price is what the card is scanned for, so it gets its own zone below
             a hairline, with "mulai" as a quiet label instead of running into the
-            figure. Mono keeps the digits tabular, so prices line up column to
-            column across the grid. */}
+            figure. */}
         <div className="mt-2 flex items-end justify-between gap-3 border-t border-line pt-3">
           <p>
             <span className="block text-[12px] leading-none text-ink-soft">mulai</span>
-            <span className="mt-1.5 block font-mono text-[20px] leading-none font-medium text-ink">
+            <span className="mt-1.5 block font-figure text-[20px] leading-none font-medium text-ink">
               {formatRupiah(priceFrom)}
             </span>
           </p>

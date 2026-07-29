@@ -62,15 +62,15 @@ export function RoomPanel({ roomNumber }: { roomNumber: string }) {
 
       <div className="p-5">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-mono text-[15px] font-medium">
+          <h2 className="font-figure text-[15px] font-medium">
             Kamar {roomNumber} · {room.type}
           </h2>
-          <p className={cn('font-mono text-[13px] font-medium', statusTone[room.status])}>
+          <p className={cn('font-figure text-[13px] font-medium', statusTone[room.status])}>
             {statusLabel}
           </p>
         </div>
 
-        <p className="mt-2 mb-1.5 font-mono text-[32px] leading-none font-medium">
+        <p className="mt-2 mb-1.5 font-figure text-[32px] leading-none font-medium">
           {formatRupiah(room.rent)}
           <span className="font-body text-[14px] font-normal text-ink-soft"> /bulan</span>
         </p>

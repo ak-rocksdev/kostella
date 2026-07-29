@@ -18,7 +18,7 @@ export function Kawasan() {
                 {area.name}
               </h2>
               <p className="text-[14px] text-ink-soft">{area.nearby}</p>
-              <p className="ml-auto rounded-badge bg-available px-3 py-[5px] font-mono text-[13px] font-medium text-white">
+              <p className="ml-auto rounded-badge bg-available px-3 py-[5px] font-figure text-[13px] font-medium text-white">
                 {area.vacantRooms} kamar kosong
               </p>
             </div>

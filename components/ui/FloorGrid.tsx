@@ -40,7 +40,7 @@ export function RoomCell({ room, status, type, price, selected, compact, onSelec
       disabled={!onSelect}
       onClick={onSelect ? () => onSelect({ room, status, type, price }) : undefined}
       className={cn(
-        'flex flex-col items-start gap-0.5 rounded-none text-left font-mono',
+        'flex flex-col items-start gap-0.5 rounded-none text-left font-figure',
         compact ? 'min-w-16 px-2.5 py-2' : 'min-w-27 px-3.5 py-3',
         onSelect ? 'cursor-pointer' : 'cursor-default',
         selected && 'outline-2 outline-offset-2 outline-plum',

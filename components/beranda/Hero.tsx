@@ -13,7 +13,7 @@ import { routes } from '@/lib/routes'
 /** Availability, stated as a date. Green reinforces it; the words carry it. */
 function VacancyPill({ children }: { children: string }) {
   return (
-    <span className="rounded-badge bg-available px-2 py-[3px] font-mono text-[11px] font-medium whitespace-nowrap text-white">
+    <span className="rounded-badge bg-available px-2 py-[3px] font-figure text-[11px] font-medium whitespace-nowrap text-white">
       {children}
     </span>
   )
@@ -25,7 +25,7 @@ function VacantRoomRow({ room, first }: { room: VacantRoom; first: boolean }) {
       href={routes.detail}
       aria-label={`Kamar ${room.room} ${room.type} di Kostella ${room.building}, ${room.price} per bulan, ${room.vacancy}`}
       className={cn(
-        'flex items-center gap-2.5 py-2.5 font-mono text-[13px] text-ink',
+        'flex items-center gap-2.5 py-2.5 font-figure text-[13px] text-ink',
         !first && 'border-t border-line',
       )}
     >
@@ -113,7 +113,7 @@ export function Hero() {
           <div className="mt-6 rounded-card border border-line bg-paper p-5 shadow-float lg:absolute lg:right-12 lg:bottom-0 lg:left-0 lg:mt-0">
             <div className="mb-2 flex items-baseline justify-between gap-3">
               <Eyebrow>{hero.availability.eyebrow}</Eyebrow>
-              <span className="flex items-center gap-1.5 font-mono text-[12px] text-ink-soft">
+              <span className="flex items-center gap-1.5 font-figure text-[12px] text-ink-soft">
                 <span aria-hidden className="size-[7px] rounded-full bg-available" />
                 {hero.availability.updated}
               </span>

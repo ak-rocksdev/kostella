@@ -61,11 +61,11 @@ export function ResultCard({
         {/* The figure carries the row, with the unit stepped down beside it and
             availability holding the opposite edge. */}
         <div className="mt-auto flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-line pt-3">
-          <p className="font-mono text-[20px] leading-none font-medium">
+          <p className="font-figure text-[20px] leading-none font-medium">
             {result.price}
             <span className="font-body text-[13px] font-normal text-ink-soft"> /bulan</span>
           </p>
-          <p className={cn('font-mono text-[13px] font-medium', availabilityTone[result.status])}>
+          <p className={cn('font-figure text-[13px] font-medium', availabilityTone[result.status])}>
             {result.availability}
           </p>
         </div>

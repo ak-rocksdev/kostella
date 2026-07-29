@@ -14,8 +14,10 @@ type ReceiptTableProps = {
 }
 
 /**
- * Costs as a receipt, not a marketing table. Mono figures line up, which is the
- * point: the brand's second claim is that you can see exactly what you pay.
+ * Costs as a receipt, not a marketing table. This is the one place figures must
+ * line up digit for digit — the brand's second claim is that you can see
+ * exactly what you pay, and a column that doesn't align undercuts it. Hence
+ * `tabular-nums` here and nowhere else.
  *
  * A description list, because every line is a label and its value.
  */
@@ -24,7 +26,7 @@ export function ReceiptTable({ rows, total, note }: ReceiptTableProps) {
 
   return (
     <>
-      <dl className="font-mono text-[15px] leading-[1.6] text-ink">
+      <dl className="font-figure text-[15px] leading-[1.6] tabular-nums text-ink">
         {rows.map((r) => (
           <div key={r.label} className={row}>
             <dt>{r.label}</dt>

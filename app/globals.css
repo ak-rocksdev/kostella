@@ -30,10 +30,15 @@
   --color-occupied-soft: #e7e5e0;
   --color-occupied-faded: #b7b5af; /* room number on a taken cell — grey fill, faded text */
 
-  /* Typefaces — the underlying vars are assigned by next/font in app/layout.tsx */
+  /* Typefaces — the underlying vars are assigned by next/font in app/layout.tsx.
+     Two families, three roles. Archivo does double duty: Expanded for the big
+     identity numerals, normal width for figures, so a price and the building
+     number it belongs to speak with the same voice.
+     (The system originally specified IBM Plex Mono for figures. Replaced at the
+     client's request — see docs/superpowers/specs for the reasoning.) */
   --font-display: var(--font-archivo), sans-serif; /* signage face, expanded numerals */
   --font-body: var(--font-jakarta), sans-serif;
-  --font-mono: var(--font-plex-mono), monospace; /* prices, room codes, receipts */
+  --font-figure: var(--font-archivo), sans-serif; /* prices, room codes, receipts */
 
   /* The eyebrow is the one type step reused verbatim in every section.
      Sentence case everywhere else; ALL CAPS only here. */

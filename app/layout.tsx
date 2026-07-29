@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
-import { Archivo, IBM_Plex_Mono, Plus_Jakarta_Sans } from 'next/font/google'
+import { Archivo, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 
-/* Archivo carries the brand: property and room numbers are set in its Expanded
-   width (font-stretch 125%). That needs the variable font's `wdth` axis, not a
-   static cut. */
+/* Archivo carries the brand twice over, distinguished by width rather than by
+   being a different family:
+     - property and room numbers in its Expanded width (font-stretch 125%)
+     - prices, codes, and receipts at normal width
+   Both need the variable font's `wdth` axis, not a static cut. */
 const archivo = Archivo({
   subsets: ['latin'],
   axes: ['wdth'],
@@ -18,13 +20,6 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 })
 
-const plexMono = IBM_Plex_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-plex-mono',
-  display: 'swap',
-})
-
 export const metadata: Metadata = {
   title: 'Kostella — Beranda',
   description:
@@ -33,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${archivo.variable} ${jakarta.variable} ${plexMono.variable}`}>
+    <html lang="id" className={`${archivo.variable} ${jakarta.variable}`}>
       <body>{children}</body>
     </html>
   )
