@@ -1,16 +1,26 @@
 /**
  * Link targets in one place.
  *
- * The Beranda design links out to the search and property-detail screens.
- * Those exist in the design bundle but are not built yet, so they resolve to
- * `#`. Building them is a single edit here.
+ * Beranda, Pencarian, and Detail are built and link to each other. Everything
+ * still pointing at `#` is a screen the design does not specify yet — survey
+ * booking, the rental application, the partnership page. They stay honest
+ * placeholders rather than invented flows.
  */
 export const routes = {
-  pencarian: '#',
-  detail: '#',
-  franchise: '#franchise',
-  kawasan: '#kawasan',
-  biaya: '#biaya',
-  whatsapp: '#',
+  beranda: '/',
+  pencarian: '/pencarian',
+  /** One property only. Per-property routing needs data for the other thirty. */
+  detail: '/detail',
+
+  // In-page anchors on Beranda.
+  kawasan: '/#kawasan',
+  biaya: '/#biaya',
+  franchise: '/#franchise',
+
+  // Not designed yet.
   survei: '#',
+  ajukanSewa: '#',
+  kemitraan: '#',
+  whatsapp: '#',
+  kawasanLain: '#',
 } as const

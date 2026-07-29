@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button'
 import { SectionEyebrow } from '@/components/ui/Eyebrow'
-import { franchise } from '@/lib/content'
+import { franchise } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
 /**
@@ -17,7 +17,7 @@ export function Franchise() {
             {franchise.body}
           </p>
           <div className="mt-6">
-            <Button href={routes.franchise} variant="inverse">
+            <Button href={routes.kemitraan} variant="inverse">
               {franchise.cta}
             </Button>
           </div>

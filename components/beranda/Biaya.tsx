@@ -1,6 +1,6 @@
 import { ReceiptTable } from '@/components/ui/ReceiptTable'
 import { SectionEyebrow } from '@/components/ui/Eyebrow'
-import { biaya } from '@/lib/content'
+import { biaya } from '@/lib/content/beranda'
 
 /**
  * The second claim: exactly what you pay. Set as a receipt in mono figures,

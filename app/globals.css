@@ -15,6 +15,7 @@
   --color-ink-faint: #9a9892; /* secondary text on the inverse surface */
   --color-line: #d9d7d0; /* dividers, card borders */
   --color-photo-bg: #dddbd4; /* holding colour behind a photo while it loads */
+  --color-map-bg: #e4e2db; /* holding colour behind a map while its tiles load */
 
   /* Brand */
   --color-plum: #57182f; /* primary buttons, active markers, accent rules */
@@ -27,6 +28,7 @@
   --color-held-soft: #f5e3d7;
   --color-occupied: #9a9892;
   --color-occupied-soft: #e7e5e0;
+  --color-occupied-faded: #b7b5af; /* room number on a taken cell — grey fill, faded text */
 
   /* Typefaces — the underlying vars are assigned by next/font in app/layout.tsx */
   --font-display: var(--font-archivo), sans-serif; /* signage face, expanded numerals */
@@ -72,6 +74,18 @@
   }
 }
 
+/* The tool screens — search results, operator dashboard — run wider than the
+   marketing column, because they show inventory side by side with a map. */
+@utility wrap-wide {
+  margin-inline: auto;
+  max-width: 1376px;
+  padding-inline: 20px;
+
+  @media (width >= 40rem) {
+    padding-inline: 32px;
+  }
+}
+
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
@@ -101,8 +115,21 @@
   }
 }
 
-/* The system defines exactly three motion rules and this page uses one (the
-   property-card photo zoom). Honour a reduced-motion preference regardless. */
+/* Motion rule two of three: floor-grid cells stagger in per floor, 40ms apart.
+   The delay is set per cell by FloorGrid. */
+@keyframes kst-cell-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The system defines exactly three motion rules. Honour a reduced-motion
+   preference regardless of which a page uses. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
-import type { Status } from '@/lib/content'
+import type { Status } from '@/lib/content/types'
 
 type Tone = 'plum' | 'neutral' | 'available' | 'held' | 'occupied'
 

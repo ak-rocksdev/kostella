@@ -10,10 +10,8 @@
  * real Kostella images. The four shipped here are stand-ins from the design
  * bundle, and two properties share one file.
  */
-import { routes } from './routes'
-
-/** Availability status. Never communicated by colour alone — each carries text. */
-export type Status = 'available' | 'held' | 'occupied'
+import { routes } from '../routes'
+import type { Status } from './types'
 
 export const nav = [
   { label: 'Cari kamar', href: routes.pencarian, muted: false },
@@ -28,7 +26,7 @@ export const hero = {
   intro:
     '31 gedung di Jakarta, Bandung, dan Bali. Kamar yang tampil di sini benar-benar kosong hari ini.',
   chipPrompt: 'Kamu kuliah atau kerja di mana?',
-  photo: { src: '/images/foto-gedung-1.jpg', alt: 'Ruang bersama di salah satu gedung Kostella' },
+  photo: { src: '/images/ruang-bersama.jpg', alt: 'Ruang bersama di salah satu gedung Kostella' },
   availability: {
     eyebrow: 'Kosong sekarang',
     updated: 'diperbarui hari ini',
@@ -70,7 +68,8 @@ export type Property = {
   number: string
   street: string
   distances: string[]
-  priceFrom: string
+  /** Cheapest monthly rent in the building, in rupiah. */
+  priceFrom: number
   status: Status
   /** Vacant-room count, shown on the badge. Only meaningful when available. */
   count?: number
@@ -94,35 +93,35 @@ export const areas: Area[] = [
         number: '362',
         street: 'Jl. Dr. Susilo 2 No. 362',
         distances: ['Trisakti 1 km', 'Central Park 0,2 km'],
-        priceFrom: 'mulai Rp1.650.000',
+        priceFrom: 1_650_000,
         status: 'available',
         count: 2,
-        photo: '/images/foto-gedung-3.jpg',
+        photo: '/images/tampak-depan.jpg',
       },
       {
         number: '351',
         street: 'Jl. Dr. Susilo 2 No. 351',
         distances: ['Trisakti 1,1 km', 'Terminal Grogol 0,3 km'],
-        priceFrom: 'mulai Rp1.550.000',
+        priceFrom: 1_550_000,
         status: 'available',
         count: 5,
-        photo: '/images/foto-kamar-1.jpg',
+        photo: '/images/kamar-standard.jpg',
       },
       {
         number: '360',
         street: 'Jl. Dr. Susilo 2 No. 360',
         distances: ['Trisakti 1 km', 'Terminal Grogol 0,2 km'],
-        priceFrom: 'mulai Rp1.650.000',
+        priceFrom: 1_650_000,
         status: 'held',
-        photo: '/images/foto-gedung-2.jpg',
+        photo: '/images/kamar-superior.jpg',
       },
       {
         number: '2C',
         street: 'Jl. Dr. Susilo 2C',
         distances: ['Untar 0,9 km', 'Central Park 0,4 km'],
-        priceFrom: 'mulai Rp1.750.000',
+        priceFrom: 1_750_000,
         status: 'occupied',
-        photo: '/images/foto-gedung-1.jpg',
+        photo: '/images/ruang-bersama.jpg',
       },
     ],
   },

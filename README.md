@@ -25,8 +25,19 @@ The design medium is **HTML/CSS/JS** — these are prototypes, not production co
 
 # The implementation
 
-The Beranda screen has been built for real. Everything outside `project/` is the
+Three of the four screens are built. Everything outside `project/` is the
 implementation; `project/` stays as the read-only design reference.
+
+| Route | Screen | Status |
+| --- | --- | --- |
+| `/` | Beranda | Built |
+| `/pencarian` | Hasil pencarian | Built |
+| `/detail` | Detail properti 362 | Built |
+| — | Dashboard pengelola | Not built. The design gives it no entry point from any public screen. |
+
+The three built screens link to each other in both directions. Links still
+pointing at `#` are screens the design does not specify — survey booking, the
+rental application, the partnership page. They are listed in `lib/routes.ts`.
 
 ```bash
 npm install
@@ -42,14 +53,18 @@ Next.js App Router, TypeScript, Tailwind v4.
 | --- | --- |
 | `app/globals.css` | Design tokens, restated in Tailwind's `@theme`. Edit values here. |
 | `app/layout.tsx` | The three brand typefaces, loaded via `next/font`. |
-| `app/page.tsx` | The Beranda composition. |
-| `components/ui/` | The design-system primitives Beranda uses. |
-| `components/beranda/` | Page sections, one per section of the design. |
-| `lib/content.ts` | All copy and figures. |
+| `app/*/page.tsx` | One file per route. |
+| `components/ui/` | Design-system primitives, shared across screens. |
+| `components/beranda/` `components/pencarian/` `components/detail/` | Sections, one per section of each design. |
+| `lib/content/` | All copy and figures, one file per screen. |
+| `lib/content/geography.ts` | Coordinates every map reads from. |
 | `lib/routes.ts` | Link targets — where the unbuilt screens get wired in. |
-| `docs/superpowers/specs/` | The implementation design spec. |
+| `docs/superpowers/specs/` | The implementation design specs. |
 
-Only `Hero` and `FooterMap` ship as Client Components; the rest render on the
-server. Read `docs/superpowers/specs/2026-07-29-beranda-implementation-design.md`
-before changing anything visual — it records which design-system rules the code
-is holding to and why.
+Client Components are kept to where state or the DOM genuinely requires them:
+`Hero`, `HeroGallery`, `RoomExplorer`, `SearchResults`, `FloorGrid`, and
+`LeafletMap`. Everything else renders on the server.
+
+Read the specs in `docs/superpowers/specs/` before changing anything visual —
+they record which design-system rules the code is holding to, and where it
+knowingly departs from the prototype.

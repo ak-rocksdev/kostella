@@ -6,7 +6,7 @@ import { Header } from '@/components/beranda/Header'
 import { Hero } from '@/components/beranda/Hero'
 import { Kawasan } from '@/components/beranda/Kawasan'
 import { ProofBar } from '@/components/ui/ProofBar'
-import { proofPoints } from '@/lib/content'
+import { proofPoints } from '@/lib/content/beranda'
 
 export default function BerandaPage() {
   return (

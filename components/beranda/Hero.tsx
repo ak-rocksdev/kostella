@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
 import { Eyebrow, SectionEyebrow } from '@/components/ui/Eyebrow'
 import { cn } from '@/lib/cn'
-import { areaChips, hero, vacantRooms, type VacantRoom } from '@/lib/content'
+import { areaChips, hero, vacantRooms, type VacantRoom } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
 /** Availability, stated as a date. Green reinforces it; the words carry it. */

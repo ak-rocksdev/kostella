@@ -15,8 +15,11 @@ type ButtonProps = {
   className?: string
 }
 
+/* Border width only. The colour belongs to the variant — setting a colour here
+   too would collide on the same property, and source order rather than intent
+   would decide which one wins. */
 const base =
-  'inline-flex items-center justify-center rounded-badge border border-transparent font-body font-semibold leading-[1.2] transition-colors duration-150'
+  'inline-flex items-center justify-center rounded-badge border font-body font-semibold leading-[1.2] transition-colors duration-150'
 
 const sizes: Record<Size, string> = {
   sm: 'px-3.5 py-[7px] text-[14px]',
@@ -28,11 +31,11 @@ const sizes: Record<Size, string> = {
    values, no client JavaScript. The system's rule is that buttons darken
    slightly — nothing bouncy. */
 const variants: Record<Variant, string> = {
-  primary: 'bg-plum text-white hover:bg-plum-deep',
-  secondary: 'bg-paper text-ink border-line hover:border-ink-soft',
-  ghost: 'bg-transparent text-plum hover:bg-plum-soft',
+  primary: 'border-transparent bg-plum text-white hover:bg-plum-deep',
+  secondary: 'border-line bg-paper text-ink hover:border-ink-soft',
+  ghost: 'border-transparent bg-transparent text-plum hover:bg-plum-soft',
   // Plum focus rings are unreadable on the dark franchise block.
-  inverse: 'bg-stone text-ink hover:bg-line focus-visible:outline-stone',
+  inverse: 'border-transparent bg-stone text-ink hover:bg-line focus-visible:outline-stone',
 }
 
 export function Button({

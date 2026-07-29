@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { StatusBadge } from './Badge'
-import type { Property } from '@/lib/content'
+import { formatRupiah } from '@/lib/format'
+import type { Property } from '@/lib/content/beranda'
 
 type PropertyCardProps = Property & {
   href: string
@@ -55,8 +56,18 @@ export function PropertyCard({
         {distances.length > 0 && (
           <p className="text-[13px] leading-[1.6] text-ink-soft">{distances.join(' · ')}</p>
         )}
-        <div className="mt-1 flex items-center justify-between">
-          <span className="font-mono text-[14px] font-medium text-ink">{priceFrom}</span>
+
+        {/* Price is what the card is scanned for, so it gets its own zone below
+            a hairline, with "mulai" as a quiet label instead of running into the
+            figure. Mono keeps the digits tabular, so prices line up column to
+            column across the grid. */}
+        <div className="mt-2 flex items-end justify-between gap-3 border-t border-line pt-3">
+          <p>
+            <span className="block text-[12px] leading-none text-ink-soft">mulai</span>
+            <span className="mt-1.5 block font-mono text-[20px] leading-none font-medium text-ink">
+              {formatRupiah(priceFrom)}
+            </span>
+          </p>
           <StatusBadge status={status} count={count} />
         </div>
       </div>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { PropertyCard } from '@/components/ui/PropertyCard'
 import { SectionEyebrow } from '@/components/ui/Eyebrow'
-import { areas } from '@/lib/content'
+import { areas } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
 export function Kawasan() {

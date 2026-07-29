@@ -2,7 +2,7 @@ import { BadgeCheck, Clock, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { SectionEyebrow } from '@/components/ui/Eyebrow'
 import { FooterMap } from './FooterMap'
-import { footer } from '@/lib/content'
+import { footer } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
 export function Footer() {

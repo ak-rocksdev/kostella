@@ -2,7 +2,7 @@ import { CalendarCheck, FileText, KeyRound, Search } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { SectionEyebrow } from '@/components/ui/Eyebrow'
 import { cn } from '@/lib/cn'
-import { caraSewa, type StepIcon } from '@/lib/content'
+import { caraSewa, type StepIcon } from '@/lib/content/beranda'
 
 /* Mapped here rather than in content.ts so only the four icons the page uses
    are bundled. Thin-line, 1.5px stroke, 20px — the system's icon rule. */

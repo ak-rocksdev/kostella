@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
-import { nav } from '@/lib/content'
+import { nav } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
 export function Header() {
