@@ -5,8 +5,6 @@ import { Franchise } from '@/components/beranda/Franchise'
 import { Header } from '@/components/beranda/Header'
 import { Hero } from '@/components/beranda/Hero'
 import { Kawasan } from '@/components/beranda/Kawasan'
-import { ProofBar } from '@/components/ui/ProofBar'
-import { proofPoints } from '@/lib/content/beranda'
 
 export default function BerandaPage() {
   return (
@@ -14,7 +12,6 @@ export default function BerandaPage() {
       <Header />
       <main>
         <Hero />
-        <ProofBar items={proofPoints} />
         <Kawasan />
         <Biaya />
         <CaraSewa />

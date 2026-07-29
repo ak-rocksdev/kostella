@@ -137,8 +137,8 @@
 .budget-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 9999px;
   background: var(--color-paper);
   border: 2px solid var(--color-plum);
@@ -146,8 +146,8 @@
 }
 
 .budget-range::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 9999px;
   background: var(--color-paper);
   border: 2px solid var(--color-plum);

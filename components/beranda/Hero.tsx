@@ -7,16 +7,16 @@ import { BudgetPanel, type EmptyReason } from './BudgetPanel'
 import { areaChips, budget, hero, vacantRooms } from '@/lib/content/beranda'
 
 /**
- * The building itself is the page's opening frame, and the argument sits on it.
+ * The hero argues from the renter's side of the screen.
  *
- * Kostella owns and runs every room, so the honest thing to lead with is the
- * place — not a stock scene, not an illustration. The headline and the budget
- * control layer over it: one states the claim, the other lets you test it
- * immediately, which is the whole difference between this and an aggregator.
+ * Everyone who has hunted for a kos has driven across the city to see a room
+ * that turned out to be taken. That is the pain the headline names, and the
+ * budget control beside it is the answer — state a figure, and what comes back
+ * is only what you can actually still take.
  *
- * Results deliberately do not appear here. Stating a budget sends you to the
- * search screen with that figure already set; a hero that previews its own
- * answer gives the visitor two places to read the same list.
+ * Results deliberately do not appear here. Setting a budget sends you to the
+ * search screen with the figure already applied; a hero that answers its own
+ * question gives the visitor two places to read the same list.
  */
 export function Hero() {
   const [area, setArea] = useState(areaChips[0].label)
@@ -44,7 +44,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative isolate bg-ink">
+    <section aria-label="Cari kamar" className="relative isolate bg-ink">
       <div className="absolute inset-0 -z-10">
         <Image
           src={hero.photo.src}
@@ -54,14 +54,15 @@ export function Hero() {
           sizes="100vw"
           className="object-cover"
         />
-        {/* Weighted to the left, where the type sits, so the photo stays
-            readable as a photograph on the right instead of being flattened
-            under an even wash. Held at 70% behind the text: against a fully
-            blown-out photo that still leaves solid stone at 5.6:1, so the
-            wording holds up whatever image is dropped in later. */}
+        {/* Two scrims, because the type moves.
+            Below lg the text spans the full width, so an even wash is the only
+            one that holds — the left-weighted ramp measured 4.26:1 on the lead
+            at 390px, under the 4.5 floor. At lg the type returns to the left
+            half and the ramp comes back, keeping the right side readable as a
+            photograph rather than flattening it. */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-linear-to-r from-ink/90 from-5% via-ink/70 to-ink/35"
+          className="absolute inset-0 bg-ink/78 lg:bg-transparent lg:bg-linear-to-r lg:from-ink/90 lg:from-5% lg:via-ink/70 lg:to-ink/35"
         />
       </div>
 
@@ -72,15 +73,15 @@ export function Hero() {
             <Eyebrow className="inline text-stone">{hero.eyebrow}</Eyebrow>
           </div>
 
-          <h1 className="mt-5 max-w-[15ch] text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.05] font-semibold tracking-[-0.02em] text-stone text-balance">
+          <h1 className="mt-5 max-w-[18ch] text-[clamp(2rem,4.6vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-stone text-balance">
             {hero.heading}
           </h1>
 
           {/* Solid, not translucent. Over a photograph the alpha would eat the
               contrast, and the system's inverse-secondary grey is far too faint
               to survive here — the hierarchy comes from size and weight. */}
-          <p className="mt-6 max-w-[480px] text-[17px] leading-[1.65] text-stone">
-            {hero.intro}
+          <p className="mt-6 max-w-[460px] text-[17px] leading-[1.65] text-stone text-pretty">
+            {hero.lead}
           </p>
         </div>
 

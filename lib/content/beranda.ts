@@ -20,18 +20,32 @@ export const nav = [
   { label: 'Untuk pemilik kos', href: routes.franchise, muted: true },
 ] as const
 
+/**
+ * The hero speaks to the renter, not about the operator.
+ *
+ * Ownership is what makes these promises true, but it is not what the reader
+ * wants — a student hunting for a room does not care who holds the deed. They
+ * care about not wasting an afternoon on a room that was taken last week. So
+ * the pain leads and the mechanism stays out of the frame entirely; it still
+ * carries the franchise block and the property pages, where owners and parents
+ * actually go looking for it.
+ */
 export const hero = {
-  eyebrow: 'Milik & dikelola sendiri sejak 2008',
-  heading: 'Kos yang kamarnya kami kelola sendiri.',
-  intro:
-    '31 gedung di Jakarta, Bandung, dan Bali. Kamar yang tampil di sini benar-benar kosong hari ini.',
+  eyebrow: 'Kos di Jakarta, Bandung, dan Bali',
+  heading: 'Tidak ada lagi survei kamar yang sudah terisi.',
+  lead: 'Setiap kamar di sini dicek tiap hari. Kalau masih tampil, berarti memang masih bisa kamu ambil.',
   chipPrompt: 'Kamu kuliah atau kerja di mana?',
   budgetPrompt: 'Budget maksimal per bulan',
-  photo: { src: '/images/ruang-bersama.jpg', alt: 'Ruang bersama di salah satu gedung Kostella' },
-  availability: {
-    eyebrow: 'Kosong sekarang',
-    updated: 'diperbarui hari ini',
-  },
+  /**
+   * A room, not the shared lounge. The lounge read as a café and its orange
+   * cast fought the palette the brief caps at two non-neutrals. A facade would
+   * suit the brand better still, but the only one on hand is 500px wide and
+   * would break up full-bleed — a high-resolution facade is an asset request.
+   *
+   * Decorative alt: this is a placeholder from the design bundle, not a real
+   * Kostella room, so describing it as one would be false.
+   */
+  photo: { src: '/images/kamar-standard.jpg', alt: '' },
 } as const
 
 /**
@@ -82,13 +96,6 @@ export const vacantRooms: VacantRoom[] = [
   { building: '351', room: '108', type: 'Superior', rent: 1_950_000, vacancy: 'kosong 3 Agu', area: 'Trisakti/Untar' },
   { building: '362', room: '205', type: 'Superior', rent: 1_950_000, vacancy: 'kosong 1 Agu', area: 'Trisakti/Untar' },
   { building: '2A3', room: '108', type: 'Pojok', rent: 2_100_000, vacancy: 'kosong 5 Agu', area: 'Trisakti/Untar' },
-]
-
-export const proofPoints = [
-  { value: '2008', label: 'tahun berdiri' },
-  { value: '31', label: 'gedung dikelola sendiri' },
-  { value: '340', label: 'kamar' },
-  { value: '14 bln', label: 'rata-rata lama tinggal' },
 ]
 
 export type Property = {
