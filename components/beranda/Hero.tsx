@@ -45,24 +45,29 @@ export function Hero() {
 
   return (
     <section aria-label="Cari kamar" className="relative isolate bg-ink">
-      <div className="absolute inset-0 -z-10">
+      {/* Desktop only. At 390 the photograph showed a 345px band under a 78%
+          wash — visually a grey smear, since the panel covers the part of the
+          room worth seeing. It cost a full LCP download to say nothing, so the
+          phone gets the ink surface instead and the warmth comes from the real
+          room photographs in the cards directly below.
+
+          `sizes` is what makes this cheap rather than merely hidden: below lg
+          the browser resolves the preload to the smallest candidate, so the
+          large file is fetched only where it is actually shown. */}
+      <div className="absolute inset-0 -z-10 hidden lg:block">
         <Image
           src={hero.photo.src}
           alt={hero.photo.alt}
           fill
           priority
-          sizes="100vw"
+          sizes="(min-width: 1024px) 100vw, 16px"
           className="object-cover"
         />
-        {/* Two scrims, because the type moves.
-            Below lg the text spans the full width, so an even wash is the only
-            one that holds — the left-weighted ramp measured 4.26:1 on the lead
-            at 390px, under the 4.5 floor. At lg the type returns to the left
-            half and the ramp comes back, keeping the right side readable as a
-            photograph rather than flattening it. */}
+        {/* Weighted to the left, where the type sits, so the right side stays
+            readable as a photograph rather than flattening under an even wash. */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-ink/78 lg:bg-transparent lg:bg-linear-to-r lg:from-ink/90 lg:from-5% lg:via-ink/70 lg:to-ink/35"
+          className="absolute inset-0 bg-linear-to-r from-ink/90 from-5% via-ink/70 to-ink/35"
         />
       </div>
 

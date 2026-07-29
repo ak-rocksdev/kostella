@@ -48,11 +48,22 @@ export function BudgetPanel({
   const progress = ((amount - budget.min) / (budget.max - budget.min)) * 100
 
   return (
-    <div className="rounded-card border border-line bg-paper p-5 shadow-float sm:p-7">
+    // min-w-0: as a grid item this defaults to min-width:auto, which refuses to
+    // shrink below the chip row's content width — so the row never scrolls, it
+    // widens the panel instead and takes the page with it.
+    <div className="min-w-0 rounded-card border border-line bg-paper p-5 shadow-float sm:p-7">
       <p id="area-prompt" className="text-[15px] leading-[1.6] font-semibold">
         {hero.chipPrompt}
       </p>
-      <div role="group" aria-labelledby="area-prompt" className="mt-3 flex flex-wrap gap-2">
+      {/* One scrolling row on a phone, where two wrapped rows cost 148px — the
+          panel's single largest block — and pushed the action past the fold.
+          The row bleeds to the panel's edge so the cut-off chip reads as "there
+          is more", and it wraps normally again once there is room. */}
+      <div
+        role="group"
+        aria-labelledby="area-prompt"
+        className="mt-3 -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:-mx-7 sm:px-7 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0"
+      >
         {areaChips.map((chip) => (
           <Chip
             key={chip.label}
@@ -104,9 +115,19 @@ export function BudgetPanel({
         <span>{formatRupiah(budget.max)}</span>
       </div>
 
-      {/* Never invite someone to view nothing: with no match the action widens
-          the search, and the line beneath says how to get a result instead. */}
-      <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
+      {/* The count sits above the action, not after it. It is the reason to
+          press the button, and below it the line landed on the fold and went
+          unread. Never invite someone to view nothing either: with no match the
+          action widens the search instead of counting to zero. */}
+      <div className="mt-6">
+        {emptyReason ? (
+          <SearchHint reason={emptyReason} onFix={onFixEmpty} />
+        ) : (
+          <p aria-live="polite" className="mb-3 text-[13px] leading-[1.5] text-ink-soft">
+            {matchCount} dari {totalCount} kamar masuk budget kamu
+          </p>
+        )}
+
         <Link
           href={routes.pencarian}
           className="inline-flex items-center justify-center gap-2 rounded-badge border border-transparent bg-plum px-7 py-3.5 font-body text-[16px] leading-[1.2] font-semibold text-white transition-colors duration-150 hover:bg-plum-deep"
@@ -114,15 +135,6 @@ export function BudgetPanel({
           {matchCount > 0 ? `Lihat ${matchCount} kamar kosong` : 'Lihat semua kamar'}
           <ArrowRight size={18} strokeWidth={1.5} aria-hidden />
         </Link>
-
-        {emptyReason ? (
-          <SearchHint reason={emptyReason} onFix={onFixEmpty} />
-        ) : (
-          <p aria-live="polite" className="text-[13px] leading-[1.5] text-ink-soft">
-            {matchCount} dari {totalCount} kamar
-            <br className="hidden sm:block" /> masuk budget kamu
-          </p>
-        )}
       </div>
     </div>
   )
@@ -142,9 +154,8 @@ function SearchHint({ reason, onFix }: { reason: EmptyReason; onFix: () => void 
         }
 
   return (
-    <p aria-live="polite" className="text-[13px] leading-[1.5] text-ink-soft">
-      {copy.line}
-      <br className="hidden sm:block" />{' '}
+    <p aria-live="polite" className="mb-3 text-[13px] leading-[1.5] text-ink-soft">
+      {copy.line}{' '}
       <button
         type="button"
         onClick={onFix}
