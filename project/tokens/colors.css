@@ -1,0 +1,25 @@
+:root{
+/* Neutrals */
+--stone:#EDECE7; /* page background — cool stone grey, NOT cream */
+--paper:#FFFFFF; /* cards, panels, raised surfaces */
+--ink:#16171A; /* primary text, big numbers */
+--ink-soft:#5E5F62; /* secondary text, labels */
+--line:#D9D7D0; /* dividers, card borders */
+/* Brand */
+--plum:#57182F; /* primary buttons, active markers, accent rules */
+--plum-soft:#F3E7EA; /* badge backgrounds, soft highlight */
+/* Status — availability only, never decoration */
+--available:#2E7D52;
+--held:#B4531E;
+--occupied:#9A9892;
+/* Semantic aliases */
+--surface-page:var(--stone);
+--surface-card:var(--paper);
+--surface-inverse:var(--ink);
+--text-body:var(--ink);
+--text-soft:var(--ink-soft);
+--text-inverse:var(--stone);
+--border-default:var(--line);
+--action-primary:var(--plum);
+--action-primary-soft:var(--plum-soft);
+}

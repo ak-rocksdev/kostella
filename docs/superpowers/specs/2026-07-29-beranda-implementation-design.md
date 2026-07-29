@@ -203,3 +203,28 @@ everything needed and asks that the prototypes not be rendered unless requested.
   production site would use its own tile provider.
 - **Photos are placeholders.** The brand brief forbids stock photos and expects real
   Kostella photography. The four images ship from the bundle as-is.
+
+## Outcome
+
+Built and verified on 2026-07-29. `tsc --noEmit`, `next build`, and `eslint` all pass
+clean, and the page renders with no console errors.
+
+The Archivo risk did not materialise: `next/font/google` loads the `wdth` axis, and the
+compiled CSS carries `font-stretch: 125%`. The expanded numerals are correct.
+
+Two defects surfaced during verification and were fixed:
+
+1. **Horizontal page overflow below 640px.** The CaraSewa dividers used a 28px negative
+   inline margin to bleed past the content column, but the mobile gutter is 20px, so the
+   grid pushed 8px past the viewport on each side. The bleed now applies only from `sm`
+   up, where the 32px gutter absorbs it; at one column the steps sit flush and the rules
+   span the column's full width. Verified with no horizontal overflow at 360, 390, 500,
+   640, 768, 1024, 1280, and 1440.
+2. **Map markers rendered as a single digit.** Leaflet's `DivIcon` defaults to a 12×12
+   box, which clipped "362" to "3". The prototype passed `iconSize: null` to disable it;
+   the port now clears the option so each plate sizes to its own label.
+
+One deviation from the design system is carried over deliberately from the prototype: the
+hero availability card uses `0 12px 32px rgba(22,23,26,0.10)`, a heavier shadow than the
+system's "max one shadow" rule allows. It is named `--shadow-float` and commented rather
+than left as a magic value, so the exception is visible.

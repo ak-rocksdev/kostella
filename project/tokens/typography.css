@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=Plus+Jakarta+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+--font-display:'Archivo',sans-serif; /* signage face; expanded width for numbers */
+--font-body:'Plus Jakarta Sans',sans-serif;
+--font-mono:'IBM Plex Mono',monospace; /* prices, room codes, receipt tables */
+/* Type scale */
+--text-number-hero:140px; /* property number, lh 0.85, Archivo Expanded 700 */
+--text-number-hero-sm:96px;
+--text-h1:44px; /* lh 1.1, Jakarta 600 */
+--text-h2:30px; /* lh 1.2, 600 */
+--text-h3:21px; /* lh 1.3, 600 */
+--text-body-size:16px; /* lh 1.65, 400 */
+--text-body-sm:14px; /* lh 1.6, 400 */
+--text-eyebrow:12px; /* lh 1.4, tracking .08em, 600, ALL CAPS (only here) */
+--text-price-lg:32px; /* Plex Mono 500 */
+--text-room-code:15px; /* Plex Mono 500 */
+--tracking-eyebrow:0.08em;
+--number-stretch:125%; /* font-stretch for Archivo Expanded numbers */
+}

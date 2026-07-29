@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Kostella">
+  <rect width="32" height="32" rx="4" fill="#57182F" />
+  <text
+    x="16"
+    y="23"
+    text-anchor="middle"
+    fill="#EDECE7"
+    font-family="Archivo, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="21"
+    font-weight="700"
+  >K</text>
+</svg>

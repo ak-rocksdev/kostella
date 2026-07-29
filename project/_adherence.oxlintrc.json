@@ -1,0 +1,260 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/core/**",
+              "ui_kits/beranda/**",
+              "ui_kits/dashboard/**",
+              "ui_kits/detail/**",
+              "ui_kits/pencarian/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Archivo|Plus Jakarta Sans|IBM Plex Mono))/i]",
+        "message": "Font not provided by the design system. Available: Archivo, Plus Jakarta Sans, IBM Plex Mono."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute > JSXIdentifier[name!=/^(?:tone|children|style|key|ref|className|style|children)$/]",
+        "message": "<Badge> doesn't accept that prop. Declared props: tone, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:plum|neutral|available|held|occupied)$/]",
+        "message": "<Badge> tone must be one of 'plum' | 'neutral' | 'available' | 'held' | 'occupied'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|disabled|onClick|children|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, disabled, onClick, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|secondary|ghost|inverse)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'secondary' | 'ghost' | 'inverse'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute > JSXIdentifier[name!=/^(?:selected|onClick|children|style|key|ref|className|style|children)$/]",
+        "message": "<Chip> doesn't accept that prop. Declared props: selected, onClick, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Eyebrow'] > JSXAttribute > JSXIdentifier[name!=/^(?:inverse|children|style|key|ref|className|style|children)$/]",
+        "message": "<Eyebrow> doesn't accept that prop. Declared props: inverse, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Room'] > JSXAttribute > JSXIdentifier[name!=/^(?:room|status|type|price|key|ref|className|style|children)$/]",
+        "message": "<Room> doesn't accept that prop. Declared props: room, status, type, price."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Room'] > JSXAttribute[name.name='status'] > Literal[value!=/^(?:available|held|occupied)$/]",
+        "message": "<Room> status must be one of 'available' | 'held' | 'occupied'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Input'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|placeholder|onChange|style|key|ref|className|style|children)$/]",
+        "message": "<Input> doesn't accept that prop. Declared props: label, value, placeholder, onChange, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MetricCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|detail|style|key|ref|className|style|children)$/]",
+        "message": "<MetricCard> doesn't accept that prop. Declared props: label, value, detail, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PropertyCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:number|street|distances|priceFrom|status|count|photo|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<PropertyCard> doesn't accept that prop. Declared props: number, street, distances, priceFrom, status, count, photo, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PropertyCard'] > JSXAttribute[name.name='status'] > Literal[value!=/^(?:available|held|occupied)$/]",
+        "message": "<PropertyCard> status must be one of 'available' | 'held' | 'occupied'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ReceiptRow'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|soft|key|ref|className|style|children)$/]",
+        "message": "<ReceiptRow> doesn't accept that prop. Declared props: label, value, soft."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Badge": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": []
+      },
+      "Chip": {
+        "replaces": []
+      },
+      "Eyebrow": {
+        "replaces": []
+      },
+      "Room": {
+        "replaces": []
+      },
+      "Input": {
+        "replaces": []
+      },
+      "MetricCard": {
+        "replaces": []
+      },
+      "PropertyCard": {
+        "replaces": []
+      },
+      "ReceiptRow": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--action-primary",
+      "--action-primary-soft",
+      "--available",
+      "--border-default",
+      "--content-max",
+      "--font-body",
+      "--font-display",
+      "--font-mono",
+      "--held",
+      "--icon-size",
+      "--icon-stroke",
+      "--ink",
+      "--ink-soft",
+      "--line",
+      "--number-stretch",
+      "--occupied",
+      "--paper",
+      "--plum",
+      "--plum-soft",
+      "--radius-badge",
+      "--radius-card",
+      "--radius-room",
+      "--section-pad-desktop",
+      "--section-pad-mobile",
+      "--shadow-max",
+      "--sp-1",
+      "--sp-10",
+      "--sp-2",
+      "--sp-3",
+      "--sp-4",
+      "--sp-5",
+      "--sp-6",
+      "--sp-7",
+      "--sp-8",
+      "--sp-9",
+      "--stone",
+      "--surface-card",
+      "--surface-inverse",
+      "--surface-page",
+      "--text-body",
+      "--text-body-size",
+      "--text-body-sm",
+      "--text-col-max",
+      "--text-eyebrow",
+      "--text-h1",
+      "--text-h2",
+      "--text-h3",
+      "--text-inverse",
+      "--text-number-hero",
+      "--text-number-hero-sm",
+      "--text-price-lg",
+      "--text-room-code",
+      "--text-soft",
+      "--tracking-eyebrow"
+    ],
+    "tokenKinds": {
+      "--stone": "color",
+      "--paper": "color",
+      "--ink": "color",
+      "--ink-soft": "color",
+      "--line": "color",
+      "--plum": "color",
+      "--plum-soft": "color",
+      "--available": "color",
+      "--held": "color",
+      "--occupied": "color",
+      "--surface-page": "color",
+      "--surface-card": "color",
+      "--surface-inverse": "color",
+      "--text-body": "font",
+      "--text-soft": "font",
+      "--text-inverse": "font",
+      "--border-default": "color",
+      "--action-primary": "color",
+      "--action-primary-soft": "color",
+      "--font-display": "font",
+      "--font-body": "font",
+      "--font-mono": "font",
+      "--text-number-hero": "font",
+      "--text-number-hero-sm": "font",
+      "--text-h1": "font",
+      "--text-h2": "font",
+      "--text-h3": "font",
+      "--text-body-size": "font",
+      "--text-body-sm": "font",
+      "--text-eyebrow": "font",
+      "--text-price-lg": "font",
+      "--text-room-code": "font",
+      "--tracking-eyebrow": "font",
+      "--number-stretch": "spacing",
+      "--sp-1": "spacing",
+      "--sp-2": "spacing",
+      "--sp-3": "spacing",
+      "--sp-4": "spacing",
+      "--sp-5": "spacing",
+      "--sp-6": "spacing",
+      "--sp-7": "spacing",
+      "--sp-8": "spacing",
+      "--sp-9": "spacing",
+      "--sp-10": "spacing",
+      "--section-pad-desktop": "spacing",
+      "--section-pad-mobile": "spacing",
+      "--content-max": "spacing",
+      "--text-col-max": "font",
+      "--radius-badge": "radius",
+      "--radius-card": "radius",
+      "--radius-room": "radius",
+      "--shadow-max": "shadow",
+      "--icon-size": "spacing",
+      "--icon-stroke": "color"
+    },
+    "fontFamilies": [
+      "Archivo",
+      "IBM Plex Mono",
+      "Plus Jakarta Sans"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+<!-- @dsCard group="Components" viewport="700x760" name="Core" subtitle="Button, Chip, Badge, Input, FloorGrid, PropertyCard, ReceiptTable, MetricCard, ProofBar" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--stone);font-family:var(--font-body)}
+.sec{padding:14px 20px;border-bottom:1px solid var(--line)}
+.lb{font:600 11px var(--font-body);letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+a{color:var(--plum)}a:hover{color:var(--ink)}</style></head><body>
+<div id="root"></div>
+<script type="text/babel">
+const { Button, Chip, Badge, StatusBadge, Input, Eyebrow, FloorGrid, FloorGridLegend, PropertyCard, ReceiptTable, MetricCard, ProofBar } = window.KostellaDesignSystem_f6d153;
+function Card() {
+  return <div>
+    <div className="sec"><span className="lb">Button</span><div className="row">
+      <Button variant="primary">Jadwalkan survei</Button><Button variant="secondary">Ajukan sewa</Button><Button variant="ghost">Lihat semua</Button><Button variant="primary" disabled>Jadwalkan survei</Button>
+    </div></div>
+    <div className="sec"><span className="lb">Chip · Badge</span><div className="row">
+      <Chip selected>Trisakti/Untar</Chip><Chip>Kamar mandi dalam</Chip><Chip>&lt; Rp2 juta</Chip>
+      <Badge tone="plum">Khusus putri</Badge><StatusBadge status="available" count={5} /><StatusBadge status="held" /><StatusBadge status="occupied" />
+    </div></div>
+    <div className="sec"><span className="lb">Input · Eyebrow</span><div className="row" style={{alignItems:'flex-end'}}>
+      <Input label="Nomor WhatsApp" placeholder="08xx xxxx xxxx" /><Eyebrow>Milik &amp; dikelola sendiri sejak 2008</Eyebrow>
+    </div></div>
+    <div className="sec"><span className="lb">FloorGrid (compact)</span>
+      <FloorGrid compact floors={[
+        { label: 'Lantai 2', rooms: [{room:'205',status:'held'},{room:'208',status:'occupied'},{room:'211',status:'available'},{room:'212',status:'occupied'}] },
+        { label: 'Lantai 1', rooms: [{room:'101',status:'occupied'},{room:'105',status:'available'},{room:'107',status:'occupied'}] },
+      ]} selectedRoom="105" />
+      <div style={{marginTop:10}}><FloorGridLegend /></div>
+    </div>
+    <div className="sec" style={{display:'flex',gap:20}}>
+      <div style={{width:200}}><span className="lb">PropertyCard</span>
+        <PropertyCard number="362" street="Jl. Dr. Susilo 2 No. 362" distances={['Trisakti 1 km','Central Park 0,2 km']} priceFrom="mulai Rp1.650.000" status="available" count={2} /></div>
+      <div style={{flex:1}}><span className="lb">ReceiptTable</span>
+        <ReceiptTable rows={[{label:'Sewa bulanan',value:'Rp 1.650.000'},{label:'Deposit (dikembalikan)',value:'Rp 1.500.000'},{label:'Listrik',value:'dihitung terpisah',soft:true}]} total={{label:'Bayar di awal',value:'Rp 3.150.000'}} /></div>
+    </div>
+    <div className="sec" style={{borderBottom:'none'}}><span className="lb">MetricCard · ProofBar</span>
+      <div className="row"><MetricCard label="Okupansi" value="8/11" detail="2 kamar kosong" /><div style={{flex:1}}><ProofBar items={[{value:'2008',label:'berdiri'},{value:'31',label:'gedung'},{value:'340',label:'kamar'}]} /></div></div>
+    </div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Card />);
+</script>
+</body></html>

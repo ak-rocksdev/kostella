@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+/* ─── Design tokens ────────────────────────────────────────────────────────
+   Mirrors project/tokens/{colors,typography,layout}.css from the Kostella
+   Design System. This block is the single place a token value is edited —
+   every utility in the app derives from it. */
+@theme {
+  /* Neutrals */
+  --color-stone: #edece7; /* page background — cool stone grey, NOT cream */
+  --color-paper: #ffffff; /* cards, panels, raised surfaces */
+  --color-ink: #16171a; /* primary text, big numbers */
+  --color-ink-soft: #5e5f62; /* secondary text, labels */
+  /* Shares a value with --occupied but is a neutral, not a status. Named
+     separately so the "status colours never decorate" rule stays legible. */
+  --color-ink-faint: #9a9892; /* secondary text on the inverse surface */
+  --color-line: #d9d7d0; /* dividers, card borders */
+  --color-photo-bg: #dddbd4; /* holding colour behind a photo while it loads */
+
+  /* Brand */
+  --color-plum: #57182f; /* primary buttons, active markers, accent rules */
+  --color-plum-soft: #f3e7ea; /* badge backgrounds, soft highlight */
+  --color-plum-deep: #451325; /* primary button hover — from Button.jsx, no token upstream */
+
+  /* Status — availability only, never decoration */
+  --color-available: #2e7d52;
+  --color-held: #b4531e;
+  --color-held-soft: #f5e3d7;
+  --color-occupied: #9a9892;
+  --color-occupied-soft: #e7e5e0;
+
+  /* Typefaces — the underlying vars are assigned by next/font in app/layout.tsx */
+  --font-display: var(--font-archivo), sans-serif; /* signage face, expanded numerals */
+  --font-body: var(--font-jakarta), sans-serif;
+  --font-mono: var(--font-plex-mono), monospace; /* prices, room codes, receipts */
+
+  /* The eyebrow is the one type step reused verbatim in every section.
+     Sentence case everywhere else; ALL CAPS only here. */
+  --text-eyebrow: 12px;
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--letter-spacing: 0.08em;
+  --text-eyebrow--font-weight: 600;
+
+  /* Radii */
+  --radius-badge: 4px; /* badges + inputs */
+  --radius-card: 12px; /* cards */
+
+  /* Elevation — separation comes from 1px --line rules, not shadows. */
+  --shadow-max: 0 1px 2px rgba(22, 23, 26, 0.06);
+  /* The hero availability card is the one surface that lifts off the page,
+     because it overlaps the photo behind it. Deviates from the system's
+     "max one shadow" rule; carried over from the prototype deliberately. */
+  --shadow-float: 0 12px 32px rgba(22, 23, 26, 0.1);
+}
+
+/* Archivo Expanded numerals are the brand's identity — property numbers, room
+   numbers, stats. Packaged as a utility because it recurs in seven places. */
+@utility numeral {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 700;
+}
+
+/* Content column: max 1200px, centred, 32px gutters. Every section uses it, so
+   the page's vertical rhythm reads as one column. */
+@utility wrap {
+  margin-inline: auto;
+  max-width: 1200px;
+  padding-inline: 20px;
+
+  @media (width >= 40rem) {
+    padding-inline: 32px;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-stone);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+  }
+
+  a {
+    color: var(--color-plum);
+  }
+
+  a:hover {
+    color: var(--color-ink);
+  }
+
+  /* The prototype ships no focus styles. Every interactive element gets a
+     visible one; the inverse surface overrides the colour where plum on ink
+     would be unreadable. */
+  :focus-visible {
+    outline: 2px solid var(--color-plum);
+    outline-offset: 2px;
+  }
+}
+
+/* The system defines exactly three motion rules and this page uses one (the
+   property-card photo zoom). Honour a reduced-motion preference regardless. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
