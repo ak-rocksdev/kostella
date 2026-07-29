@@ -220,13 +220,28 @@ every rent exactly. So the hero asks for a budget, and the inventory answers
 immediately. The claim is demonstrated rather than asserted — something an
 aggregator reselling other people's listings could not show.
 
-**Structure.** Two bands:
+**Structure.** One frame. The building runs full width directly beneath the
+navbar and the argument sits on it: eyebrow, headline, and intro on the left,
+the budget panel as an opaque paper card on the right.
 
-1. Stone. Eyebrow, headline, and intro on the left; the budget panel on the
-   right. The panel holds the area chips, the budget control, and a primary
-   action whose label carries the live count.
-2. The building, edge to edge, with the "Kosong sekarang" card floating over it.
-   The photo is the promise and the list is the proof, so they share one frame.
+Kostella owns and runs every room, so the honest thing to open with is the place
+itself. The headline states the claim and the control lets you test it in the
+same view.
+
+**Results do not appear in the hero.** An earlier pass previewed the matching
+rooms on the photo; that was cut. Setting a budget sends you to the search
+screen with the figure already applied, and a hero that answers its own question
+gives the visitor two places to read the same list. The guidance that lived on
+that card — what to do when nothing matches — moved into the panel, so nobody
+gets stranded on a figure that returns nothing.
+
+**Text over photography.** The scrim runs left to right (`ink/90` → `ink/70` →
+`ink/35`), weighted to where the type sits so the right-hand side still reads as
+a photograph rather than an even wash. Type over it is solid `--stone`, never
+translucent: against a blown-out photo, alpha eats the contrast, and the
+system's inverse-secondary grey (`#9A9892`) falls to about 2.4:1 and is unusable
+here. Solid stone holds 5.6:1 in the worst case, so the wording survives whatever
+photograph is dropped in later. Hierarchy comes from size and weight instead.
 
 **The signature** is the budget figure itself, set in Archivo Expanded at
 `clamp(1.75rem, 4vw, 2.25rem)` — the same treatment as the building plates. The
@@ -238,13 +253,13 @@ screen readers work without reimplementation. Its track and fill are drawn as
 elements behind a transparent native track, because the system forbids gradients
 and a gradient is the usual way to fill a range track.
 
-**Empty states are designed, not accidental.** Two can occur, and each offers
-the way out rather than a dead end:
+**Empty states are designed, not accidental.** Two can occur, and each states
+the way out inline in the panel rather than leaving a dead end:
 
-- Budget below every rent → "Yang termurah Rp1.550.000 di gedung 351", with a
-  button that raises the budget to exactly that figure.
-- An area with no inventory → "Yang terdekat ada di Trisakti/Untar", with a
-  button that switches to it.
+- Budget below every rent → "Termurah Rp1.550.000 di gedung 351", with a control
+  that raises the budget to exactly that figure.
+- An area with no inventory → "Belum ada kamar kosong di Bandung", with a control
+  that switches to the nearest area that has some.
 
 With no match the primary action becomes "Lihat semua kamar" rather than
 counting to zero, and the "n dari m" line is suppressed when the area holds

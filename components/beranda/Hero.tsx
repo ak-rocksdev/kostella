@@ -2,55 +2,84 @@
 
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
-import { SectionEyebrow } from '@/components/ui/Eyebrow'
-import { AvailabilityCard, type EmptyReason } from './AvailabilityCard'
-import { BudgetPanel } from './BudgetPanel'
+import { Eyebrow } from '@/components/ui/Eyebrow'
+import { BudgetPanel, type EmptyReason } from './BudgetPanel'
 import { areaChips, budget, hero, vacantRooms } from '@/lib/content/beranda'
 
 /**
- * The hero is a live demonstration, not a description.
+ * The building itself is the page's opening frame, and the argument sits on it.
  *
- * The brand's two claims are that it knows which rooms are genuinely empty and
- * exactly what they cost. So the visitor sets a budget and the inventory answers
- * immediately — the proof happens in front of them, which is something no
- * aggregator reselling someone else's listings could show.
+ * Kostella owns and runs every room, so the honest thing to lead with is the
+ * place — not a stock scene, not an illustration. The headline and the budget
+ * control layer over it: one states the claim, the other lets you test it
+ * immediately, which is the whole difference between this and an aggregator.
  *
- * It reads as two bands: the argument and its control on stone, then the
- * building itself running edge to edge with the live list floating over it.
+ * Results deliberately do not appear here. Stating a budget sends you to the
+ * search screen with that figure already set; a hero that previews its own
+ * answer gives the visitor two places to read the same list.
  */
 export function Hero() {
   const [area, setArea] = useState(areaChips[0].label)
   const [amount, setAmount] = useState<number>(budget.initial)
 
   const inArea = useMemo(() => vacantRooms.filter((room) => room.area === area), [area])
-  const matches = useMemo(() => inArea.filter((room) => room.rent <= amount), [inArea, amount])
+  const matchCount = useMemo(
+    () => inArea.filter((room) => room.rent <= amount).length,
+    [inArea, amount],
+  )
 
   const selectedChip = areaChips.find((chip) => chip.label === area)
-  const cheapestInArea = inArea[0]
+  const cheapest = inArea[0]
 
   let emptyReason: EmptyReason | null = null
   if (inArea.length === 0 && selectedChip?.nearest) {
     emptyReason = { kind: 'area', area, nearest: selectedChip.nearest }
-  } else if (matches.length === 0 && cheapestInArea) {
-    emptyReason = { kind: 'budget', cheapest: cheapestInArea }
+  } else if (matchCount === 0 && cheapest) {
+    emptyReason = { kind: 'budget', cheapest: cheapest.rent, building: cheapest.building }
   }
 
   const fixEmpty = () => {
     if (emptyReason?.kind === 'area') setArea(emptyReason.nearest)
-    if (emptyReason?.kind === 'budget') setAmount(emptyReason.cheapest.rent)
+    if (emptyReason?.kind === 'budget') setAmount(emptyReason.cheapest)
   }
 
   return (
-    <section className="bg-stone">
-      <div className="wrap grid items-start gap-10 pt-14 pb-12 sm:pt-20 lg:grid-cols-[1fr_1fr] lg:gap-16">
-        <div className="lg:pt-2">
-          <SectionEyebrow>{hero.eyebrow}</SectionEyebrow>
+    <section className="relative isolate bg-ink">
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src={hero.photo.src}
+          alt={hero.photo.alt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* Weighted to the left, where the type sits, so the photo stays
+            readable as a photograph on the right instead of being flattened
+            under an even wash. Held at 70% behind the text: against a fully
+            blown-out photo that still leaves solid stone at 5.6:1, so the
+            wording holds up whatever image is dropped in later. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-r from-ink/90 from-5% via-ink/70 to-ink/35"
+        />
+      </div>
 
-          <h1 className="mt-5 text-[clamp(2rem,5vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.015em] text-balance">
+      <div className="wrap grid items-center gap-10 py-14 sm:py-20 lg:min-h-[620px] lg:grid-cols-[1fr_minmax(0,460px)] lg:gap-16 lg:py-24">
+        <div>
+          <div className="flex items-center gap-3">
+            <span aria-hidden className="h-0.5 w-8 shrink-0 bg-stone" />
+            <Eyebrow className="inline text-stone">{hero.eyebrow}</Eyebrow>
+          </div>
+
+          <h1 className="mt-5 max-w-[15ch] text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.05] font-semibold tracking-[-0.02em] text-stone text-balance">
             {hero.heading}
           </h1>
 
-          <p className="mt-5 max-w-[460px] text-[17px] leading-[1.65] text-ink-soft">
+          {/* Solid, not translucent. Over a photograph the alpha would eat the
+              contrast, and the system's inverse-secondary grey is far too faint
+              to survive here — the hierarchy comes from size and weight. */}
+          <p className="mt-6 max-w-[480px] text-[17px] leading-[1.65] text-stone">
             {hero.intro}
           </p>
         </div>
@@ -60,39 +89,11 @@ export function Hero() {
           onAreaChange={setArea}
           amount={amount}
           onAmountChange={setAmount}
-          matchCount={matches.length}
+          matchCount={matchCount}
           totalCount={inArea.length}
+          emptyReason={emptyReason}
+          onFixEmpty={fixEmpty}
         />
-      </div>
-
-      {/* The building, edge to edge. The list sits on it because the photo is
-          the promise and the list is the proof — they belong in one frame. */}
-      <div className="relative">
-        <div className="relative aspect-3/2 w-full sm:aspect-21/9 lg:h-[460px] lg:aspect-auto">
-          <Image
-            src={hero.photo.src}
-            alt={hero.photo.alt}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          {/* Keeps the floating card's edge readable against a bright photo. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink/25 to-transparent to-40%"
-          />
-        </div>
-
-        <div className="wrap relative -mt-16 pb-4 sm:-mt-24 lg:mt-0 lg:pb-0">
-          <AvailabilityCard
-            rooms={matches}
-            area={area}
-            emptyReason={emptyReason}
-            onFixEmpty={fixEmpty}
-            className="lg:absolute lg:right-8 lg:bottom-10 lg:w-[440px]"
-          />
-        </div>
       </div>
     </section>
   )

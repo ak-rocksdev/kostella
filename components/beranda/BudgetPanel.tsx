@@ -7,6 +7,11 @@ import { areaChips, budget, hero } from '@/lib/content/beranda'
 import { formatRupiah } from '@/lib/format'
 import { routes } from '@/lib/routes'
 
+/** Why the search currently returns nothing, and what to do about it. */
+export type EmptyReason =
+  | { kind: 'area'; area: string; nearest: string }
+  | { kind: 'budget'; cheapest: number; building: string }
+
 type BudgetPanelProps = {
   area: string
   onAreaChange: (area: string) => void
@@ -14,6 +19,8 @@ type BudgetPanelProps = {
   onAmountChange: (amount: number) => void
   matchCount: number
   totalCount: number
+  emptyReason: EmptyReason | null
+  onFixEmpty: () => void
 }
 
 /**
@@ -22,7 +29,11 @@ type BudgetPanelProps = {
  * Every competitor opens with a location box. Kostella can open with money,
  * because it owns its buildings and therefore knows every rent exactly — so the
  * budget becomes the brand's own number, set in the same Expanded numerals as
- * the building plates. You state a figure and the inventory answers it.
+ * the building plates. You state a figure and the panel tells you, before you
+ * click anything, how much of the inventory it reaches.
+ *
+ * The results themselves live on the search screen. This panel's job is to send
+ * you there with a figure already set, not to preview the answer.
  */
 export function BudgetPanel({
   area,
@@ -31,19 +42,17 @@ export function BudgetPanel({
   onAmountChange,
   matchCount,
   totalCount,
+  emptyReason,
+  onFixEmpty,
 }: BudgetPanelProps) {
   const progress = ((amount - budget.min) / (budget.max - budget.min)) * 100
 
   return (
-    <div className="rounded-card border border-line bg-paper p-5 shadow-max sm:p-7">
+    <div className="rounded-card border border-line bg-paper p-5 shadow-float sm:p-7">
       <p id="area-prompt" className="text-[15px] leading-[1.6] font-semibold">
         {hero.chipPrompt}
       </p>
-      <div
-        role="group"
-        aria-labelledby="area-prompt"
-        className="mt-3 flex flex-wrap gap-2"
-      >
+      <div role="group" aria-labelledby="area-prompt" className="mt-3 flex flex-wrap gap-2">
         {areaChips.map((chip) => (
           <Chip
             key={chip.label}
@@ -96,7 +105,7 @@ export function BudgetPanel({
       </div>
 
       {/* Never invite someone to view nothing: with no match the action widens
-          the search instead of counting to zero. */}
+          the search, and the line beneath says how to get a result instead. */}
       <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
         <Link
           href={routes.pencarian}
@@ -105,7 +114,10 @@ export function BudgetPanel({
           {matchCount > 0 ? `Lihat ${matchCount} kamar kosong` : 'Lihat semua kamar'}
           <ArrowRight size={18} strokeWidth={1.5} aria-hidden />
         </Link>
-        {totalCount > 0 && (
+
+        {emptyReason ? (
+          <SearchHint reason={emptyReason} onFix={onFixEmpty} />
+        ) : (
           <p aria-live="polite" className="text-[13px] leading-[1.5] text-ink-soft">
             {matchCount} dari {totalCount} kamar
             <br className="hidden sm:block" /> masuk budget kamu
@@ -113,5 +125,33 @@ export function BudgetPanel({
         )}
       </div>
     </div>
+  )
+}
+
+/** An empty result is an invitation to act, never a dead end. */
+function SearchHint({ reason, onFix }: { reason: EmptyReason; onFix: () => void }) {
+  const copy =
+    reason.kind === 'area'
+      ? {
+          line: `Belum ada kamar kosong di ${reason.area}.`,
+          action: `Coba ${reason.nearest}`,
+        }
+      : {
+          line: `Termurah ${formatRupiah(reason.cheapest)} di gedung ${reason.building}.`,
+          action: `Naikkan ke ${formatRupiah(reason.cheapest)}`,
+        }
+
+  return (
+    <p aria-live="polite" className="text-[13px] leading-[1.5] text-ink-soft">
+      {copy.line}
+      <br className="hidden sm:block" />{' '}
+      <button
+        type="button"
+        onClick={onFix}
+        className="cursor-pointer font-semibold text-plum underline underline-offset-2 hover:text-ink"
+      >
+        {copy.action}
+      </button>
+    </p>
   )
 }
