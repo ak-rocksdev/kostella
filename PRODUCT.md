@@ -56,11 +56,18 @@ by invented names. Rooms are numbered the same way.
 Rp1.950.000, Pojok Rp2.100.000. Rooms 101/105/107 on floor one, 205/208/211/212
 on floor two, 304 on floor three.
 
-**Money rules that apply across buildings:** deposit Rp1.500.000, refundable in
-full on move-out; electricity metered separately; rent paid between the 1st and
-16th of each month; second occupant Rp400.000/month; overnight guest
-Rp100.000/night; motorbike parking free. Late payment incurs a penalty per the
-tenancy agreement.
+**Tenancy is monthly.** A kos is rented by the month — one month is the shortest
+term there is. Rents are always quoted per month, and nothing on the site should
+imply nightly or short-stay booking.
+
+**Money rules that apply across buildings:** rent quoted per month; deposit
+Rp1.500.000, refundable in full on move-out; electricity metered separately; rent
+paid between the 1st and 16th of each month; a second occupant sharing the room
+adds Rp400.000 per month; motorbike parking free. Late payment incurs a penalty
+per the tenancy agreement.
+
+A resident hosting a guest overnight is charged Rp100.000 for that night. This is
+a house rule for residents, not a rate anyone can book against.
 
 **Contact:** 0812 8000 0362, 08.00–21.00 WIB daily.
 

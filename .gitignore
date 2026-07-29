@@ -13,3 +13,7 @@ next-env.d.ts
 
 # impeccable live-mode runtime state
 .impeccable/live/state/
+
+# Local agent-harness hooks (machine-specific absolute paths)
+.cursor/
+.codex/
