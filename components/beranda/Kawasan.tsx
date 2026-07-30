@@ -40,7 +40,7 @@ export function Kawasan() {
                 edge, so the first card slammed flush left on load however much
                 px-5 was there; scroll-px-5 is what makes snapping respect the
                 inset. */}
-            <ul className="no-scrollbar -mx-5 -my-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 py-4 sm:mx-0 sm:my-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:py-0 lg:grid-cols-4">
+            <ul className="no-scrollbar -mx-5 -my-8 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 py-8 sm:mx-0 sm:my-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:py-0 lg:grid-cols-4">
               {area.properties.map((property, i) => (
                 <li key={property.number} className="w-[82%] shrink-0 snap-start sm:w-auto">
                   <Reveal delay={i * 90} className="h-full">
