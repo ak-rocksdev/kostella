@@ -34,16 +34,26 @@ export function PropertyCard({
       className="group block overflow-hidden rounded-card border border-line bg-paper font-body shadow-max"
     >
       <div className="relative aspect-4/5 overflow-hidden bg-photo-bg">
+        {/* Decorative: the street and number are already in the text below, and
+            these are placeholders from the design bundle rather than the real
+            buildings — naming them would assert something untrue. */}
         <Image
           src={photo}
-          alt={`Tampak gedung Kostella ${number}`}
+          alt=""
           fill
           sizes={sizes}
           className="object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.03]"
         />
+        {/* A text-shadow alone left the numeral at 1.4:1 wherever the photo runs
+            light. This is the same foot scrim the property gallery already uses,
+            so the number holds against any photograph dropped in later. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-t from-ink/55 to-transparent to-45%"
+        />
         <span
           aria-hidden
-          className="numeral absolute bottom-2 left-4 text-[56px] leading-[0.85] tracking-[-0.02em] text-white [text-shadow:0_1px_6px_rgba(22,23,26,0.35)]"
+          className="numeral absolute bottom-2 left-4 text-[56px] leading-[0.85] tracking-[-0.02em] text-white"
         >
           {number}
         </span>

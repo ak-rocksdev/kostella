@@ -13,12 +13,18 @@ export function Header() {
         {/* The design has no mobile navigation pattern, so below md the links
             give way to the wordmark and the primary action rather than to an
             invented menu. */}
-        <nav aria-label="Utama" className="hidden gap-8 text-[14px] font-medium md:flex">
+        {/* min-h-11 on the links, not just the row: the text sits 21px tall, so
+            the clickable area was under the 24px floor even though the header
+            gives it 64px to sit in. */}
+        <nav aria-label="Utama" className="hidden items-center gap-8 text-[14px] font-medium md:flex">
           {nav.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className={cn(item.muted && 'text-ink-soft hover:text-ink')}
+              className={cn(
+                'inline-flex min-h-11 items-center',
+                item.muted && 'text-ink-soft hover:text-ink',
+              )}
             >
               {item.label}
             </Link>

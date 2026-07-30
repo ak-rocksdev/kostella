@@ -36,7 +36,7 @@ export function Kawasan() {
         <p className="mt-9">
           <Link
             href={routes.pencarian}
-            className="inline-flex items-center gap-2 text-[15px] font-semibold"
+            className="inline-flex min-h-11 items-center gap-2 text-[15px] font-semibold"
           >
             Lihat semua kawasan
             <ArrowRight size={18} strokeWidth={1.5} aria-hidden />

@@ -26,7 +26,7 @@ export function CaraSewa() {
     <section className="border-t border-line bg-paper">
       <div className="wrap py-14 sm:py-24">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <SectionEyebrow>{caraSewa.eyebrow}</SectionEyebrow>
+          <SectionEyebrow as="h2">{caraSewa.eyebrow}</SectionEyebrow>
           <p className="text-[14px] text-ink-soft">{caraSewa.aside}</p>
         </div>
 

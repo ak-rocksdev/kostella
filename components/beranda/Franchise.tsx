@@ -13,9 +13,12 @@ export function Franchise() {
       <div className="wrap grid items-center gap-8 py-14 sm:py-18 lg:grid-cols-[1fr_auto] lg:gap-12">
         <div>
           <SectionEyebrow inverse>{franchise.eyebrow}</SectionEyebrow>
-          <p className="mt-4 max-w-[620px] text-[clamp(1.375rem,3vw,1.75rem)] leading-[1.3] font-semibold tracking-[-0.01em] text-stone">
+          {/* A heading in everything but the tag it had: it is this section's
+              only statement, and without it the block reached a screen reader
+              as an unnamed region. */}
+          <h2 className="mt-4 max-w-[620px] text-[clamp(1.375rem,3vw,1.75rem)] leading-[1.3] font-semibold tracking-[-0.01em] text-stone">
             {franchise.body}
-          </p>
+          </h2>
           <div className="mt-6">
             <Button href={routes.kemitraan} variant="inverse">
               {franchise.cta}

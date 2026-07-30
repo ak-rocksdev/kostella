@@ -24,7 +24,11 @@
 
   /* Status — availability only, never decoration */
   --color-available: #2e7d52;
-  --color-held: #b4531e;
+  /* Darkened from the brief's #B4531E. Paired with --held-soft behind it, that
+     value measured 4.0:1 — under the 4.5 AA floor — on the "Sisa 1" badge.
+     This is the one status colour that ever sits on its own tint, and parents
+     reading carefully are a named audience, so the pairing has to hold. */
+  --color-held: #9c4718;
   --color-held-soft: #f5e3d7;
   --color-occupied: #9a9892;
   --color-occupied-soft: #e7e5e0;
