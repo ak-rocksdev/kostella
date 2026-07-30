@@ -31,7 +31,16 @@ export function Kawasan() {
                 how many there are. The bleed matches the content gutter exactly,
                 so cards run to the screen edge without pushing the page wider.
                 From sm up it is a plain grid again. */}
-            <ul className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-1 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
+            {/* Two things a scroller gets wrong by default, both fixed here.
+                `overflow-x: auto` clips on BOTH axes — the spec makes the other
+                axis `auto` the moment one stops being `visible` — so the cards'
+                shadows were being sliced off inside the box. The py/-my pair
+                opens the clip box by 16px without moving anything on the page.
+                And `snap-start` aligns to the scrollport edge, not the padding
+                edge, so the first card slammed flush left on load however much
+                px-5 was there; scroll-px-5 is what makes snapping respect the
+                inset. */}
+            <ul className="no-scrollbar -mx-5 -my-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 py-4 sm:mx-0 sm:my-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:py-0 lg:grid-cols-4">
               {area.properties.map((property, i) => (
                 <li key={property.number} className="w-[82%] shrink-0 snap-start sm:w-auto">
                   <Reveal delay={i * 90} className="h-full">
