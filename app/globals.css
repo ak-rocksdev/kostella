@@ -78,7 +78,7 @@
     0 12px 24px -10px rgba(22, 23, 26, 0.16);
   --shadow-lift:
     0 2px 4px rgba(22, 23, 26, 0.07), 0 8px 16px -4px rgba(22, 23, 26, 0.08),
-    0 28px 56px -16px rgba(22, 23, 26, 0.22);
+    0 20px 40px -16px rgba(22, 23, 26, 0.22);
   /* The hero availability card is the one surface that lifts off the page,
      because it overlaps the photo behind it. Deviates from the system's
      "max one shadow" rule; carried over from the prototype deliberately. */
