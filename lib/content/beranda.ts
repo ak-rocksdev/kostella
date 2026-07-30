@@ -102,7 +102,19 @@ export const vacantRooms: VacantRoom[] = [
 export type Property = {
   number: string
   street: string
+  area: string
   distances: string[]
+  /** Who the building takes. Only 362's is confirmed by the brief. */
+  tenancy: string
+  /**
+   * Shown as tags on the card.
+   *
+   * CAUTION: the brief specifies facilities for building 362 only. The values
+   * for 351, 360, and 2C were authored by the designer in the search screen and
+   * carried across for consistency — they read as fact on the page and need the
+   * owner's confirmation before this goes anywhere public.
+   */
+  facilities: string[]
   /** Cheapest monthly rent in the building, in rupiah. */
   priceFrom: number
   status: Status
@@ -127,7 +139,10 @@ export const areas: Area[] = [
       {
         number: '362',
         street: 'Jl. Dr. Susilo 2 No. 362',
+        area: 'Grogol, Jakarta Barat',
         distances: ['Trisakti 1 km', 'Central Park 0,2 km'],
+        tenancy: 'Khusus putri',
+        facilities: ['Kamar mandi dalam', 'AC', 'Wifi'],
         priceFrom: 1_650_000,
         status: 'available',
         count: 2,
@@ -136,7 +151,10 @@ export const areas: Area[] = [
       {
         number: '351',
         street: 'Jl. Dr. Susilo 2 No. 351',
+        area: 'Grogol, Jakarta Barat',
         distances: ['Trisakti 1,1 km', 'Terminal Grogol 0,3 km'],
+        tenancy: 'Campur',
+        facilities: ['Kamar mandi dalam', 'AC', 'Dapur bersama'],
         priceFrom: 1_550_000,
         status: 'available',
         count: 5,
@@ -145,7 +163,10 @@ export const areas: Area[] = [
       {
         number: '360',
         street: 'Jl. Dr. Susilo 2 No. 360',
+        area: 'Grogol, Jakarta Barat',
         distances: ['Trisakti 1 km', 'Terminal Grogol 0,2 km'],
+        tenancy: 'Khusus putri',
+        facilities: ['AC', 'Wifi', 'Laundry'],
         priceFrom: 1_650_000,
         status: 'held',
         photo: '/images/kamar-superior.jpg',
@@ -153,7 +174,10 @@ export const areas: Area[] = [
       {
         number: '2C',
         street: 'Jl. Dr. Susilo 2C',
+        area: 'Grogol, Jakarta Barat',
         distances: ['Untar 0,9 km', 'Central Park 0,4 km'],
+        tenancy: 'Campur',
+        facilities: ['Kamar mandi dalam', 'AC', 'Parkir motor'],
         priceFrom: 1_750_000,
         status: 'occupied',
         photo: '/images/ruang-bersama.jpg',

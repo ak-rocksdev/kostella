@@ -1,5 +1,6 @@
-import { SectionEyebrow } from '@/components/ui/Eyebrow'
-import { caraSewa } from '@/lib/content/beranda'
+import { SectionEyebrow } from "@/components/ui/Eyebrow";
+import { Reveal } from "@/components/ui/Reveal";
+import { caraSewa } from "@/lib/content/beranda";
 
 /**
  * Renting drawn as the route it is.
@@ -21,7 +22,7 @@ import { caraSewa } from '@/lib/content/beranda'
  * this work.
  */
 export function CaraSewa() {
-  const lastIndex = caraSewa.steps.length - 1
+  const lastIndex = caraSewa.steps.length - 1;
 
   return (
     <section className="border-t border-line bg-paper">
@@ -33,28 +34,34 @@ export function CaraSewa() {
 
         <ol className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {caraSewa.steps.map((step, i) => (
-            <li key={step.number} className="relative">
-              {/* Runs to the next station, across the column gutter. Absent on
+            <li key={step.number}>
+              <Reveal delay={i * 120} className="relative">
+                {/* Runs to the next station, across the column gutter. Absent on
                   the last step, so the route visibly terminates. */}
-              {i < lastIndex && (
-                <span
-                  aria-hidden
-                  className="absolute top-[21px] left-0 hidden h-px w-[calc(100%+2rem)] bg-line lg:block"
-                />
-              )}
+                {i < lastIndex && (
+                  <span
+                    aria-hidden
+                    className="route-line absolute top-[21px] left-0 hidden h-px w-[calc(100%+2rem)] bg-line lg:block"
+                  />
+                )}
 
-              {/* The paper ground punches the line, so the numeral sits on the
+                {/* The paper ground punches the line, so the numeral sits on the
                   route rather than being crossed out by it. */}
-              <span className="numeral relative bg-paper pr-4 text-[44px] leading-none text-plum">
-                {step.number}
-              </span>
+                <span className="numeral relative bg-paper pr-4 text-[44px] leading-none text-plum">
+                  {step.number}
+                </span>
 
-              <h3 className="mt-4 mb-2 text-[20px] leading-[1.3] font-semibold">{step.title}</h3>
-              <p className="text-[15px] leading-[1.6] text-ink-soft">{step.body}</p>
+                <h3 className="mt-4 mb-2 text-[20px] leading-[1.3] font-semibold">
+                  {step.title}
+                </h3>
+                <p className="text-[15px] leading-[1.6] text-ink-soft">
+                  {step.body}
+                </p>
+              </Reveal>
             </li>
           ))}
         </ol>
       </div>
     </section>
-  )
+  );
 }

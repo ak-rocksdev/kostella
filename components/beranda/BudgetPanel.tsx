@@ -62,7 +62,7 @@ export function BudgetPanel({
       <div
         role="group"
         aria-labelledby="area-prompt"
-        className="mt-3 -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:-mx-7 sm:px-7 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0"
+        className="no-scrollbar mt-3 -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:-mx-7 sm:px-7 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0"
       >
         {areaChips.map((chip) => (
           <Chip

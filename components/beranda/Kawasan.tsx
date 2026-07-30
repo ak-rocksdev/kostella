@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { PropertyCard } from '@/components/ui/PropertyCard'
+import { Reveal } from '@/components/ui/Reveal'
 import { areas } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
@@ -24,10 +25,18 @@ export function Kawasan() {
               </p>
             </div>
 
-            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {area.properties.map((property) => (
-                <li key={property.number}>
-                  <PropertyCard {...property} href={routes.detail} />
+            {/* A phone gets a scroller, not a stack. Four full-width cards is
+                four screens of scrolling before the section ends; sideways, the
+                set stays one gesture wide and the half-visible next card says
+                how many there are. The bleed matches the content gutter exactly,
+                so cards run to the screen edge without pushing the page wider.
+                From sm up it is a plain grid again. */}
+            <ul className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-1 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
+              {area.properties.map((property, i) => (
+                <li key={property.number} className="w-[82%] shrink-0 snap-start sm:w-auto">
+                  <Reveal delay={i * 90} className="h-full">
+                    <PropertyCard {...property} href={routes.detail} />
+                  </Reveal>
                 </li>
               ))}
             </ul>
