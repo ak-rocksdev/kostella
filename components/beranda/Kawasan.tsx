@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { PropertyCard } from '@/components/ui/PropertyCard'
-import { SectionEyebrow } from '@/components/ui/Eyebrow'
 import { areas } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
@@ -9,16 +8,18 @@ export function Kawasan() {
   return (
     <section id="kawasan" className="border-t border-line bg-paper">
       <div className="wrap py-14 sm:py-24">
-        <SectionEyebrow>Properti per kawasan</SectionEyebrow>
-
+        {/* No section eyebrow. The area name is the heading, and "Properti per
+            kawasan" only restated what four property cards already say. */}
         {areas.map((area) => (
-          <div key={area.name} className="mt-7">
-            <div className="mb-7 flex flex-wrap items-baseline gap-x-4 gap-y-2">
-              <h2 className="text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.15] font-semibold tracking-[-0.01em]">
-                {area.name}
-              </h2>
-              <p className="text-[14px] text-ink-soft">{area.nearby}</p>
-              <p className="ml-auto rounded-badge bg-available px-3 py-[5px] font-figure text-[13px] font-medium text-white">
+          <div key={area.name}>
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+              <div>
+                <h2 className="text-[clamp(2rem,4.5vw,2.75rem)] leading-[1.1] font-semibold tracking-[-0.015em]">
+                  {area.name}
+                </h2>
+                <p className="mt-1.5 text-[15px] text-ink-soft">{area.nearby}</p>
+              </div>
+              <p className="rounded-badge bg-available px-3 py-[5px] font-figure text-[13px] font-medium text-white">
                 {area.vacantRooms} kamar kosong
               </p>
             </div>

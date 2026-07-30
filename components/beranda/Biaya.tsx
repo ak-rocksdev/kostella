@@ -1,5 +1,4 @@
 import { ReceiptTable } from '@/components/ui/ReceiptTable'
-import { SectionEyebrow } from '@/components/ui/Eyebrow'
 import { biaya } from '@/lib/content/beranda'
 
 /**
@@ -10,22 +9,31 @@ export function Biaya() {
   return (
     <section id="biaya" className="border-t border-line bg-stone">
       <div className="wrap grid items-center gap-12 py-14 sm:py-24 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+        {/* No section eyebrow: the heading already says what this is, and
+            "Transparansi biaya" above "Yang kamu bayar, tanpa kejutan." was the
+            same sentence twice. */}
         <div>
-          <SectionEyebrow>{biaya.eyebrow}</SectionEyebrow>
-
-          <h2 className="mt-5 text-[clamp(1.75rem,4vw,2.25rem)] leading-[1.15] font-semibold tracking-[-0.01em]">
+          <h2 className="text-[clamp(2rem,4.5vw,2.75rem)] leading-[1.1] font-semibold tracking-[-0.015em]">
             {biaya.heading}
           </h2>
-          <p className="mt-4 max-w-[460px] text-[16px] leading-[1.65] text-ink-soft">{biaya.body}</p>
+          <p className="mt-5 max-w-[460px] text-[16px] leading-[1.65] text-ink-soft">{biaya.body}</p>
 
-          <div className="mt-7 flex gap-6">
+          {/* The two figures are the section's payload, so they get the brand's
+              numeral treatment and a rule of their own rather than trailing the
+              paragraph as an afterthought. */}
+          <dl className="mt-8 flex gap-10 border-t border-line pt-6">
             {biaya.stats.map((stat) => (
-              <p key={stat.label}>
-                <span className="numeral block text-[34px] leading-none">{stat.value}</span>
-                <span className="mt-1 block text-[13px] text-ink-soft">{stat.label}</span>
-              </p>
+              <div key={stat.label}>
+                <dt className="sr-only">{stat.label}</dt>
+                <dd className="numeral text-[clamp(2.5rem,5vw,3.25rem)] leading-none">
+                  {stat.value}
+                </dd>
+                <p aria-hidden className="mt-2 text-[14px] leading-[1.4] text-ink-soft">
+                  {stat.label}
+                </p>
+              </div>
             ))}
-          </div>
+          </dl>
         </div>
 
         <div className="rounded-card border border-line border-t-[3px] border-t-plum bg-paper p-6 shadow-max sm:p-8">
