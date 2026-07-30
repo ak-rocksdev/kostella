@@ -48,10 +48,16 @@ export function PropertyCard({
   // hover feel answered rather than animated. The press settles back fast — a
   // slow press feels broken. Keyboard focus gets the same lift, so it is never
   // the quieter state.
+  //
+  // The transitions name `translate` and `scale`, NOT `transform`. Tailwind v4
+  // compiles translate-*/scale-* to the individual `translate` and `scale`
+  // properties, so `transition-transform` names a property nothing is animating
+  // and the movement snaps while only the shadow eases. This is silent — every
+  // class is valid and the styles apply, they just arrive instantly.
   return (
     <Link
       href={href}
-      className="group flex h-full flex-col overflow-hidden rounded-card border border-line bg-paper font-body shadow-card transition-[transform,box-shadow] duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 hover:shadow-lift focus-visible:-translate-y-2 focus-visible:shadow-lift active:translate-y-0 active:shadow-card active:duration-100"
+      className="group flex h-full flex-col overflow-hidden rounded-card border border-line bg-paper font-body shadow-card transition-[translate,box-shadow] duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 hover:shadow-lift focus-visible:-translate-y-2 focus-visible:shadow-lift active:translate-y-0 active:shadow-card active:duration-100"
     >
       <div className="relative aspect-square overflow-hidden bg-photo-bg">
         {/* Decorative: the street and number are already in the text below, and
@@ -62,7 +68,7 @@ export function PropertyCard({
           alt=""
           fill
           sizes={sizes}
-          className="object-cover transition-transform duration-[500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+          className="object-cover transition-[scale] duration-[500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
         />
 
         <span className="absolute top-3 left-3">
