@@ -101,6 +101,18 @@ payment, and the operator dashboard.
 
 ## Brand Commitments
 
+**Standing visual preference, set by the client on 2026-07-30.** Kostella is to
+sit alongside international co-living products — Cove, Habyt, Hmlet — and their
+craft level is the bar: disciplined typography, generous space, photography
+carrying the page, a mature component system. This is a deliberate reversal of
+the source brief, which listed Cove's look among the directions to avoid and
+positioned Kostella away from co-living operators. The client was shown that
+conflict and chose this anyway. Execute it fully; do not reintroduce the older
+direction by halves.
+
+The two claims in **Positioning** are unaffected. They are product truth, not a
+look, and they survive any visual world.
+
 - **Name:** Kostella. Where a mark is needed, the wordmark is set in Archivo 600.
   The existing logo asset predates this system and its colour is unconfirmed.
 - **Language:** Indonesian throughout. Informal-respectful "kamu" for tenants;

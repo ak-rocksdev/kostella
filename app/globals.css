@@ -16,6 +16,9 @@
   --color-line: #d9d7d0; /* dividers, card borders */
   --color-photo-bg: #dddbd4; /* holding colour behind a photo while it loads */
   --color-map-bg: #e4e2db; /* holding colour behind a map while its tiles load */
+  /* The new world's page ground: warm near-white, not the old cool stone.
+     Photography is the colour here, so the ground gets out of its way. */
+  --color-canvas: #fbfaf8;
 
   /* Brand */
   --color-plum: #57182f; /* primary buttons, active markers, accent rules */

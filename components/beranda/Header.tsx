@@ -6,7 +6,7 @@ import { routes } from '@/lib/routes'
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-10 border-b border-line bg-stone">
+    <header className="sticky top-0 z-10 border-b border-line bg-canvas">
       <div className="wrap flex h-16 items-center justify-between gap-4">
         <span className="text-[20px] font-semibold tracking-[-0.01em]">Kostella</span>
 
