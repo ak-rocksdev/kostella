@@ -12,7 +12,7 @@ import { caraSewa } from "@/lib/content/beranda";
  */
 export function CaraSewa() {
   return (
-    <section className="bg-paper">
+    <section className="bg-canvas">
       <div className="wrap py-20 sm:py-28">
         <div className="max-w-[36ch]">
           <h2 className="text-[clamp(2rem,4vw,2.75rem)] leading-[1.1] font-semibold tracking-[-0.025em]">

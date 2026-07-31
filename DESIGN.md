@@ -55,11 +55,12 @@ named the comparison set. Seed keys 39ac8395 and dcb6575e, both discharged.
 `app/globals.css` is the source of truth; these are the values the build settled
 on for the landing page.
 
-**Grounds.** `--color-canvas: #fbfaf8` is the page ground and `--color-paper:
-#ffffff` is every card. Sections alternate between the two; nothing else is a
-surface. `--color-stone: #edece7` survives from the previous world but has been
-demoted from page ground to the fill behind tags and building-number markers.
-`--color-ink: #16171a` on the one dark panel.
+**Grounds.** One ground for the whole page: `--color-canvas: #fbfaf8`. White
+(`--color-paper`) is reserved for cards, so anything white is something you can
+act on. Banded sections were tried and dropped — alternating grounds competed
+with the elevation for the same job. `--color-stone: #edece7` survives from the
+previous world but has been demoted from page ground to the fill behind tags and
+building-number markers. `--color-ink: #16171a` on the one dark panel.
 
 **Brand and status.** `--color-plum: #57182f` on actions and active states only;
 `--color-plum-soft: #f3e7ea` behind step numbers and the verified badge.

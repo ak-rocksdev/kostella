@@ -121,6 +121,22 @@
   }
 }
 
+/* Starts where `wrap` starts and runs off the right edge of the screen. Used by
+   the area showcase, where the card track is meant to read as continuing past
+   the viewport rather than ending inside a column.
+
+   `100%` rather than `100vw`: vw counts the scrollbar, so the extra ~15px would
+   shift the content column out of alignment with every other section — and on
+   the other side, give the page a horizontal scroll of its own. */
+@utility rail-bleed {
+  padding-inline-start: max(20px, calc((100% - 1200px) / 2 + 20px));
+  padding-inline-end: 0;
+
+  @media (width >= 40rem) {
+    padding-inline-start: max(32px, calc((100% - 1200px) / 2 + 32px));
+  }
+}
+
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;

@@ -11,10 +11,8 @@ import { routes } from '@/lib/routes'
  * how the category signs off a page: one dark band, one sentence, one action.
  */
 export function Franchise() {
-  // Same ground as the section above it: the dark panel is the break, and a
-  // second ground change right at its top edge only competed with it.
   return (
-    <section id="franchise" className="bg-paper">
+    <section id="franchise" className="bg-canvas">
       <div className="wrap pb-20 sm:pb-28">
         <div className="flex flex-col items-start gap-8 rounded-card bg-ink px-8 py-12 shadow-card sm:px-14 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
           <div>

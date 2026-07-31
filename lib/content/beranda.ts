@@ -126,6 +126,12 @@ export type Property = {
 export type Area = {
   name: string
   nearby: string
+  /**
+   * Two sentences beside the card track. Every claim here is derived from the
+   * distances already listed on the cards — no new fact is introduced, because
+   * a paragraph is exactly where an unchecked one would slip in unnoticed.
+   */
+  blurb: string
   vacantRooms: number
   properties: Property[]
 }
@@ -134,6 +140,8 @@ export const areas: Area[] = [
   {
     name: 'Grogol',
     nearby: 'dekat Trisakti & Untar',
+    blurb:
+      'Semua gedung kami di sini berdiri di Jl. Dr. Susilo, sekitar satu kilometer dari Trisakti dan Untar. Angka kamar kosongnya dicek ulang tiap hari.',
     vacantRooms: 7,
     properties: [
       {
