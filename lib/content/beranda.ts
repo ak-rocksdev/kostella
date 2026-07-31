@@ -12,6 +12,8 @@
  */
 import { routes } from '../routes'
 import type { Status } from './types'
+/* No cycle: detail.ts does not import this file. */
+import { defaultRoom, property, receiptFor, rooms } from './detail'
 
 export const nav = [
   { label: 'Cari kamar', href: routes.pencarian, muted: false },
@@ -289,22 +291,35 @@ export const areas: Area[] = [
   },
 ]
 
+/**
+ * The example receipt is the detail page's receipt for the same room, not a
+ * second copy of it.
+ *
+ * It used to be typed out here. Both listed a Rp 1.500.000 deposit; when the
+ * client had it removed from the room receipt on 2026-07-31, this one went on
+ * claiming a deposit and a Rp 3.150.000 first payment while the detail page for
+ * the very same room said Rp 1.650.000. For a brand whose entire position is
+ * that its figures are right, that is the worst kind of bug — so the two are now
+ * the same function call and cannot drift again.
+ */
+const contoh = receiptFor(defaultRoom)
+
 export const biaya = {
   eyebrow: 'Transparansi biaya',
   heading: 'Yang kamu bayar, tanpa kejutan.',
-  body: 'Semua biaya tercantum sebelum kamu survei. Deposit kembali penuh saat keluar, listrik dihitung sesuai pemakaian, dan tidak ada biaya lain yang muncul belakangan.',
+  body: 'Semua biaya tercantum sebelum kamu survei. Listrik dihitung sesuai pemakaian, dan tidak ada biaya lain yang muncul belakangan.',
+  /**
+   * Both figures restate the receipt beside them rather than adding a claim.
+   * The second one replaces "100% deposit kembali", which stopped being true of
+   * this page the moment the deposit left the receipt.
+   */
   stats: [
     { value: '0', label: 'biaya tersembunyi' },
-    { value: '100%', label: 'deposit kembali' },
+    { value: '1×', label: 'sewa dibayar di awal' },
   ],
-  example: 'Contoh: Kostella 362 · kamar 105 · Standard',
-  rows: [
-    { label: 'Sewa bulanan', value: 'Rp 1.650.000' },
-    { label: 'Deposit (dikembalikan)', value: 'Rp 1.500.000' },
-    { label: 'Listrik', value: 'dihitung terpisah', soft: true },
-    { label: 'Parkir motor', value: 'gratis', soft: true },
-  ],
-  total: { label: 'Bayar di awal', value: 'Rp 3.150.000' },
+  example: `Contoh: Kostella ${property.number} · kamar ${defaultRoom} · ${rooms[defaultRoom].type}`,
+  rows: contoh.rows,
+  total: contoh.total,
 } as const
 
 /** Icon keys map to lucide components in the section that renders them, so the
