@@ -120,14 +120,22 @@ export function receiptFor(roomNumber: string) {
   }
 }
 
-export const houseRules = [
-  { title: 'Jam tamu', body: 'Tamu diterima 08.00–21.00 di area bersama.' },
-  { title: 'Pasangan', body: 'Khusus putri. Tamu laki-laki hanya di ruang tamu.' },
+/** Keys into the icon map in HouseRules — kept as strings so this file stays data. */
+export type HouseRuleIcon = 'jam' | 'tamu' | 'kebersihan' | 'parkir'
+
+export const houseRules: Array<{ title: string; body: string; icon: HouseRuleIcon }> = [
+  { icon: 'jam', title: 'Jam tamu', body: 'Tamu diterima 08.00–21.00 di area bersama.' },
+  { icon: 'tamu', title: 'Pasangan', body: 'Khusus putri. Tamu laki-laki hanya di ruang tamu.' },
   {
+    icon: 'kebersihan',
     title: 'Kebersihan',
     body: 'Kamar dibersihkan penghuni; area bersama oleh petugas setiap hari.',
   },
-  { title: 'Parkir', body: 'Motor gratis di halaman dalam. Mobil tidak tersedia.' },
+  {
+    icon: 'parkir',
+    title: 'Parkir',
+    body: 'Motor gratis di halaman dalam. Mobil tidak tersedia.',
+  },
 ]
 
 /**
