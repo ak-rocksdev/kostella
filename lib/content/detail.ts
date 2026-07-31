@@ -69,7 +69,13 @@ export const rooms: Record<string, RoomDetail> = {
   '304': { type: 'Pojok', rent: 2_100_000, status: 'occupied', photo: 0 },
 }
 
-/** Refundable in full on move-out. The brand's headline promise. */
+/**
+ * Refundable in full on move-out. The brand's headline promise.
+ *
+ * No longer shown on the detail receipt — removed at the client's request — but
+ * kept here because Beranda still states the same figure, and dropping it would
+ * leave that claim with no definition anywhere in the codebase.
+ */
 export const deposit = 1_500_000
 
 export const defaultRoom = '105'
@@ -97,9 +103,18 @@ export const receiptNote =
   'Pembayaran tanggal 1–16 tiap bulan. Keterlambatan dikenakan denda sesuai perjanjian sewa.'
 
 /**
- * The full cost of a room, including the rules competitors bury. What you pay
- * up front is rent plus deposit — derived, so it can never disagree with the
- * rent shown elsewhere on the page.
+ * The full cost of a room, including the rules competitors bury.
+ *
+ * The deposit and the second-occupant charge were removed at the client's
+ * request on 2026-07-31, so what you pay up front is now one month's rent and
+ * nothing else. Still derived from the room, so the total can never disagree
+ * with the rent shown elsewhere on this page.
+ *
+ * NOTE: Beranda's example receipt (lib/content/beranda.ts) still lists a
+ * Rp 1.500.000 deposit and totals Rp 3.150.000, and the section above it still
+ * claims "100% deposit kembali". Those figures are hard-coded there and were
+ * not part of this request, so the two screens currently disagree about whether
+ * a deposit exists at all.
  */
 export function receiptFor(roomNumber: string) {
   const room = rooms[roomNumber]
@@ -107,15 +122,13 @@ export function receiptFor(roomNumber: string) {
   return {
     rows: [
       { label: 'Sewa bulanan', value: formatRupiah(room.rent, { spaced: true }) },
-      { label: 'Deposit (dikembalikan)', value: formatRupiah(deposit, { spaced: true }) },
       { label: 'Listrik', value: 'dihitung terpisah', soft: true },
-      { label: 'Orang kedua', value: 'Rp 400.000 /bulan' },
       { label: 'Tamu menginap', value: 'Rp 100.000 /malam' },
       { label: 'Parkir motor', value: 'gratis', soft: true },
     ],
     total: {
       label: 'Bayar di awal',
-      value: formatRupiah(room.rent + deposit, { spaced: true }),
+      value: formatRupiah(room.rent, { spaced: true }),
     },
   }
 }
