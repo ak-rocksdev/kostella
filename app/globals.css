@@ -43,16 +43,13 @@
      number it belongs to speak with the same voice.
      (The system originally specified IBM Plex Mono for figures. Replaced at the
      client's request — see docs/superpowers/specs for the reasoning.) */
+  /* Currently unused. The Expanded width carried the oversized identity
+     numerals of the previous world; this one sets building and room numbers as
+     small markers in --font-figure. Kept as a token because it is part of the
+     upstream design system, and because Archivo is loaded either way. */
   --font-display: var(--font-archivo), sans-serif; /* signage face, expanded numerals */
   --font-body: var(--font-jakarta), sans-serif;
   --font-figure: var(--font-archivo), sans-serif; /* prices, room codes, receipts */
-
-  /* The eyebrow is the one type step reused verbatim in every section.
-     Sentence case everywhere else; ALL CAPS only here. */
-  --text-eyebrow: 12px;
-  --text-eyebrow--line-height: 1.4;
-  --text-eyebrow--letter-spacing: 0.08em;
-  --text-eyebrow--font-weight: 600;
 
   /* Radii. The new world is softer: 16px on cards and photographs, 8px on the
      small static tags, and controls go fully round in the components. */
@@ -87,14 +84,6 @@
      because it overlaps the photo behind it. Deviates from the system's
      "max one shadow" rule; carried over from the prototype deliberately. */
   --shadow-float: 0 12px 32px rgba(22, 23, 26, 0.1);
-}
-
-/* Archivo Expanded numerals are the brand's identity — property numbers, room
-   numbers, stats. Packaged as a utility because it recurs in seven places. */
-@utility numeral {
-  font-family: var(--font-display);
-  font-stretch: 125%;
-  font-weight: 700;
 }
 
 /* Content column: max 1200px, centred, 32px gutters. Every section uses it, so
@@ -144,7 +133,7 @@
   }
 
   body {
-    background: var(--color-stone);
+    background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-body);
     /* `clip`, not `hidden`: hidden would make the body a scroll container and

@@ -28,7 +28,7 @@ export function Sekitar() {
         ariaLabel={`Peta sekitar Kostella ${property.number} dengan radius jalan kaki 10 menit`}
         className="h-80"
       />
-      <p className="mt-2 text-[12px] text-ink-soft">{surroundings.caption}</p>
+      <p className="mt-3 text-[12px] text-ink-soft">{surroundings.caption}</p>
     </>
   )
 }

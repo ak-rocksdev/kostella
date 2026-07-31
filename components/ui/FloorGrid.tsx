@@ -8,7 +8,9 @@ import type { Status } from '@/lib/content/types'
  * depends on colour alone: taken cells are grey with faded text, held cells are
  * hatched, and only vacant cells are filled solid.
  *
- * Square corners on purpose. These read as a floorplan, not as buttons.
+ * The tag radius, not the control radius. These are read as a floorplan, so
+ * they must not look pressable — but at zero radius they read as unstyled in a
+ * world where nothing else has a hard corner.
  */
 const cells: Record<Status, string> = {
   available: 'border-2 border-available bg-available text-white',
@@ -40,7 +42,7 @@ export function RoomCell({ room, status, type, price, selected, compact, onSelec
       disabled={!onSelect}
       onClick={onSelect ? () => onSelect({ room, status, type, price }) : undefined}
       className={cn(
-        'flex flex-col items-start gap-0.5 rounded-none text-left font-figure',
+        'flex flex-col items-start gap-0.5 rounded-badge text-left font-figure',
         compact ? 'min-w-16 px-2.5 py-2' : 'min-w-27 px-3.5 py-3',
         onSelect ? 'cursor-pointer' : 'cursor-default',
         selected && 'outline-2 outline-offset-2 outline-plum',
@@ -83,7 +85,7 @@ export function FloorGrid({ floors, selectedRoom, onSelect, compact, animate }: 
           key={floor.label}
           className="grid items-start gap-2 sm:grid-cols-[90px_1fr] sm:gap-5"
         >
-          <h3 className="text-eyebrow text-ink-soft uppercase sm:pt-3">{floor.label}</h3>
+          <h3 className="text-[13px] font-semibold text-ink-soft sm:pt-3">{floor.label}</h3>
           <ul className="flex flex-wrap gap-2">
             {floor.rooms.map((room, roomIndex) => (
               <li
@@ -123,7 +125,7 @@ export function FloorGridLegend() {
     <ul className="flex flex-wrap gap-x-6 gap-y-2">
       {items.map(([status, label]) => (
         <li key={status} className="flex items-center gap-2 text-[13px] text-ink-soft">
-          <span aria-hidden className={cn('inline-block size-3.5', cells[status])} />
+          <span aria-hidden className={cn('inline-block size-3.5 rounded-[3px]', cells[status])} />
           {label}
         </li>
       ))}

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
-import { Eyebrow } from '@/components/ui/Eyebrow'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { ResultCard } from './ResultCard'
 import { ResultsMap } from './ResultsMap'
 import { context, defaultFilters, emptyState, filters, results } from '@/lib/content/pencarian'
@@ -12,7 +12,7 @@ import { routes } from '@/lib/routes'
 /** An empty result offers the nearest alternative, never just a dead end. */
 function EmptyState() {
   return (
-    <div className="rounded-card border border-dashed border-line bg-paper px-6 py-8 text-center">
+    <div className="rounded-card border border-dashed border-line px-6 py-9 text-center">
       <p className="text-[16px] font-semibold">{emptyState.heading}</p>
       <p className="mt-2 mb-4 text-[14px] leading-[1.6] text-ink-soft">{emptyState.body}</p>
       <Button href={routes.kawasanLain} variant="secondary" size="sm">
@@ -40,8 +40,8 @@ export function SearchResults() {
     )
 
   return (
-    <div className="wrap-wide pt-6 pb-14 sm:pb-24">
-      <div role="group" aria-label="Filter pencarian" className="mb-6 flex flex-wrap gap-2">
+    <div className="wrap-wide pt-8 pb-16 sm:pb-24">
+      <div role="group" aria-label="Filter pencarian" className="mb-7 flex flex-wrap gap-2">
         {filters.map((filter) => (
           <Chip
             key={filter}
@@ -53,9 +53,9 @@ export function SearchResults() {
         ))}
       </div>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[60fr_40fr]">
+      <div className="grid items-start gap-6 lg:grid-cols-[60fr_40fr] lg:gap-8">
         <div className="flex flex-col gap-4">
-          <Eyebrow>{context.resultsLabel}</Eyebrow>
+          <SectionLabel>{context.resultsLabel}</SectionLabel>
           {results.map((result) => (
             <ResultCard
               key={result.number}

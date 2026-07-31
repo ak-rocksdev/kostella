@@ -159,7 +159,7 @@ export function LeafletMap({
       ref={container}
       role="region"
       aria-label={ariaLabel}
-      className={cn('overflow-hidden rounded-card border border-line bg-map-bg', className)}
+      className={cn('overflow-hidden rounded-card bg-map-bg shadow-card', className)}
     />
   )
 }

@@ -9,7 +9,7 @@ import { mapLandmarks, results } from '@/lib/content/pencarian'
  */
 export function ResultsMap({ activeNumber }: { activeNumber: string }) {
   return (
-    <div className="lg:sticky lg:top-6">
+    <div className="lg:sticky lg:top-24">
       <LeafletMap
         center={grogolCentre}
         zoom={15}
@@ -20,7 +20,7 @@ export function ResultsMap({ activeNumber }: { activeNumber: string }) {
           ...landmarkMarkers(mapLandmarks),
         ]}
         ariaLabel="Peta hasil pencarian di Grogol, Jakarta Barat"
-        className="h-120 lg:h-[calc(100vh-160px)] lg:min-h-120"
+        className="h-120 lg:h-[calc(100vh-140px)] lg:min-h-120"
       />
     </div>
   )

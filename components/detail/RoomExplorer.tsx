@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Eyebrow } from '@/components/ui/Eyebrow'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { FloorGrid, FloorGridLegend } from '@/components/ui/FloorGrid'
 import { ReceiptTable } from '@/components/ui/ReceiptTable'
 import { HouseRules } from './HouseRules'
@@ -18,19 +18,24 @@ import { defaultRoom, floors, receiptFor, receiptNote } from '@/lib/content/deta
  *
  * The room panel sits in column two at desktop but follows the grid in source
  * order, so on a phone you get the grid and then what you just selected.
+ *
+ * Every block here is now a white card on the page ground, the same as the
+ * landing page. The previous world separated them with hairline rules and gave
+ * the receipt a 3px plum top edge; both were devices of a design built on lines
+ * rather than on surfaces.
  */
 export function RoomExplorer() {
   const [room, setRoom] = useState(defaultRoom)
   const receipt = receiptFor(room)
 
   return (
-    <div className="wrap grid items-start gap-x-12 gap-y-14 pt-12 pb-14 sm:gap-y-16 sm:pb-24 lg:grid-cols-[1.5fr_1fr]">
+    <div className="wrap grid items-start gap-x-12 gap-y-14 pt-14 pb-16 sm:gap-y-16 sm:pb-24 lg:grid-cols-[1.5fr_1fr]">
       <section className="lg:col-start-1">
-        <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
-          <Eyebrow>Semua kamar · pilih untuk lihat detail</Eyebrow>
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
+          <SectionLabel>Semua kamar · pilih untuk lihat detail</SectionLabel>
           <FloorGridLegend />
         </div>
-        <div className="rounded-card border border-line bg-paper p-5 sm:p-8">
+        <div className="rounded-card bg-paper p-5 shadow-card sm:p-8">
           <FloorGrid
             floors={floors}
             selectedRoom={room}
@@ -40,24 +45,24 @@ export function RoomExplorer() {
         </div>
       </section>
 
-      <div className="lg:sticky lg:top-22 lg:col-start-2 lg:row-span-4 lg:row-start-1">
+      <div className="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-4 lg:row-start-1">
         <RoomPanel key={room} roomNumber={room} />
       </div>
 
       <section className="lg:col-start-1">
-        <Eyebrow>Rincian biaya — kamar {room}</Eyebrow>
-        <div className="mt-4 rounded-card border border-line border-t-[3px] border-t-plum bg-paper p-5 sm:p-8">
+        <SectionLabel>Rincian biaya — kamar {room}</SectionLabel>
+        <div className="mt-4 rounded-card bg-paper p-5 shadow-card sm:p-8">
           <ReceiptTable rows={receipt.rows} total={receipt.total} note={receiptNote} />
         </div>
       </section>
 
       <section className="lg:col-start-1">
-        <Eyebrow className="mb-4">Sekitar</Eyebrow>
+        <SectionLabel className="mb-4">Sekitar</SectionLabel>
         <Sekitar />
       </section>
 
       <section className="lg:col-start-1">
-        <Eyebrow>Aturan rumah</Eyebrow>
+        <SectionLabel className="mb-4">Aturan rumah</SectionLabel>
         <HouseRules />
       </section>
     </div>

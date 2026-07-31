@@ -6,7 +6,7 @@ import { houseRules } from '@/lib/content/detail'
  */
 export function HouseRules() {
   return (
-    <dl className="mt-4 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+    <dl className="grid gap-x-10 gap-y-5 sm:grid-cols-2">
       {houseRules.map((rule) => (
         <div key={rule.title}>
           <dt className="mb-1 text-[15px] font-semibold">{rule.title}</dt>

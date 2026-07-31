@@ -31,7 +31,7 @@ export function RoomPanel({ roomNumber }: { roomNumber: string }) {
   const statusLabel = room.vacancy ?? (room.status === 'held' ? 'dibooking' : 'terisi')
 
   return (
-    <aside className="overflow-hidden rounded-card border border-line bg-paper shadow-max">
+    <aside className="overflow-hidden rounded-card bg-paper shadow-card">
       <div className="relative aspect-3/2 bg-photo-bg">
         <Image
           src={photos[shown].src}
@@ -51,7 +51,7 @@ export function RoomPanel({ roomNumber }: { roomNumber: string }) {
             aria-pressed={shown === index}
             onClick={() => setChosenPhoto(index)}
             className={cn(
-              'relative aspect-square flex-1 cursor-pointer overflow-hidden rounded-badge',
+              'relative aspect-square flex-1 cursor-pointer overflow-hidden rounded-badge transition-opacity duration-200 hover:opacity-85',
               shown === index && 'outline-2 outline-offset-1 outline-plum',
             )}
           >
@@ -60,25 +60,27 @@ export function RoomPanel({ roomNumber }: { roomNumber: string }) {
         ))}
       </div>
 
-      <div className="p-5">
+      <div className="p-6">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-figure text-[15px] font-medium">
+          <h2 className="text-[16px] font-semibold">
             Kamar {roomNumber} · {room.type}
           </h2>
-          <p className={cn('font-figure text-[13px] font-medium', statusTone[room.status])}>
+          <p className={cn('text-[13px] font-semibold', statusTone[room.status])}>
             {statusLabel}
           </p>
         </div>
 
-        <p className="mt-2 mb-1.5 font-figure text-[32px] leading-none font-medium">
-          {formatRupiah(room.rent)}
-          <span className="font-body text-[14px] font-normal text-ink-soft"> /bulan</span>
+        <p className="mt-3 mb-2">
+          <span className="font-figure text-[30px] leading-none font-bold tracking-[-0.02em]">
+            {formatRupiah(room.rent)}
+          </span>
+          <span className="ml-1.5 text-[14px] text-ink-soft">/bulan</span>
         </p>
         <p className="text-[13px] leading-[1.6] text-ink-soft">
           {room.size ?? defaultRoomSize} · {roomSpec}
         </p>
 
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-6 flex flex-col gap-2.5">
           <Button href={vacant ? routes.survei : undefined} size="lg" disabled={!vacant}>
             Jadwalkan survei
           </Button>

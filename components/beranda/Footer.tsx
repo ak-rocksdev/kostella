@@ -1,17 +1,9 @@
 import { BadgeCheck, Clock, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { FooterMap } from './FooterMap'
 import { footer } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
-
-/**
- * The labels here used to be the system's rule-and-caps section eyebrow. That
- * device belonged to the previous world; in this one a label is just a small
- * bold line, and the only thing that separates blocks is space.
- */
-function Label({ children }: { children: React.ReactNode }) {
-  return <p className="text-[13px] font-semibold text-ink-soft">{children}</p>
-}
 
 export function Footer() {
   return (
@@ -19,11 +11,11 @@ export function Footer() {
       <div className="wrap pt-20 sm:pt-28">
         <div className="grid items-start gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
           <div>
-            <Label>{footer.mapEyebrow}</Label>
+            <SectionLabel>{footer.mapEyebrow}</SectionLabel>
             {/* The map carries the card radius and elevation the rest of the
                 page uses; it is a photograph of the neighbourhood as far as
                 this layout is concerned. */}
-            <div className="mt-4 overflow-hidden rounded-card shadow-card">
+            <div className="mt-4">
               <FooterMap />
             </div>
             <p className="mt-3 text-[12px] text-ink-soft">{footer.mapCaption}</p>
@@ -31,7 +23,7 @@ export function Footer() {
 
           <div className="flex flex-col gap-10">
             <div>
-              <Label>{footer.addressEyebrow}</Label>
+              <SectionLabel>{footer.addressEyebrow}</SectionLabel>
               <ul className="mt-4 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
                 {footer.buildings.map((building) => (
                   <li
@@ -49,7 +41,7 @@ export function Footer() {
             </div>
 
             <div className="rounded-card bg-paper p-6 shadow-card">
-              <Label>{footer.contactEyebrow}</Label>
+              <SectionLabel>{footer.contactEyebrow}</SectionLabel>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <MessageCircle size={22} strokeWidth={1.5} aria-hidden className="text-plum" />
                 <span className="font-figure text-[22px] font-semibold whitespace-nowrap text-ink">

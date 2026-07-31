@@ -53,9 +53,9 @@ named the comparison set. Seed keys 39ac8395 and dcb6575e, both discharged.
 ## Tokens
 
 `app/globals.css` is the source of truth; these are the values the build settled
-on for the landing page.
+on. All three screens — Beranda, Pencarian, Detail — run on them.
 
-**Grounds.** One ground for the whole page: `--color-canvas: #fbfaf8`. White
+**Grounds.** One ground for every page: `--color-canvas: #fbfaf8`. White
 (`--color-paper`) is reserved for cards, so anything white is something you can
 act on. Banded sections were tried and dropped — alternating grounds competed
 with the elevation for the same job. `--color-stone: #edece7` survives from the
@@ -71,8 +71,13 @@ and always carries a word beside the colour.
 (Archivo, normal width) for prices, phone numbers and building numbers. Section
 headings run `clamp(2rem, 4–4.5vw, 2.75rem)` at 600 with `-0.015em` to `-0.025em`
 tracking; body copy sits at 15–17px and 1.6–1.65 line height. The `numeral`
-utility (Archivo Expanded 125%) is retained for the detail and search pages but
-is no longer used on the landing page.
+utility (Archivo Expanded 125%) is gone — the oversized identity numeral was the
+previous world's signature, and every screen now sets building and room numbers
+as a small marker in `--font-figure`.
+
+The rule-and-caps section eyebrow is gone with it. `SectionLabel` replaces it
+everywhere: 13px, semibold, `--color-ink-soft`, sentence case, separated from
+what follows by space alone.
 
 **Radii.** `--radius-card: 16px` on cards, photographs and panels;
 `--radius-badge: 8px` on tags and number markers; `rounded-full` on every
@@ -83,4 +88,5 @@ focus, both three-layer. The resting step is kept inside a 26px reach so it
 survives the carousel's clip box. `--shadow-float` remains for the hero card.
 
 **Rhythm.** Sections run `py-20 sm:py-28` inside `wrap` (1200px, 20/32px
-gutters).
+gutters). The search screen uses `wrap-wide` (1376px) because it puts inventory
+beside a map.
