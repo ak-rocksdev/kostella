@@ -52,5 +52,34 @@ named the comparison set. Seed keys 39ac8395 and dcb6575e, both discharged.
 
 ## Tokens
 
-Provisional until the first build settles them; `app/globals.css` is the source
-of truth and this file is updated to match once the build lands.
+`app/globals.css` is the source of truth; these are the values the build settled
+on for the landing page.
+
+**Grounds.** `--color-canvas: #fbfaf8` is the page ground and `--color-paper:
+#ffffff` is every card. Sections alternate between the two; nothing else is a
+surface. `--color-stone: #edece7` survives from the previous world but has been
+demoted from page ground to the fill behind tags and building-number markers.
+`--color-ink: #16171a` on the one dark panel.
+
+**Brand and status.** `--color-plum: #57182f` on actions and active states only;
+`--color-plum-soft: #f3e7ea` behind step numbers and the verified badge.
+Availability keeps `--color-available` / `--color-held` / `--color-occupied`
+and always carries a word beside the colour.
+
+**Type.** `--font-body` (Plus Jakarta Sans) for everything read, `--font-figure`
+(Archivo, normal width) for prices, phone numbers and building numbers. Section
+headings run `clamp(2rem, 4–4.5vw, 2.75rem)` at 600 with `-0.015em` to `-0.025em`
+tracking; body copy sits at 15–17px and 1.6–1.65 line height. The `numeral`
+utility (Archivo Expanded 125%) is retained for the detail and search pages but
+is no longer used on the landing page.
+
+**Radii.** `--radius-card: 16px` on cards, photographs and panels;
+`--radius-badge: 8px` on tags and number markers; `rounded-full` on every
+control, pill and status badge.
+
+**Elevation.** `--shadow-card` at rest and `--shadow-lift` on hover and keyboard
+focus, both three-layer. The resting step is kept inside a 26px reach so it
+survives the carousel's clip box. `--shadow-float` remains for the hero card.
+
+**Rhythm.** Sections run `py-20 sm:py-28` inside `wrap` (1200px, 20/32px
+gutters).

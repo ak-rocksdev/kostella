@@ -75,25 +75,19 @@ export function PropertyCard({
           <StatusBadge status={status} count={count} />
         </span>
 
-        {/* A text-shadow alone left the numeral at 1.4:1 wherever the photo runs
-            light. This is the same foot scrim the property gallery already uses,
-            so the number holds against any photograph dropped in later. */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-linear-to-t from-ink/55 to-transparent to-45%"
-        />
-        <span
-          aria-hidden
-          className="numeral absolute bottom-2 left-4 text-[56px] leading-[0.85] tracking-[-0.02em] text-white"
-        >
-          {number}
-        </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div>
-          <p className="text-[15px] leading-[1.35] font-semibold text-ink">
-            <span className="sr-only">Kostella {number}, </span>
+          {/* The number stays the naming system, but as a marker beside the
+              street rather than 56px of display type over the photograph. The
+              old treatment needed its own scrim to stay legible and left the
+              picture doing nothing. */}
+          <p className="flex items-baseline gap-2 text-[15px] leading-[1.35] font-semibold text-ink">
+            <span className="rounded-badge bg-stone px-1.5 py-0.5 font-figure text-[13px] leading-[1.4] tracking-[0.01em] text-ink">
+              <span className="sr-only">Kostella </span>
+              {number}
+            </span>
             {street}
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-[13px] text-ink-soft">

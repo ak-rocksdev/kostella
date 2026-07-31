@@ -1,60 +1,39 @@
-import { SectionEyebrow } from "@/components/ui/Eyebrow";
 import { Reveal } from "@/components/ui/Reveal";
 import { caraSewa } from "@/lib/content/beranda";
 
 /**
- * Renting drawn as the route it is.
+ * Four steps, stated plainly.
  *
- * The steps were four columns of equal weight separated by vertical rules, and
- * the 01–04 numerals were decoration — nothing connected them, so the sequence
- * had to be inferred. A single hairline now runs through the numerals like
- * stations on a line, and stops at the fourth. That is the section's own claim
- * made structural: from searching to holding the key is one continuous path,
- * and it ends.
- *
- * The line is the one new pattern this page introduces. It earns its place by
- * carrying information the reader needs — order and completion — rather than
- * decorating a list.
- *
- * The step icons are gone. They were generic and the brief already flags the
- * icon set as a substitution to be replaced; its own proof elements use no
- * icons at all, just numerals and a small label. The numbers were always doing
- * this work.
+ * The previous world drew a hairline route through the numerals — a good device,
+ * and a bespoke one. This world is the category standard taken straight, and a
+ * connector nobody else in it draws is exactly the sort of quirk that would be
+ * smuggled in rather than committed to. The sequence carries itself: the numbers
+ * are ordered, and the aside already says it takes a day.
  */
 export function CaraSewa() {
-  const lastIndex = caraSewa.steps.length - 1;
-
   return (
-    <section className="border-t border-line bg-paper">
-      <div className="wrap py-14 sm:py-24">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-          <SectionEyebrow as="h2">{caraSewa.eyebrow}</SectionEyebrow>
-          <p className="text-[15px] text-ink-soft">{caraSewa.aside}</p>
+    <section className="bg-paper">
+      <div className="wrap py-20 sm:py-28">
+        <div className="max-w-[36ch]">
+          <h2 className="text-[clamp(2rem,4vw,2.75rem)] leading-[1.1] font-semibold tracking-[-0.025em]">
+            {caraSewa.eyebrow}
+          </h2>
+          <p className="mt-4 text-[17px] leading-[1.6] text-ink-soft">
+            {caraSewa.aside}
+          </p>
         </div>
 
-        <ol className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {caraSewa.steps.map((step, i) => (
             <li key={step.number}>
-              <Reveal delay={i * 120} className="relative">
-                {/* Runs to the next station, across the column gutter. Absent on
-                  the last step, so the route visibly terminates. */}
-                {i < lastIndex && (
-                  <span
-                    aria-hidden
-                    className="route-line absolute top-[21px] left-0 hidden h-px w-[calc(100%+2rem)] bg-line lg:block"
-                  />
-                )}
-
-                {/* The paper ground punches the line, so the numeral sits on the
-                  route rather than being crossed out by it. */}
-                <span className="numeral relative bg-paper pr-4 text-[44px] leading-none text-plum">
+              <Reveal delay={i * 90}>
+                <span className="inline-flex size-10 items-center justify-center rounded-full bg-plum-soft font-figure text-[15px] font-semibold text-plum">
                   {step.number}
                 </span>
-
-                <h3 className="mt-4 mb-2 text-[20px] leading-[1.3] font-semibold">
+                <h3 className="mt-5 mb-2.5 text-[19px] leading-[1.3] font-semibold">
                   {step.title}
                 </h3>
-                <p className="text-[15px] leading-[1.6] text-ink-soft">
+                <p className="text-[15px] leading-[1.65] text-ink-soft">
                   {step.body}
                 </p>
               </Reveal>

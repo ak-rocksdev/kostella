@@ -7,8 +7,8 @@ import { routes } from '@/lib/routes'
 
 export function Kawasan() {
   return (
-    <section id="kawasan" className="border-t border-line bg-paper">
-      <div className="wrap py-14 sm:py-24">
+    <section id="kawasan" className="bg-paper">
+      <div className="wrap py-20 sm:py-28">
         {/* No section eyebrow. The area name is the heading, and "Properti per
             kawasan" only restated what four property cards already say. */}
         {areas.map((area) => (

@@ -1,38 +1,33 @@
 import { Button } from '@/components/ui/Button'
-import { SectionEyebrow } from '@/components/ui/Eyebrow'
 import { franchise } from '@/lib/content/beranda'
 import { routes } from '@/lib/routes'
 
 /**
- * The only inverse surface in the system, and the only place the copy switches
- * from "kamu" to "Anda" — this block speaks to owners, not tenants.
+ * The one dark surface, and the only place the copy switches from "kamu" to
+ * "Anda" — this block speaks to owners, not tenants.
+ *
+ * It used to be a full-bleed slab with a 140px outlined numeral. In this world
+ * it is a rounded panel sitting on the canvas like every other card, which is
+ * how the category signs off a page: one dark band, one sentence, one action.
  */
 export function Franchise() {
+  // Same ground as the section above it: the dark panel is the break, and a
+  // second ground change right at its top edge only competed with it.
   return (
-    <section id="franchise" className="bg-ink">
-      <div className="wrap grid items-center gap-8 py-14 sm:py-18 lg:grid-cols-[1fr_auto] lg:gap-12">
-        <div>
-          <SectionEyebrow inverse>{franchise.eyebrow}</SectionEyebrow>
-          {/* A heading in everything but the tag it had: it is this section's
-              only statement, and without it the block reached a screen reader
-              as an unnamed region. */}
-          <h2 className="mt-4 max-w-[620px] text-[clamp(1.375rem,3vw,1.75rem)] leading-[1.3] font-semibold tracking-[-0.01em] text-stone">
-            {franchise.body}
-          </h2>
-          <div className="mt-6">
-            <Button href={routes.kemitraan} variant="inverse">
-              {franchise.cta}
-            </Button>
+    <section id="franchise" className="bg-paper">
+      <div className="wrap pb-20 sm:pb-28">
+        <div className="flex flex-col items-start gap-8 rounded-card bg-ink px-8 py-12 shadow-card sm:px-14 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+          <div>
+            <p className="text-[14px] font-semibold text-stone/70">{franchise.eyebrow}</p>
+            <h2 className="mt-3 max-w-[24ch] text-[clamp(1.5rem,3vw,2rem)] leading-[1.25] font-semibold tracking-[-0.02em] text-stone text-balance">
+              {franchise.body}
+            </h2>
           </div>
-        </div>
 
-        {/* The sentence already states the number; this is its display echo. */}
-        <p
-          aria-hidden
-          className="numeral hidden text-[140px] leading-[0.85] text-transparent [-webkit-text-stroke:1px_var(--color-ink-soft)] sm:block"
-        >
-          {franchise.numeral}
-        </p>
+          <Button href={routes.kemitraan} variant="inverse" size="lg" className="shrink-0">
+            {franchise.cta}
+          </Button>
+        </div>
       </div>
     </section>
   )

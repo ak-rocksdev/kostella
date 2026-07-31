@@ -54,9 +54,10 @@
   --text-eyebrow--letter-spacing: 0.08em;
   --text-eyebrow--font-weight: 600;
 
-  /* Radii */
-  --radius-badge: 4px; /* badges + inputs */
-  --radius-card: 12px; /* cards */
+  /* Radii. The new world is softer: 16px on cards and photographs, 8px on the
+     small static tags, and controls go fully round in the components. */
+  --radius-badge: 8px; /* tags and small markers */
+  --radius-card: 16px; /* cards and photographs */
 
   /* Elevation.
      The brief specifies near-zero elevation and a single 1px shadow, separating
@@ -136,12 +137,10 @@
     overflow-x: clip;
   }
 
+  /* Links inherit. In this world plum belongs to actions and active states
+     only, so a link colours itself where it means to rather than by default. */
   a {
-    color: var(--color-plum);
-  }
-
-  a:hover {
-    color: var(--color-ink);
+    color: inherit;
   }
 
   /* The prototype ships no focus styles. Every interactive element gets a

@@ -19,12 +19,12 @@ type ButtonProps = {
    too would collide on the same property, and source order rather than intent
    would decide which one wins. */
 const base =
-  'inline-flex items-center justify-center rounded-badge border font-body font-semibold leading-[1.2] transition-colors duration-150'
+  'inline-flex items-center justify-center rounded-full border font-body font-semibold leading-[1.2] transition-colors duration-200'
 
 const sizes: Record<Size, string> = {
-  sm: 'px-3.5 py-[7px] text-[14px]',
-  md: 'px-5 py-2.5 text-[14px]',
-  lg: 'px-7 py-3.5 text-[16px]',
+  sm: 'px-4 py-2 text-[14px]',
+  md: 'px-5 py-2.5 text-[15px]',
+  lg: 'px-7 py-4 text-[16px]',
 }
 
 /* Hover states are CSS here; the prototype ran them as JS event handlers. Same

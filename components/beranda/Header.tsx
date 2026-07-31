@@ -22,8 +22,8 @@ export function Header() {
               key={item.label}
               href={item.href}
               className={cn(
-                'inline-flex min-h-11 items-center',
-                item.muted && 'text-ink-soft hover:text-ink',
+                'inline-flex min-h-11 items-center text-ink-soft transition-colors hover:text-ink',
+                item.muted && 'text-ink-soft/80',
               )}
             >
               {item.label}
