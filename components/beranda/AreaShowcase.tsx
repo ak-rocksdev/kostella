@@ -8,7 +8,7 @@ import { PropertyCard } from '@/components/ui/PropertyCard'
 import { Reveal } from '@/components/ui/Reveal'
 import { formatRupiah } from '@/lib/format'
 import { routes } from '@/lib/routes'
-import type { Area } from '@/lib/content/beranda'
+import { vacantRoomsIn, type Area } from '@/lib/content/beranda'
 
 /** Gap between cards, in px. Paging has to know it to land on a card edge. */
 const GAP = 20
@@ -32,6 +32,10 @@ export function AreaShowcase({ area }: { area: Area }) {
   const trackRef = useRef<HTMLUListElement>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(true)
+  // How much of the track is on screen, and how far along it we are. Drives the
+  // progress bar under the arrows: with nine tiles, two arrows alone give no
+  // sense of how much is left.
+  const [progress, setProgress] = useState({ visible: 1, at: 0 })
 
   // Both ends are reported as reached until proven otherwise, so the arrows
   // start disabled rather than flashing enabled on a track that cannot scroll.
@@ -41,6 +45,10 @@ export function AreaShowcase({ area }: { area: Area }) {
     const max = el.scrollWidth - el.clientWidth
     setAtStart(el.scrollLeft <= 1)
     setAtEnd(el.scrollLeft >= max - 1)
+    setProgress({
+      visible: el.clientWidth / el.scrollWidth,
+      at: max > 0 ? el.scrollLeft / max : 0,
+    })
   }, [])
 
   useEffect(() => {
@@ -54,16 +62,17 @@ export function AreaShowcase({ area }: { area: Area }) {
     return () => observer.disconnect()
   }, [sync])
 
+  // A page is however many whole cards currently fit, so the arrow advances the
+  // view rather than nudging it — eight buildings one card at a time is a
+  // chore. It still lands on a card edge, which is what keeps snapping quiet.
   const page = (direction: 1 | -1) => {
     const el = trackRef.current
     if (!el) return
     const card = el.querySelector('li')
-    const step = card ? card.getBoundingClientRect().width + GAP : el.clientWidth * 0.8
+    const step = card ? card.getBoundingClientRect().width + GAP : el.clientWidth
     el.scrollBy({
-      left: direction * step,
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 'auto'
-        : 'smooth',
+      left: direction * step * Math.max(1, Math.floor(el.clientWidth / step)),
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     })
   }
 
@@ -93,7 +102,7 @@ export function AreaShowcase({ area }: { area: Area }) {
           </div>
           <div>
             <dd className="font-figure text-[32px] leading-none font-semibold tracking-[-0.02em] text-available">
-              {area.vacantRooms}
+              {vacantRoomsIn(area)}
             </dd>
             <dt className="mt-2 text-[14px] text-ink-soft">kamar kosong</dt>
           </div>
@@ -108,13 +117,29 @@ export function AreaShowcase({ area }: { area: Area }) {
         {/* Paging buttons, not a scrollbar replacement: the track is a native
             scroller and stays swipeable and keyboard-reachable without them.
             Hidden where a thumb is the better control. */}
-        <div className="mt-9 hidden gap-2.5 lg:flex">
-          <TrackButton label="Gedung sebelumnya" disabled={atStart} onClick={() => page(-1)}>
-            <ArrowLeft size={19} strokeWidth={1.75} aria-hidden />
-          </TrackButton>
-          <TrackButton label="Gedung berikutnya" disabled={atEnd} onClick={() => page(1)}>
-            <ArrowRight size={19} strokeWidth={1.75} aria-hidden />
-          </TrackButton>
+        <div className="mt-9 hidden items-center gap-5 lg:flex">
+          <div className="flex gap-2.5">
+            <TrackButton label="Gedung sebelumnya" disabled={atStart} onClick={() => page(-1)}>
+              <ArrowLeft size={19} strokeWidth={1.75} aria-hidden />
+            </TrackButton>
+            <TrackButton label="Gedung berikutnya" disabled={atEnd} onClick={() => page(1)}>
+              <ArrowRight size={19} strokeWidth={1.75} aria-hidden />
+            </TrackButton>
+          </div>
+
+          {/* Decorative: it reports the scroll position of the list beside it,
+              which a screen reader reaches by walking the list itself. */}
+          <div aria-hidden className="h-[3px] flex-1 rounded-full bg-line">
+            <div
+              className="h-full rounded-full bg-plum"
+              style={{
+                width: `${Math.min(1, progress.visible) * 100}%`,
+                // Travels across the leftover track, so the thumb reaches the
+                // right edge exactly when the last card does.
+                marginInlineStart: `${progress.at * (1 - Math.min(1, progress.visible)) * 100}%`,
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -125,11 +150,18 @@ export function AreaShowcase({ area }: { area: Area }) {
             were sliced off inside the box. The px/-mx and py/-my pairs open the
             clip box without moving anything on the page. And `snap-start` aligns
             to the scrollport edge rather than the padding edge, so without
-            scroll-px the first card slams flush against it on load. */}
+            scroll-ps the first card slams flush against it on load.
+
+            The end padding is larger than the negative margin on purpose: the
+            track bleeds off the right edge while you are in the middle of it,
+            but the last tile stops on the page's own gutter, so the end of the
+            list reads as an end rather than as something cut off. Logical
+            longhands (ps/pe) rather than px — px is a shorthand, and which one
+            wins would come down to Tailwind's layer order rather than intent. */}
         <ul
           ref={trackRef}
           onScroll={sync}
-          className="no-scrollbar -mx-4 -my-8 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-4 px-4 py-8"
+          className="no-scrollbar -ms-4 -me-4 -my-8 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-ps-4 py-8 ps-4 pe-9 sm:pe-12"
         >
           {area.properties.map((property, i) => (
             <li

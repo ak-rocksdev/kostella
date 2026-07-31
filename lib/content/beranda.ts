@@ -121,6 +121,19 @@ export type Property = {
   /** Vacant-room count, shown on the badge. Only meaningful when available. */
   count?: number
   photo: string
+  /**
+   * ═══ INVENTED. MUST BE REPLACED BEFORE THIS GOES ANYWHERE PUBLIC. ═══
+   *
+   * Set on the four buildings added on 2026-07-31 so the area section reads at
+   * full length for the pitch. The client has 31 buildings and named four; the
+   * other four here — their addresses, rents, tenancy, facilities and vacancy
+   * counts — were written by me and are not claims Kostella has made.
+   *
+   * To remove them: delete every property carrying this flag. Nothing else
+   * needs touching. The area's vacancy figure is derived from the counts that
+   * remain, so it returns to the client's real 7 on its own.
+   */
+  placeholder?: true
 }
 
 export type Area = {
@@ -132,8 +145,24 @@ export type Area = {
    * a paragraph is exactly where an unchecked one would slip in unnoticed.
    */
   blurb: string
-  vacantRooms: number
   properties: Property[]
+}
+
+/**
+ * Rooms a visitor can actually take in this area, right now.
+ *
+ * Derived rather than stored. The client's figure for Grogol is 7, which is
+ * exactly the sum of the vacancy counts on the buildings they confirmed — a
+ * held room reads "Sisa 1" on its badge but is spoken for, so it is not
+ * counted. Deriving it means the headline number and the cards can never drift
+ * apart, and pulling the placeholder buildings restores the real figure without
+ * anyone having to remember to edit it.
+ */
+export function vacantRoomsIn(area: Area): number {
+  return area.properties.reduce(
+    (total, property) => total + (property.status === 'available' ? (property.count ?? 0) : 0),
+    0,
+  )
 }
 
 export const areas: Area[] = [
@@ -142,7 +171,6 @@ export const areas: Area[] = [
     nearby: 'dekat Trisakti & Untar',
     blurb:
       'Semua gedung kami di sini berdiri di Jl. Dr. Susilo, sekitar satu kilometer dari Trisakti dan Untar. Angka kamar kosongnya dicek ulang tiap hari.',
-    vacantRooms: 7,
     properties: [
       {
         number: '362',
@@ -189,6 +217,73 @@ export const areas: Area[] = [
         priceFrom: 1_750_000,
         status: 'occupied',
         photo: '/images/ruang-bersama.jpg',
+      },
+
+      /* ══════════════════════════════════════════════════════════════════════
+         EVERYTHING BELOW THIS LINE IS INVENTED. DELETE BEFORE LAUNCH.
+
+         Added 2026-07-31 at the client's request so the area section reads at
+         full length in the pitch deck. Kostella operates 31 buildings and has
+         named four of them; these four are my fabrication — addresses, rents,
+         tenancy, facilities and vacancy counts alike. They are plausible, which
+         is exactly what makes them dangerous: nothing on the rendered page
+         marks them as unreal.
+
+         Replacing them needs, per building: number, street, area, tenancy,
+         facilities, cheapest monthly rent, status, vacant-room count, photo.
+         Deleting them instead is safe and complete — the area's vacancy figure
+         is derived by vacantRoomsIn() and returns to the client's 7 by itself.
+         ══════════════════════════════════════════════════════════════════════ */
+      {
+        number: '358',
+        street: 'Jl. Dr. Susilo 2 No. 358',
+        area: 'Grogol, Jakarta Barat',
+        distances: ['Trisakti 1 km', 'Central Park 0,3 km'],
+        tenancy: 'Campur',
+        facilities: ['Kamar mandi dalam', 'AC', 'Wifi'],
+        priceFrom: 1_600_000,
+        status: 'available',
+        count: 3,
+        photo: '/images/kamar-standard.jpg',
+        placeholder: true,
+      },
+      {
+        number: '355',
+        street: 'Jl. Dr. Susilo 2 No. 355',
+        area: 'Grogol, Jakarta Barat',
+        distances: ['Trisakti 1,2 km', 'Terminal Grogol 0,3 km'],
+        tenancy: 'Khusus putra',
+        facilities: ['AC', 'Wifi', 'Dapur bersama'],
+        priceFrom: 1_500_000,
+        status: 'available',
+        count: 4,
+        photo: '/images/ruang-bersama.jpg',
+        placeholder: true,
+      },
+      {
+        number: '364',
+        street: 'Jl. Dr. Susilo 2 No. 364',
+        area: 'Grogol, Jakarta Barat',
+        distances: ['Untar 1 km', 'Central Park 0,2 km'],
+        tenancy: 'Khusus putri',
+        facilities: ['Kamar mandi dalam', 'AC', 'Laundry'],
+        priceFrom: 1_700_000,
+        status: 'available',
+        count: 2,
+        photo: '/images/tampak-depan.jpg',
+        placeholder: true,
+      },
+      {
+        number: '2A',
+        street: 'Jl. Dr. Susilo 2A',
+        area: 'Grogol, Jakarta Barat',
+        distances: ['Untar 0,8 km', 'Terminal Grogol 0,4 km'],
+        tenancy: 'Campur',
+        facilities: ['Kamar mandi dalam', 'AC', 'Parkir motor'],
+        priceFrom: 1_850_000,
+        status: 'held',
+        photo: '/images/kamar-superior.jpg',
+        placeholder: true,
       },
     ],
   },
