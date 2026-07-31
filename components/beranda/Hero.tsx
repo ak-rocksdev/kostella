@@ -3,43 +3,48 @@ import { SearchBar } from './SearchBar'
 import { hero } from '@/lib/content/beranda'
 
 /**
- * The category standard, taken deliberately and finished properly.
+ * Overlay variant, for comparison against the stacked hero on main.
  *
- * A light ground with real air, the claim set large and centred, one elevated
- * search row, and a wide photograph anchoring the composition. The previous
- * hero put white type over a darkened photo — dramatic, but it read austere,
- * and this brand is asking someone to picture living somewhere.
+ * The photograph runs full-bleed from directly under the navbar and the whole
+ * argument — claim, supporting line, and the search row — layers over it. The
+ * white pill on a photograph is the move this canon is known for; it is the one
+ * place a search control reads as an object rather than as a form.
  *
- * The photo sits below the fold-line on purpose rather than behind the words:
- * at this craft level a photograph earns its own frame, and text over an image
- * is where the contrast problems and the art-direction compromises live.
+ * The scrim is 68%, not the 55% that would look prettier. Against a fully
+ * blown-out photograph that leaves solid stone at 5.3:1, which the 18px
+ * supporting line needs — and the photograph here is a bright white room, so
+ * this is the realistic case rather than the pessimistic one. The bottom
+ * gradient is depth only; nothing legible depends on it.
  */
 export function Hero() {
   return (
-    <section aria-label="Cari kamar" className="bg-canvas">
-      <div className="wrap pt-14 pb-16 text-center sm:pt-24 sm:pb-24">
-        <h1 className="mx-auto max-w-[20ch] text-[clamp(2.25rem,5.2vw,3.75rem)] leading-[1.06] font-semibold tracking-[-0.03em] text-balance">
+    <section aria-label="Cari kamar" className="relative isolate bg-ink">
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src={hero.photo.src}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div aria-hidden className="absolute inset-0 bg-ink/68" />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-t from-ink/30 to-transparent to-55%"
+        />
+      </div>
+
+      <div className="wrap flex min-h-[580px] flex-col justify-center py-20 text-center sm:min-h-[720px] sm:py-28">
+        <h1 className="mx-auto max-w-[20ch] text-[clamp(2.25rem,5.2vw,3.75rem)] leading-[1.06] font-semibold tracking-[-0.03em] text-stone text-balance">
           {hero.heading}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-[54ch] text-[18px] leading-[1.6] text-ink-soft text-pretty">
+        <p className="mx-auto mt-6 max-w-[54ch] text-[18px] leading-[1.6] text-stone text-pretty">
           {hero.lead}
         </p>
 
-        <SearchBar />
-
-        {/* 16:9, not 21:9. The source frames are 3:2, and a cinematic slice
-            through one lands on wall rather than on the room. */}
-        <div className="relative mt-14 aspect-4/3 overflow-hidden rounded-[20px] bg-photo-bg sm:mt-20 sm:aspect-16/9">
-          <Image
-            src={hero.photo.src}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
+        <SearchBar onDark />
       </div>
     </section>
   )
