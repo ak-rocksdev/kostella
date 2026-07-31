@@ -365,23 +365,43 @@ export const franchise = {
   numeral: '31',
 } as const
 
+const phone = '0812 8000 0362'
+
 export const footer = {
-  mapEyebrow: 'Gedung kami di Grogol',
-  mapCaption: 'Lokasi perkiraan — alamat pasti dikirim saat jadwal survei dikonfirmasi.',
-  addressEyebrow: 'Alamat gedung',
-  addressNote:
-    'Grogol, Jakarta Barat · + 27 gedung lain di Jakarta, Bandung, dan Bali.',
+  /**
+   * One line of who Kostella is, for the reader who scrolled past everything
+   * else. Every figure in it is from PRODUCT.md.
+   */
+  positioning:
+    'Kos milik dan dikelola sendiri sejak 2008. 31 gedung di Jakarta, Bandung, dan Bali.',
+
+  navLabel: 'Jelajahi',
+
+  addressEyebrow: 'Gedung kami di Grogol',
+  addressNote: '+ 27 gedung lain di Jakarta, Bandung, dan Bali.',
+  addressCaption: 'Alamat pasti dikirim saat jadwal survei dikonfirmasi.',
+  /**
+   * CAUTION: this list and the property cards disagree, and have since the
+   * design bundle was imported. Here and on the search screen the fourth and
+   * fifth buildings are 361 and 2A3; the Beranda property cards call them 360
+   * and 2C. lib/content/geography.ts holds coordinates for all five, so it is
+   * not obvious which pair is the mistake. The client has to say.
+   */
   buildings: [
     { number: '362', street: 'Jl. Dr. Susilo 2 No. 362' },
     { number: '361', street: 'Jl. Dr. Susilo 2 No. 361' },
     { number: '351', street: 'Jl. Dr. Susilo 2 No. 351' },
     { number: '2A3', street: 'Jl. Dr. Susilo 2A No. 3' },
   ],
+
   contactEyebrow: 'Hubungi kami',
-  phone: '0812 8000 0362',
+  phone,
+  /** E.164, derived from the printed number so the two cannot disagree. */
+  phoneHref: `tel:+62${phone.replace(/\D/g, '').slice(1)}`,
   verified: 'terverifikasi',
-  hours: 'Jam operasional 08.00–21.00 WIB, setiap hari',
+  hours: '08.00–21.00 WIB, setiap hari',
   contactCta: 'Chat lewat WhatsApp',
+
   disclaimer: 'Konsep — bukan situs final',
   copyright: '© Kostella 2026',
 } as const

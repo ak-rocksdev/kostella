@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { DetailHeader } from '@/components/detail/DetailHeader'
 import { HeroGallery } from '@/components/detail/HeroGallery'
 import { RoomExplorer } from '@/components/detail/RoomExplorer'
+import { SiteFooter } from '@/components/ui/SiteFooter'
 import { property } from '@/lib/content/detail'
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function DetailPage() {
         <HeroGallery />
         <RoomExplorer />
       </main>
+      <SiteFooter />
     </>
   )
 }
