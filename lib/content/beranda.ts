@@ -46,9 +46,9 @@ export const hero = {
    * suit the brand better still, but the only one on hand is 500px wide and
    * would break up full-bleed — a high-resolution facade is an asset request.
    *
-   * Rendered as a decorative CSS background, not an <img>: it carries no
-   * information a screen reader needs, and it is a placeholder from the design
-   * bundle rather than a real Kostella room, so naming it would be false.
+   * Rendered by `Hero` as a full-bleed `next/image` behind the overlay, with
+   * `alt=""`: it is decorative, and it comes from the design bundle rather
+   * than being a real Kostella room, so describing it would be false.
    */
   photo: { src: '/images/kamar-standard.jpg' },
 } as const
