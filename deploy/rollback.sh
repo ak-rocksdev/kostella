@@ -65,7 +65,7 @@ mv -Tf "${CURRENT}.tmp" "$CURRENT"
 info "current -> $TARGET"
 
 for path in / /pencarian/ /detail/; do
-  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 -H "Host: $SITE" "http://127.0.0.1${path}" || echo 000)"
+  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 --resolve "$SITE:443:127.0.0.1" "https://$SITE${path}" || echo 000)"
   printf "    %-14s %s\n" "$path" "$code"
   [ "$code" = "200" ] || fail "$path mengembalikan $code — rilis tujuan pun bermasalah"
 done

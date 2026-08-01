@@ -111,7 +111,12 @@ info "current -> $TIMESTAMP"
 
 step "6/7  Verifikasi lewat nginx"
 for path in / /pencarian/ /detail/; do
-  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 -H "Host: $SITE" "http://127.0.0.1${path}" || echo 000)"
+  # Lewat HTTPS dengan --resolve, bukan port 80 dengan header Host: Certbot
+  # memasang redirect 80->443, jadi menguji port 80 selalu mengembalikan 301
+  # dan verifikasi ini akan me-rollback setiap deploy yang justru berhasil.
+  # --resolve memaksa ke 127.0.0.1 sehingga uji ini tidak bergantung DNS luar,
+  # sekaligus benar-benar melewati TLS seperti pengunjung.
+  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 --resolve "$SITE:443:127.0.0.1" "https://$SITE${path}" || echo 000)"
   printf "    %-14s %s\n" "$path" "$code"
   [ "$code" = "200" ] || fail "$path mengembalikan $code"
 done
