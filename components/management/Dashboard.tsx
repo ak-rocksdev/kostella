@@ -9,6 +9,8 @@ import { cn } from '@/lib/cn'
 import { buildingName, portfolio } from '@/lib/content/management/buildings'
 import { surveysToday } from '@/lib/content/management/surveys'
 import { useManagement } from '@/lib/management/useManagement'
+import { useToday } from '@/lib/management/today'
+import { parseDate } from '@/lib/dates'
 import { attentionItems } from './attention'
 import { describe, when } from './log'
 import { PortfolioBar } from './PortfolioBar'
@@ -34,21 +36,26 @@ const ALL = '__all__'
  */
 export function Dashboard() {
   const { buildings, surveys, log } = useManagement()
+  const today = useToday()
   const [scope, setScope] = useState<string>(ALL)
 
   const inScope = scope === ALL ? buildings : buildings.filter((b) => b.number === scope)
   const totals = portfolio(inScope)
-  const today = surveysToday(surveys).filter((s) => scope === ALL || s.building === scope)
-  const attention = attentionItems(inScope)
+  const surveysDueToday = surveysToday(surveys).filter((s) => scope === ALL || s.building === scope)
+  const attention = attentionItems(inScope, today)
   const recent = log.filter((e) => scope === ALL || e.building === scope).slice(0, 5)
 
-  const dated = new Intl.DateTimeFormat('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Asia/Jakarta',
-  }).format(new Date())
+  /* Empty until the browser reports a date. The build cannot know which day
+     this will be read on, and pretending otherwise is what made the panel throw
+     a hydration error at exactly the moment it was being demonstrated. */
+  const dated = today
+    ? new Intl.DateTimeFormat('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(parseDate(today))
+    : ''
 
   return (
     <div className="wrap-wide py-8 sm:py-10">
@@ -56,8 +63,9 @@ export function Dashboard() {
         <div>
           <h1 className="text-[28px] leading-[1.2] font-semibold tracking-[-0.02em]">Hari ini</h1>
           {/* The date belongs to the screen, not the header: this is the only
-              screen that is about today. */}
-          <p className="mt-2 text-[15px] text-ink-soft">{dated}</p>
+              screen that is about today. Its line keeps its height while empty,
+              so the heading below does not jump when the date arrives. */}
+          <p className="mt-2 min-h-6 text-[15px] text-ink-soft">{dated}</p>
         </div>
 
         <Select
@@ -99,9 +107,9 @@ export function Dashboard() {
             },
             {
               label: 'Survei hari ini',
-              value: today.length,
-              detail: today.length
-                ? `${today.filter((s) => s.status === 'baru').length} belum dikonfirmasi`
+              value: surveysDueToday.length,
+              detail: surveysDueToday.length
+                ? `${surveysDueToday.filter((s) => s.status === 'baru').length} belum dikonfirmasi`
                 : 'tidak ada jadwal',
             },
           ]}
@@ -111,7 +119,7 @@ export function Dashboard() {
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1fr_1fr]">
         <section>
           <SectionLabel className="mb-4">Survei hari ini</SectionLabel>
-          <SurveyList surveys={today} buildings={buildings} />
+          <SurveyList surveys={surveysDueToday} buildings={buildings} />
         </section>
 
         <section>

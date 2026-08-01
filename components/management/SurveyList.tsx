@@ -49,7 +49,7 @@ export function SurveyList({
     apply((s) => setSurveyStatus(s, survey, status, note))
     show({
       title: `Survei ${survey.name} — ${SURVEY_LABEL[status].toLowerCase()}`,
-      detail: `${surveyTime(survey.at)} · ${nameOf(survey.building)} · tercatat atas ${actor}`,
+      detail: `${surveyTime(survey)} · ${nameOf(survey.building)} · tercatat atas ${actor}`,
       icon: status === 'batal' ? CalendarX : CalendarCheck,
       tone: status === 'batal' ? 'attention' : 'success',
       action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
@@ -76,7 +76,7 @@ export function SurveyList({
             className={cn('rounded-card bg-paper p-4 shadow-card sm:p-5', done && 'opacity-70')}
           >
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="font-figure text-[17px] font-bold">{surveyTime(survey.at)}</span>
+              <span className="font-figure text-[17px] font-bold">{surveyTime(survey)}</span>
               <span className="text-[15px] font-semibold">{survey.name}</span>
               <span className={cn('text-[13px] font-semibold', TONE[survey.status])}>
                 {SURVEY_LABEL[survey.status]}

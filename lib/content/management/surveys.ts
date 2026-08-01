@@ -13,6 +13,8 @@
  * states here are my guess at it.
  */
 
+import { addDays } from '@/lib/dates'
+
 export type SurveyStatus = 'baru' | 'dikonfirmasi' | 'selesai' | 'batal'
 
 export type Survey = {
@@ -20,8 +22,19 @@ export type Survey = {
   building: string
   /** The room they asked about, where they named one. */
   room?: string
-  /** ISO datetime, in Jakarta time. */
-  at: string
+  /**
+   * Days from whenever the panel is opened. 0 is today.
+   *
+   * An offset rather than a date, because this module must not read the clock.
+   * It used to, and the value it produced was baked into the static HTML at
+   * build time — so the day someone demonstrated the panel, the server's idea
+   * of "today" and the browser's disagreed and React threw #418. See
+   * `lib/management/today.ts`.
+   */
+  dayOffset: number
+  /** Local hour and minute of the viewing. */
+  hour: number
+  minute?: number
   name: string
   /** Masked — see GUIDELINES > Personal data. */
   phone: string
@@ -38,28 +51,16 @@ export const SURVEY_LABEL: Record<SurveyStatus, string> = {
 
 /**
  * Seeded relative to whenever the panel is opened, so the dashboard always has
- * a today worth looking at. A fixed date would leave the screen empty the day
+ * a today worth looking at. Fixed dates would leave the screen empty the day
  * after this was written, which is exactly when someone demonstrates it.
  */
-function todayAt(hour: number, minute = 0): string {
-  const d = new Date()
-  d.setHours(hour, minute, 0, 0)
-  return d.toISOString()
-}
-
-function daysFromNow(days: number, hour: number): string {
-  const d = new Date()
-  d.setDate(d.getDate() + days)
-  d.setHours(hour, 0, 0, 0)
-  return d.toISOString()
-}
-
 export const surveys: Survey[] = [
   {
     id: 's1',
     building: '362',
     room: '211',
-    at: todayAt(10, 0),
+    dayOffset: 0,
+    hour: 10,
     name: 'Calon penyewa A',
     phone: '0812 xxxx 7890',
     status: 'baru',
@@ -68,7 +69,9 @@ export const surveys: Survey[] = [
   {
     id: 's2',
     building: '362',
-    at: todayAt(13, 30),
+    dayOffset: 0,
+    hour: 13,
+    minute: 30,
     name: 'Orang tua calon penyewa B',
     phone: '0813 xxxx 5432',
     status: 'dikonfirmasi',
@@ -78,7 +81,8 @@ export const surveys: Survey[] = [
     id: 's3',
     building: '351',
     room: '102',
-    at: todayAt(16, 0),
+    dayOffset: 0,
+    hour: 16,
     name: 'Calon penyewa C',
     phone: '0857 xxxx 3344',
     status: 'baru',
@@ -86,7 +90,8 @@ export const surveys: Survey[] = [
   {
     id: 's4',
     building: '360',
-    at: todayAt(9, 0),
+    dayOffset: 0,
+    hour: 9,
     name: 'Calon penyewa D',
     phone: '0811 xxxx 2210',
     status: 'selesai',
@@ -96,32 +101,24 @@ export const surveys: Survey[] = [
   {
     id: 's5',
     building: '2A3',
-    at: daysFromNow(2, 11),
+    dayOffset: 2,
+    hour: 11,
     name: 'Calon penyewa E',
     phone: '0878 xxxx 9001',
     status: 'dikonfirmasi',
   },
 ]
 
-const sameDay = (iso: string, day: Date) => {
-  const d = new Date(iso)
-  return (
-    d.getFullYear() === day.getFullYear() &&
-    d.getMonth() === day.getMonth() &&
-    d.getDate() === day.getDate()
-  )
-}
+/** The calendar day a viewing falls on, given today. */
+export const surveyDate = (survey: Survey, today: string) => addDays(today, survey.dayOffset)
 
 /** Today's viewings, earliest first. Cancelled ones are still today's. */
-export function surveysToday(all: Survey[], now = new Date()): Survey[] {
-  return all
-    .filter((s) => sameDay(s.at, now))
-    .sort((a, b) => a.at.localeCompare(b.at))
+export function surveysToday(all: Survey[]): Survey[] {
+  return all.filter((s) => s.dayOffset === 0).sort((a, b) => order(a) - order(b))
 }
 
-export const surveyTime = (iso: string) =>
-  new Intl.DateTimeFormat('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Jakarta',
-  }).format(new Date(iso))
+const order = (s: Survey) => s.hour * 60 + (s.minute ?? 0)
+
+/** "09.00" — the viewing's own local time, which needs no date at all. */
+export const surveyTime = (survey: Survey) =>
+  `${String(survey.hour).padStart(2, '0')}.${String(survey.minute ?? 0).padStart(2, '0')}`

@@ -1,4 +1,5 @@
 import { CalendarClock, DoorOpen, ImageOff, Wrench, type LucideIcon } from 'lucide-react'
+import { daysBetween } from '@/lib/dates'
 import {
   buildingName,
   coverPhoto,
@@ -34,10 +35,13 @@ export type Attention = {
   href: string
 }
 
-const daysSince = (iso: string) =>
-  Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000))
-
-export function attentionItems(buildings: Building[]): Attention[] {
+/**
+ * `today` is passed in rather than read from the clock. This module renders on
+ * the server too, where "now" is build time — see `lib/management/today.ts` for
+ * the hydration failure that caused. `null` means the browser has not reported
+ * a date yet, and every day count is simply left off that first paint.
+ */
+export function attentionItems(buildings: Building[], today: string | null): Attention[] {
   const items: Attention[] = []
 
   for (const building of buildings) {
@@ -47,12 +51,15 @@ export function attentionItems(buildings: Building[]): Attention[] {
 
     for (const room of building.rooms) {
       if (!room.blocked) continue
-      const days = daysSince(room.blocked.since)
+      const days = today ? Math.max(0, daysBetween(room.blocked.since, today)) : null
       items.push({
         id: `${building.number}-blocked-${room.room}`,
         tone: 'attention',
         icon: Wrench,
-        title: `Kamar ${room.room} diblokir ${days > 0 ? `${days} hari` : 'hari ini'}`,
+        title:
+          days === null
+            ? `Kamar ${room.room} diblokir`
+            : `Kamar ${room.room} diblokir ${days > 0 ? `${days} hari` : 'hari ini'}`,
         detail: `${name} · ${room.blocked.note}`,
         href,
       })
