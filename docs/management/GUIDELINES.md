@@ -54,6 +54,21 @@ Check this list before opening a pull request, and again before demoing.
       the date it was entered. Billing reads that date.
       *Left out of the phase-1 draft; billing would have had to retrofit it.*
 
+## Public-facing attributes
+
+- [ ] Anything a manager edits that also appears publicly is stored as an **id
+      from a fixed list**, never free text.
+      *`facilityFacet` groups the search filter chips by exact string. One
+      manager typing "WiFi" where the data says "Wifi" splits the filter into
+      two chips matching half the buildings each, silently.*
+- [ ] A value shown in two places is stored once and rendered through a label
+      map. *Tenancy is "Khusus putri" on Beranda and "putri" on the search
+      screen — two shapes for one fact, and they could already have drifted.*
+- [ ] An edit screen says in plain words where the change will appear. A
+      manager should not have to guess how far a tick travels.
+- [ ] Adding a genuinely new option is a code change. That friction is correct
+      for something that reshapes a public filter.
+
 ## Roles
 
 - [ ] The **owner** view shows aggregates and trends. It never lists individual

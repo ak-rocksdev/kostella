@@ -9,8 +9,8 @@ Source: `project/ui_kits/dashboard/Dashboard.jsx` (building switcher, floor grid
 ## Goal
 
 Build the data spine of the management panel and the screens that read it: the
-buildings Kostella operates, the rooms inside them, and a record of every
-change anyone makes to either.
+buildings Kostella operates, the rooms inside them, the facilities each
+building offers, and a record of every change anyone makes to any of it.
 
 Every later phase points at a room — a tenant occupies one, a bill is raised
 for one, a report aggregates them. Getting this record right first means the
@@ -31,7 +31,8 @@ In scope:
   changes, audit log, reset.
 - `/management/buildings` — the buildings list with per-building occupancy.
 - `/management/buildings/[number]` — one building: floor grid, room table,
-  actions, and the selected room's own history.
+  actions, the selected room's own history, and the building's facilities and
+  tenancy type.
 - `/management/activity` — the audit log across all buildings, filterable.
 - `BuildingSwitcher` — the `362 ▾` control from the design.
 - `MetricCard` — the one design-system primitive this phase needs that does not
@@ -51,6 +52,14 @@ Out of scope, and why:
   will be more than one thing worth exporting.
 - A separate page per room. The panel on the building page carries everything a
   room has; a route for it would be a click with nothing new behind it.
+- Photographs. Managing them means uploading them, which means a backend and a
+  file store. The three Cove images stay until the client supplies their own.
+- Distances and area copy. Editable in principle — it would let the client fix
+  "Central Park 0,2 km", which is roughly 1,5 km — but they are marketing facts,
+  not operations. Candidate for a later phase.
+- Approval before a change takes effect. Raised and deferred by the client on
+  2026-08-01; noted here because it would change the model, not just add a
+  button.
 
 ## Data model
 
@@ -74,9 +83,45 @@ export type Building = {
   area: string
   floors: string[]      // ordered top-down, matching the public floor grid
   rooms: RoomState[]
+  /** Building-wide, and shown on every public card. Values come from
+   *  FACILITIES below — never free text. See "Why a fixed list". */
+  facilities: FacilityId[]
+  tenancy: TenancyId    // 'putri' | 'putra' | 'campur'
   placeholder?: true    // invented; see GUIDELINES > Figures
 }
 ```
+
+### Facilities: a fixed list, not free text
+
+```ts
+export const FACILITIES = [
+  { id: 'kamar-mandi-dalam', label: 'Kamar mandi dalam' },
+  { id: 'ac',                label: 'AC' },
+  { id: 'wifi',              label: 'Wifi' },
+  { id: 'dapur-bersama',     label: 'Dapur bersama' },
+  { id: 'laundry',           label: 'Laundry' },
+  { id: 'parkir-motor',      label: 'Parkir motor' },
+] as const
+```
+
+Stored as ids, rendered through the label. This is not tidiness — free text
+would break the search screen silently.
+
+`facilityFacet` in `lib/content/pencarian.ts` builds the filter chips with
+`new Set(...)`, which groups by **exact string**. A manager typing "WiFi" where
+the rest of the data says "Wifi" would produce two filter chips, each matching
+half the buildings, with no error anywhere. Ids make that impossible; adding a
+genuinely new facility is a code change, which is the right amount of friction
+for something that reshapes a public filter.
+
+The same applies to tenancy, which today is stored in two shapes:
+`'Khusus putri'` on Beranda and `'putri'` on the search screen. Phase 1 settles
+on the id and derives both labels, so the two can no longer drift.
+
+**Open with the client:** "Kamar mandi dalam" and "AC" are modelled per
+building, meaning every room has them. If a building mixes en-suite and shared
+rooms, this model is wrong and they belong on `RoomState` instead. The current
+data offers no way to tell.
 
 ### Occupancy, defined
 
@@ -118,7 +163,7 @@ export type AuditEntry = {
   actor: string             // who — see Actor below
   building: string          // '362'
   room?: string             // absent for building-level changes
-  action: 'status' | 'rent' | 'block' | 'unblock'
+  action: 'status' | 'rent' | 'block' | 'unblock' | 'facility' | 'tenancy'
   from: string              // human-readable previous value
   to: string
   /** Required for `rent`, `block` and `unblock`. A price change without a
@@ -204,6 +249,12 @@ an unsorted list.*)
   last five changes** read straight from the audit log. A manager asking "why
   is this room still blocked" gets the answer without leaving the screen.
 - A room table beneath: room, floor, type, rent, status, blocked-since.
+- **Fasilitas & tipe penghuni** — a checklist over `FACILITIES` and a single
+  choice of tenancy. Both are building-wide and both appear on every public
+  card, so each change is logged like any other and each states its reason.
+  Beside it, in plain words, what the change will do: *"Muncul di kartu
+  properti, hasil pencarian, dan filter fasilitas."* A manager should not have
+  to guess how far a tick travels.
 
 ### Actions
 
@@ -213,6 +264,8 @@ an unsorted list.*)
 | Atur harga | new rent, **reason (required)** | `rent`, from → to, with note |
 | Blokir untuk perbaikan | **reason (required)**, since date | `block` |
 | Buka blokir | **reason (required)** | `unblock` |
+| Ubah fasilitas | which facility, on or off | `facility`, from → to |
+| Ubah tipe penghuni | new tenancy | `tenancy`, from → to |
 
 A required reason on price and block is the difference between a log that
 answers questions and one that only records that something happened.
@@ -243,6 +296,13 @@ This is the phase's main risk: it touches three shipped screens. Mitigated by
 doing it last, after the management screens read correctly, and by verifying
 every public route before and after.
 
+Facilities and tenancy travel further than the room states do. Each one feeds
+three public surfaces: the property card's tag list, the search result line,
+and the search screen's **filter chips**, which are derived from whatever the
+buildings actually offer. Tick "Laundry" on 351 and the Laundry filter starts
+returning two buildings instead of one — the filter itself changed, not just a
+row of text.
+
 A **blocked room vanishing from the public site while still counted by the
 manager** is the single clearest demonstration that the two sides are one
 system. Verify it explicitly.
@@ -261,13 +321,19 @@ Recorded here when the phase ships, not asserted in advance.
 4. The loop end to end: block a room, load `/pencarian` in the same browser,
    confirm it is gone; unblock, confirm it returns; confirm both appear in the
    log with actor, timestamp and reason.
-5. Change actor, make a second change, confirm the log distinguishes them.
-6. Bump the schema version by hand with data present; confirm the panel resets
+5. Facilities reach all three public surfaces: tick Laundry on 351, then
+   confirm it appears on the property card and the search result line, **and**
+   that the search screen's Laundry chip goes from 1 to 2. Untick, confirm all
+   three revert.
+6. Change tenancy on a building; confirm Beranda's "Khusus putri" and the
+   search filter's "Putri" both follow from the one id.
+7. Change actor, make a second change, confirm the log distinguishes them.
+8. Bump the schema version by hand with data present; confirm the panel resets
    cleanly instead of erroring.
-7. `Atur ulang data demo` returns every screen to its seeded state.
-8. Keyboard: floor grid, switcher, room panel, log filters all operable without
-   a mouse, with visible focus.
-9. Contrast measured on the blocked-room treatment and the status text.
+9. `Atur ulang data demo` returns every screen to its seeded state.
+10. Keyboard: floor grid, switcher, room panel, facility checklist and log
+    filters all operable without a mouse, with visible focus.
+11. Contrast measured on the blocked-room treatment and the status text.
 
 ## Invented in this phase
 
@@ -281,9 +347,14 @@ To be put to the client in one message, per GUIDELINES:
 - Floor labels beyond 362's three.
 - The actor list. Who actually operates this — one manager per building, one
   per area, or a central office — is unknown and changes who the log is for.
-- Whether a rent change needs approval from anyone before it takes effect. The
-  design has none, so this does not either, but for an operator with franchise
-  partners that is a plausible requirement.
+- Whether a rent change needs approval before it takes effect. Deferred by the
+  client on 2026-08-01; it would change the model, not just add a button.
+- The facility list itself. Six values were reverse-engineered from the public
+  data. What Kostella actually offers and advertises — parking for cars, a
+  water dispenser, CCTV, a curfew — is unknown, and this list is what a renter
+  filters on.
+- Whether facilities are truly building-wide. "Kamar mandi dalam" and "AC" are
+  modelled that way because the current data offers no other reading.
 
 ## Revision notes
 
