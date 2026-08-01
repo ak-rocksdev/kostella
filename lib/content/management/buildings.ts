@@ -99,8 +99,7 @@ export type Building = {
    *
    * An array rather than one facade, because the public detail page runs a
    * gallery and a manager needs to decide which frame leads it. Empty is a
-   * legitimate state and the UI says so — borrowing another building's photo to
-   * fill the gap would assert they look alike.
+   * legitimate state and the UI says so.
    */
   photos: BuildingPhoto[]
   /** Top floor first, so the grid reads like a building elevation. */
@@ -157,10 +156,17 @@ const KOSTELLA_362: Building = {
 /* ══════════════════════════════════════════════════════════════════════════
    EVERYTHING BELOW IS INVENTED. DELETE BEFORE THIS REACHES ANYONE REAL.
 
-   Kostella operates 31 buildings and has named one in detail. These three are
+   Kostella operates 31 buildings and has named one in detail. These are
    modelled so the panel has more than a single row to manage and so the
    building switcher does something. Addresses, rents, room lists, facilities
    and tenancy are all mine.
+
+   THE PHOTOGRAPHS ARE THE SAME FIVE STAND-INS, REUSED. They come from the
+   design bundle and show no Kostella building — three are Cove's own product
+   photography, watermark included. Distributing them across buildings asserts
+   nothing new: the whole set was already a placeholder. It exists so the panel
+   can be demonstrated with its populated state rather than a wall of grey.
+   Replace per building when the client supplies real images.
    ══════════════════════════════════════════════════════════════════════════ */
 const PLACEHOLDERS: Building[] = [
   {
@@ -171,7 +177,11 @@ const PLACEHOLDERS: Building[] = [
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'dapur-bersama'],
     tenancy: 'campur',
-    photos: [],
+    photos: [
+      { id: '351-standard', src: '/images/kamar-standard.jpg', label: 'Kamar Standard' },
+      { id: '351-bersama', src: '/images/ruang-bersama.jpg', label: 'Ruang bersama' },
+      { id: '351-mandi', src: '/images/kamar-mandi.jpg', label: 'Kamar mandi dalam' },
+    ],
     placeholder: true,
     rooms: [
       { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_550_000, status: 'available' },
@@ -190,7 +200,10 @@ const PLACEHOLDERS: Building[] = [
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['ac', 'wifi', 'laundry'],
     tenancy: 'putri',
-    photos: [],
+    photos: [
+      { id: '360-superior', src: '/images/kamar-superior.jpg', label: 'Kamar Superior' },
+      { id: '360-standard', src: '/images/kamar-standard.jpg', label: 'Kamar Standard' },
+    ],
     placeholder: true,
     rooms: [
       { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000, status: 'occupied' },
@@ -207,7 +220,12 @@ const PLACEHOLDERS: Building[] = [
     floors: ['Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'parkir-motor'],
     tenancy: 'campur',
-    photos: [],
+    photos: [
+      { id: '2A3-bersama', src: '/images/ruang-bersama.jpg', label: 'Ruang bersama' },
+      { id: '2A3-standard', src: '/images/kamar-standard.jpg', label: 'Kamar Standard' },
+      { id: '2A3-mandi', src: '/images/kamar-mandi.jpg', label: 'Kamar mandi dalam' },
+      { id: '2A3-depan', src: '/images/tampak-depan.jpg', label: 'Tampak depan' },
+    ],
     placeholder: true,
     rooms: [
       { room: '101', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000, status: 'occupied' },
@@ -231,7 +249,9 @@ const OTHER_DISTRICTS: Building[] = [
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'wifi', 'laundry'],
     tenancy: 'campur',
-    photos: [],
+    /* One photo, so the list shows a building part-way through being filled in
+       — the state most of the client's 31 will actually be in. */
+    photos: [{ id: '18-superior', src: '/images/kamar-superior.jpg', label: 'Kamar Superior' }],
     placeholder: true,
     rooms: [
       { room: '201', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000, status: 'occupied' },

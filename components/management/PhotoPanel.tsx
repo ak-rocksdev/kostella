@@ -48,6 +48,11 @@ export function PhotoPanel({ building }: { building: Building }) {
   const selected = photos.find((p) => p.id === selectedId) ?? null
   const full = photos.length >= MAX_PHOTOS
 
+  // The preview falls back to the cover, so the panel always shows what the
+  // property card is currently showing rather than an empty frame.
+  const previewed = selected ?? photos[0] ?? null
+  const isCover = previewed?.id === photos[0]?.id
+
   const recorded = `Tercatat atas ${actor}`
 
   const ingest = async (files: FileList | null) => {
@@ -132,8 +137,55 @@ export function PhotoPanel({ building }: { building: Building }) {
         onChange={(e) => ingest(e.target.files)}
       />
 
+      {previewed && (
+        /* Large, and inline rather than in a lightbox. A modal needs a focus
+           trap, an escape route and a scroll lock to be correct, and the
+           manager is mid-task; this page already teaches that selecting a thing
+           reveals it. */
+        <figure className="mt-5">
+          <div className="relative aspect-3/2 overflow-hidden rounded-card bg-photo-bg">
+            <Image
+              src={previewed.src}
+              alt={previewed.label}
+              fill
+              sizes="(min-width: 1024px) 420px, 90vw"
+              unoptimized={previewed.src.startsWith('data:')}
+              className="object-cover"
+            />
+          </div>
+
+          <figcaption className="mt-3 flex items-start gap-3">
+            {/* The same file, rendered at the crop the property card uses.
+                One photograph appears in three shapes publicly — square on the
+                card, 4:3 in a search result, 3:2 in the gallery — and a
+                landscape shot can lose its subject to the square. Rendered
+                rather than drawn as a guide, so it is exact for any photo. */}
+            <span className="relative size-16 shrink-0 overflow-hidden rounded-badge bg-photo-bg">
+              <Image
+                src={previewed.src}
+                alt=""
+                fill
+                sizes="64px"
+                unoptimized={previewed.src.startsWith('data:')}
+                className="object-cover"
+              />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[14px] leading-[1.35] font-semibold">
+                {previewed.label}
+              </span>
+              <span className="mt-0.5 block text-[12px] leading-[1.5] text-ink-soft">
+                {isCover
+                  ? 'Besar: galeri halaman detail. Kotak kecil: potongan di kartu properti.'
+                  : 'Belum jadi sampul — hanya muncul di galeri halaman detail.'}
+              </span>
+            </span>
+          </figcaption>
+        </figure>
+      )}
+
       {photos.length > 0 ? (
-        <ul className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4">
+        <ul className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">
           {photos.map((photo, i) => (
             <li key={photo.id}>
               <Thumb
