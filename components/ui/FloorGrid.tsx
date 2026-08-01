@@ -37,6 +37,16 @@ export type Room = {
    * occupied-or-not underneath, and merging the two would lose that.
    */
   blocked?: boolean
+  /**
+   * A tenant has given notice, and this is when they leave.
+   *
+   * Also not a status: the room is still occupied, and stays that way until
+   * someone confirms they have actually gone. It is marked because a room
+   * about to come free is a manager's lead time to fill it, which is the whole
+   * reason notice gets recorded. Management only — the public grid never sets
+   * it.
+   */
+  leavingOn?: string
 }
 
 type RoomCellProps = Room & {
@@ -51,13 +61,16 @@ export function RoomCell({
   type,
   price,
   blocked,
+  leavingOn,
   selected,
   compact,
   onSelect,
 }: RoomCellProps) {
   const label = blocked
     ? 'diblokir'
-    : { available: 'tersedia', held: 'dibooking', occupied: 'terisi' }[status]
+    : leavingOn
+      ? `terisi, keluar ${leavingOn}`
+      : { available: 'tersedia', held: 'dibooking', occupied: 'terisi' }[status]
 
   return (
     <button
@@ -67,13 +80,22 @@ export function RoomCell({
       disabled={!onSelect}
       onClick={onSelect ? () => onSelect({ room, status, type, price }) : undefined}
       className={cn(
-        'flex flex-col items-start gap-0.5 rounded-badge text-left font-figure',
+        'relative flex flex-col items-start gap-0.5 rounded-badge text-left font-figure',
         compact ? 'min-w-16 px-2.5 py-2' : 'min-w-27 px-3.5 py-3',
         onSelect ? 'cursor-pointer' : 'cursor-default',
         selected && 'outline-2 outline-offset-2 outline-plum',
         blocked ? cells.blocked : cells[status],
       )}
     >
+      {/* A dot, not a colour change: the cell still has to read as occupied,
+          because it is. Colour alone would carry it, so the label above names
+          the leaving date too. */}
+      {leavingOn && !blocked && (
+        <span
+          aria-hidden
+          className="absolute top-1.5 right-1.5 size-2 rounded-full bg-held ring-2 ring-paper"
+        />
+      )}
       <span aria-hidden className="text-[15px] font-medium">
         {room}
       </span>

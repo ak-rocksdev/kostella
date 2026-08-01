@@ -12,6 +12,12 @@
  */
 import type { Status } from '../types'
 import { kostellaName } from '../naming'
+import {
+  currentTenantOf,
+  incomingTenantOf,
+  seedTenancies,
+  type Tenancy,
+} from './tenancies'
 
 /* ── Facilities ───────────────────────────────────────────────────────────
    A fixed list, stored by id. Not tidiness: `facilityFacet` on the search
@@ -73,19 +79,43 @@ export type Blocked = {
   note: string
 }
 
-export type RoomState = {
+/** A room as written in the seed: no status, because nothing stores one. */
+export type SeedRoom = {
   room: string
   floor: string
   type: string
-  /** Rupiah per month. Numeric so every total derives rather than being typed. */
-  rent: number
-  status: Status
   /**
-   * Withdrawn from letting. Deliberately not a fourth status: a blocked room
-   * is still occupied-or-not underneath, and merging the two loses that.
+   * The asking price for whoever takes this room next.
+   *
+   * NOT what the person living in it pays — that is `Tenancy.agreedRent`, set
+   * when they moved in. Raising this must not re-price a sitting tenant.
+   */
+  rent: number
+  /**
+   * Withdrawn from letting. Deliberately not a status: a blocked room is still
+   * occupied-or-not underneath, and merging the two loses that.
    */
   blocked?: Blocked
 }
+
+export type RoomState = SeedRoom & {
+  /**
+   * Derived from tenancies at merge time. Never stored, never set.
+   *
+   * Phase 1 had a manager toggle this directly, which meant a room could be
+   * marked taken with nobody in it. Occupancy is now a consequence of somebody
+   * living there.
+   */
+  status: Status
+  /** Living here now. Present exactly when `status` is 'occupied'. */
+  tenant?: Tenancy
+  /** Moving in later. Sets 'held' on an empty room; on an occupied one it is
+   *  the replacement lined up behind a tenant who has given notice. */
+  incoming?: Tenancy
+}
+
+/** A building as written in the seed, before tenancies decide its rooms. */
+export type SeedBuilding = Omit<Building, 'rooms'> & { rooms: SeedRoom[] }
 
 export type Building = {
   /** The real house number. Still the identity — see `buildingName`. */
@@ -126,7 +156,7 @@ export type Building = {
  * same reason it is data on the public side: what makes a room held is a
  * booking in progress, which these figures do not show.
  */
-const KOSTELLA_362: Building = {
+const KOSTELLA_362: SeedBuilding = {
   number: '362',
   street: 'Jl. Dr. Susilo 2 No. 362',
   district: 'Grogol',
@@ -142,14 +172,14 @@ const KOSTELLA_362: Building = {
   facilities: ['kamar-mandi-dalam', 'ac', 'wifi'],
   tenancy: 'putri',
   rooms: [
-    { room: '304', floor: 'Lantai 3', type: 'Pojok', rent: 2_100_000, status: 'occupied' },
-    { room: '205', floor: 'Lantai 2', type: 'Superior', rent: 1_950_000, status: 'held' },
-    { room: '208', floor: 'Lantai 2', type: 'Superior', rent: 1_950_000, status: 'occupied' },
-    { room: '211', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000, status: 'available' },
-    { room: '212', floor: 'Lantai 2', type: 'Superior', rent: 1_950_000, status: 'occupied' },
-    { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000, status: 'occupied' },
-    { room: '105', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000, status: 'available' },
-    { room: '107', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000, status: 'occupied' },
+    { room: '304', floor: 'Lantai 3', type: 'Pojok', rent: 2_100_000 },
+    { room: '205', floor: 'Lantai 2', type: 'Superior', rent: 1_950_000 },
+    { room: '208', floor: 'Lantai 2', type: 'Superior', rent: 1_950_000 },
+    { room: '211', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000 },
+    { room: '212', floor: 'Lantai 2', type: 'Superior', rent: 1_950_000 },
+    { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000 },
+    { room: '105', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000 },
+    { room: '107', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000 },
   ],
 }
 
@@ -168,7 +198,7 @@ const KOSTELLA_362: Building = {
    can be demonstrated with its populated state rather than a wall of grey.
    Replace per building when the client supplies real images.
    ══════════════════════════════════════════════════════════════════════════ */
-const PLACEHOLDERS: Building[] = [
+const PLACEHOLDERS: SeedBuilding[] = [
   {
     number: '351',
     street: 'Jl. Dr. Susilo 2 No. 351',
@@ -184,12 +214,12 @@ const PLACEHOLDERS: Building[] = [
     ],
     placeholder: true,
     rooms: [
-      { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_550_000, status: 'available' },
-      { room: '202', floor: 'Lantai 2', type: 'Standard', rent: 1_550_000, status: 'occupied' },
-      { room: '203', floor: 'Lantai 2', type: 'Superior', rent: 1_850_000, status: 'available' },
-      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_550_000, status: 'occupied' },
-      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 1_550_000, status: 'available' },
-      { room: '103', floor: 'Lantai 1', type: 'Standard', rent: 1_550_000, status: 'occupied' },
+      { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_550_000 },
+      { room: '202', floor: 'Lantai 2', type: 'Standard', rent: 1_550_000 },
+      { room: '203', floor: 'Lantai 2', type: 'Superior', rent: 1_850_000 },
+      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_550_000 },
+      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 1_550_000 },
+      { room: '103', floor: 'Lantai 1', type: 'Standard', rent: 1_550_000 },
     ],
   },
   {
@@ -206,10 +236,10 @@ const PLACEHOLDERS: Building[] = [
     ],
     placeholder: true,
     rooms: [
-      { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000, status: 'occupied' },
-      { room: '202', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000, status: 'available' },
-      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000, status: 'occupied' },
-      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000, status: 'occupied' },
+      { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000 },
+      { room: '202', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000 },
+      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000 },
+      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 1_650_000 },
     ],
   },
   {
@@ -228,9 +258,9 @@ const PLACEHOLDERS: Building[] = [
     ],
     placeholder: true,
     rooms: [
-      { room: '101', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000, status: 'occupied' },
-      { room: '102', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000, status: 'occupied' },
-      { room: '103', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000, status: 'occupied' },
+      { room: '101', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000 },
+      { room: '102', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000 },
+      { room: '103', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000 },
     ],
   },
 ]
@@ -240,7 +270,7 @@ const PLACEHOLDERS: Building[] = [
    shares their district, while the four Grogol buildings keep theirs.
    PRODUCT.md confirms the portfolio spans Jakarta, Bandung and Bali; which
    districts, and what is in them, is invented. */
-const OTHER_DISTRICTS: Building[] = [
+const OTHER_DISTRICTS: SeedBuilding[] = [
   {
     number: '18',
     street: 'Jl. Setiabudi Tengah No. 18',
@@ -254,11 +284,11 @@ const OTHER_DISTRICTS: Building[] = [
     photos: [{ id: '18-superior', src: '/images/kamar-superior.jpg', label: 'Kamar Superior' }],
     placeholder: true,
     rooms: [
-      { room: '201', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000, status: 'occupied' },
-      { room: '202', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000, status: 'available' },
-      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000, status: 'occupied' },
-      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000, status: 'occupied' },
-      { room: '103', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000, status: 'held' },
+      { room: '201', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000 },
+      { room: '202', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000 },
+      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000 },
+      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000 },
+      { room: '103', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000 },
     ],
   },
   {
@@ -272,15 +302,65 @@ const OTHER_DISTRICTS: Building[] = [
     photos: [],
     placeholder: true,
     rooms: [
-      { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_400_000, status: 'available' },
-      { room: '202', floor: 'Lantai 2', type: 'Standard', rent: 1_400_000, status: 'available' },
-      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_400_000, status: 'occupied' },
-      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 1_400_000, status: 'occupied' },
+      { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_400_000 },
+      { room: '202', floor: 'Lantai 2', type: 'Standard', rent: 1_400_000 },
+      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_400_000 },
+      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 1_400_000 },
     ],
   },
 ]
 
-export const buildings: Building[] = [KOSTELLA_362, ...PLACEHOLDERS, ...OTHER_DISTRICTS]
+const SEED_BUILDINGS: SeedBuilding[] = [KOSTELLA_362, ...PLACEHOLDERS, ...OTHER_DISTRICTS]
+
+/**
+ * Rooms with their occupancy worked out from who lives in them.
+ *
+ * The single place a room's status is decided. Every screen — the panel, the
+ * search results, the landing page — reads the result, so none of them can
+ * disagree about whether a room is free.
+ *
+ * A room holds at most one current tenant. Where a sitting tenant has given
+ * notice, `incoming` is the replacement booked behind them: the room is still
+ * occupied, and it already has its next occupant.
+ */
+export function withTenancies(
+  seed: SeedBuilding[],
+  tenancies: Tenancy[],
+  today: string,
+): Building[] {
+  return seed.map((building) => ({
+    ...building,
+    rooms: building.rooms.map((room) => {
+      const tenant = currentTenantOf(tenancies, building.number, room.room, today)
+      const incoming = incomingTenantOf(tenancies, building.number, room.room, today)
+      return {
+        ...room,
+        status: tenant ? 'occupied' : incoming ? 'held' : 'available',
+        ...(tenant ? { tenant } : {}),
+        ...(incoming ? { incoming } : {}),
+      } satisfies RoomState
+    }),
+  }))
+}
+
+/**
+ * A fixed day, only so the seed can be resolved without reading the clock.
+ *
+ * Every seeded date is an offset, so the scenario they describe — who is due
+ * when, who has given notice — is identical whichever day it is resolved
+ * against. This one is used for the server render, where there is no browser
+ * to ask; the client re-resolves against the real date and lands on the same
+ * arrangement. See `lib/management/today.ts`.
+ */
+export const REFERENCE_DAY = '2026-01-01'
+
+export const buildings: Building[] = withTenancies(
+  SEED_BUILDINGS,
+  seedTenancies(REFERENCE_DAY),
+  REFERENCE_DAY,
+)
+
+export { SEED_BUILDINGS }
 
 export const findBuilding = (number: string) => buildings.find((b) => b.number === number)
 
@@ -352,8 +432,18 @@ export const monthlyPotential = (b: Building) =>
   b.rooms.filter((r) => !r.blocked).reduce((sum, r) => sum + r.rent, 0)
 
 /** What it earns as things stand. Held rooms are excluded — nobody is paying. */
+/**
+ * Rent actually coming in, at what each tenant agreed to pay.
+ *
+ * Not the rooms' asking prices. Those are what the next tenant would pay, and
+ * summing them answered "what are these rooms advertised at" while claiming to
+ * answer "what is coming in". Every occupied room has a tenant by construction;
+ * the fallback exists only so a type does not have to be widened.
+ */
 export const monthlyBooked = (b: Building) =>
-  b.rooms.filter((r) => !r.blocked && r.status === 'occupied').reduce((sum, r) => sum + r.rent, 0)
+  b.rooms
+    .filter((r) => !r.blocked && r.status === 'occupied')
+    .reduce((sum, r) => sum + (r.tenant?.agreedRent ?? r.rent), 0)
 
 /** The frame that leads: the public card, the search result, the gallery. */
 export const coverPhoto = (b: Building) => b.photos[0]

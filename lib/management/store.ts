@@ -10,7 +10,9 @@
  * key rather than reconstructing a starting state.
  */
 import {
-  buildings as SEED,
+  SEED_BUILDINGS,
+  withTenancies,
+  REFERENCE_DAY,
   type Building,
   type Blocked,
   type BuildingPhoto,
@@ -19,7 +21,7 @@ import {
   type TenancyId,
 } from '@/lib/content/management/buildings'
 import { surveys as SEED_SURVEYS, type Survey, type SurveyStatus } from '@/lib/content/management/surveys'
-import type { Status } from '@/lib/content/types'
+import { seedTenancies, type Tenancy } from '@/lib/content/management/tenancies'
 
 /**
  * One key, one version. A stored blob whose version does not match is
@@ -30,11 +32,10 @@ import type { Status } from '@/lib/content/types'
  * predictable and recoverable, which is the right trade here and the wrong one
  * once this stops being a prototype.
  */
-const KEY = 'kostella.management.v1'
-const VERSION = 1
+const KEY = 'kostella.management.v2'
+const VERSION = 2
 
 export type AuditAction =
-  | 'status'
   | 'rent'
   | 'block'
   | 'unblock'
@@ -45,6 +46,11 @@ export type AuditAction =
   | 'photo-cover'
   | 'photo-label'
   | 'survey'
+  | 'tenancy-start'
+  | 'tenancy-notice'
+  | 'tenancy-notice-cancel'
+  | 'tenancy-end'
+  | 'tenancy-rent'
 
 export type AuditEntry = {
   id: string
@@ -66,7 +72,7 @@ export type AuditEntry = {
   effectiveFrom?: string
 }
 
-type RoomOverride = Partial<Pick<RoomState, 'status' | 'rent'>> & {
+type RoomOverride = Partial<Pick<RoomState, 'rent'>> & {
   /** `null` means explicitly unblocked, distinct from "not overridden". */
   blocked?: Blocked | null
 }
@@ -82,7 +88,20 @@ type Stored = {
   buildings: Record<string, BuildingOverride>
   /** Keyed by survey id. Only the fields a manager can change. */
   surveys: Record<string, { status: SurveyStatus; note?: string }>
+  /** Keyed by tenancy id. Changes to seeded tenants. */
+  tenancies: Record<string, TenancyOverride>
+  /** Tenants recorded in this browser. Seeded ones are never copied here. */
+  added: Tenancy[]
   log: AuditEntry[]
+}
+
+type TenancyOverride = {
+  /** Brought forward when someone arrives before the date they booked. */
+  movedIn?: string
+  agreedRent?: number
+  /** `null` means the notice was withdrawn — distinct from "never given". */
+  leavingOn?: string | null
+  endedOn?: string
 }
 
 /**
@@ -101,6 +120,8 @@ const empty = (): Stored => ({
   rooms: {},
   buildings: {},
   surveys: {},
+  tenancies: {},
+  added: [],
   log: [],
 })
 
@@ -202,13 +223,44 @@ export function reset() {
 }
 
 /**
- * Seed records with stored overrides applied.
+ * Seeded tenants with stored changes applied, plus any recorded here.
  *
- * An empty blob returns the seed untouched, which is what the server snapshot
+ * `today` may be null during the server render, where the reference day stands
+ * in. Every seeded date is an offset, so the arrangement it produces is the
+ * same either way — see `REFERENCE_DAY`.
+ */
+export function mergeTenancies(stored: Stored, today: string | null): Tenancy[] {
+  const seeded = seedTenancies(today ?? REFERENCE_DAY).map((tenancy) => {
+    const o = stored.tenancies[tenancy.id]
+    if (!o) return tenancy
+
+    const merged: Tenancy = { ...tenancy }
+    if (o.movedIn) merged.movedIn = o.movedIn
+    if (o.agreedRent != null) merged.agreedRent = o.agreedRent
+    // null is meaningful: notice withdrawn. undefined means untouched.
+    if (o.leavingOn !== undefined) {
+      if (o.leavingOn === null) delete merged.leavingOn
+      else merged.leavingOn = o.leavingOn
+    }
+    if (o.endedOn) merged.endedOn = o.endedOn
+    return merged
+  })
+
+  return [...seeded, ...stored.added]
+}
+
+/**
+ * Seed records with stored overrides applied, and their rooms' occupancy worked
+ * out from who lives in them.
+ *
+ * An empty blob returns the seed arrangement, which is what the server snapshot
  * produces — so the server HTML and the first client render agree.
  */
-export function merge(stored: Stored): Building[] {
-  return SEED.map((building) => {
+export function merge(stored: Stored, today: string | null): Building[] {
+  const day = today ?? REFERENCE_DAY
+  const tenancies = mergeTenancies(stored, today)
+
+  const withOverrides = SEED_BUILDINGS.map((building) => {
     const b = stored.buildings[building.number]
 
     return {
@@ -220,8 +272,7 @@ export function merge(stored: Stored): Building[] {
         const r = stored.rooms[`${building.number}/${room.room}`]
         if (!r) return room
 
-        const merged: RoomState = { ...room }
-        if (r.status) merged.status = r.status
+        const merged = { ...room }
         if (r.rent != null) merged.rent = r.rent
         // null is meaningful: unblocked. undefined means untouched.
         if (r.blocked !== undefined) {
@@ -232,6 +283,8 @@ export function merge(stored: Stored): Building[] {
       }),
     }
   })
+
+  return withTenancies(withOverrides, tenancies, day)
 }
 
 /** Seeded viewings with any status a manager has changed applied on top. */
@@ -261,37 +314,134 @@ function log(stored: Stored, entry: Omit<AuditEntry, 'id' | 'at' | 'actor'>): St
 
 const roomKey = (building: string, room: string) => `${building}/${room}`
 
-const statusLabel: Record<Status, string> = {
-  available: 'kosong',
-  held: 'dibooking',
-  occupied: 'terisi',
-}
-
 export function setActor(stored: Stored, actor: string): Stored {
   return { ...stored, actor }
 }
 
-export function setStatus(
-  stored: Stored,
-  building: string,
-  room: RoomState,
-  status: Status,
-  effectiveFrom: string,
-): Stored {
-  const key = roomKey(building, room.room)
-  const next = {
-    ...stored,
-    rooms: { ...stored.rooms, [key]: { ...stored.rooms[key], status } },
-  }
+/* ── Tenants ──────────────────────────────────────────────────────────────
+   A room's occupancy is a consequence of these, not a flag set beside them.
+   `setStatus` used to live here and was removed with phase 3: it let a manager
+   mark a room taken without saying who took it. */
+
+let tenancyCounter = 0
+
+export function startTenancy(stored: Stored, tenancy: Omit<Tenancy, 'id'>): Stored {
+  const id = `t-local-${(tenancyCounter += 1)}`
+  const next: Stored = { ...stored, added: [...stored.added, { ...tenancy, id }] }
   return log(next, {
-    building,
-    room: room.room,
-    action: 'status',
-    from: statusLabel[room.status],
-    to: statusLabel[status],
-    effectiveFrom,
+    building: tenancy.building,
+    room: tenancy.room,
+    action: 'tenancy-start',
+    from: 'kosong',
+    to: tenancy.name,
+    effectiveFrom: tenancy.movedIn,
+    note: `${tenancy.occupation} · ${formatRupiahPlain(tenancy.agreedRent)}/bulan`,
   })
 }
+
+/**
+ * Brings a booked move-in forward, for the tenant who turns up early.
+ *
+ * Their own record, moved — not an ending and a fresh start. Doing it that way
+ * wrote a move-out into the log for somebody who never left, and would have
+ * reset the due date this phase derives from the move-in.
+ */
+export function moveInEarly(stored: Stored, tenancy: Tenancy, movedIn: string): Stored {
+  return log(overrideTenancy(stored, tenancy.id, { movedIn }), {
+    building: tenancy.building,
+    room: tenancy.room,
+    action: 'tenancy-start',
+    from: tenancy.movedIn,
+    to: tenancy.name,
+    effectiveFrom: movedIn,
+    note: 'Masuk lebih awal dari jadwal',
+  })
+}
+
+/** Announces a departure. Frees nothing — only `endTenancy` does that. */
+export function giveNotice(stored: Stored, tenancy: Tenancy, leavingOn: string): Stored {
+  return log(overrideTenancy(stored, tenancy.id, { leavingOn }), {
+    building: tenancy.building,
+    room: tenancy.room,
+    action: 'tenancy-notice',
+    from: tenancy.name,
+    to: leavingOn,
+    effectiveFrom: leavingOn,
+  })
+}
+
+export function cancelNotice(stored: Stored, tenancy: Tenancy, note: string): Stored {
+  return log(overrideTenancy(stored, tenancy.id, { leavingOn: null }), {
+    building: tenancy.building,
+    room: tenancy.room,
+    action: 'tenancy-notice-cancel',
+    from: tenancy.leavingOn ?? '—',
+    to: tenancy.name,
+    note,
+  })
+}
+
+/** The only thing that returns a room to the available pool. */
+export function endTenancy(
+  stored: Stored,
+  tenancy: Tenancy,
+  endedOn: string,
+  reason: string,
+): Stored {
+  return log(overrideTenancy(stored, tenancy.id, { endedOn }), {
+    building: tenancy.building,
+    room: tenancy.room,
+    action: 'tenancy-end',
+    from: tenancy.name,
+    to: endedOn,
+    effectiveFrom: endedOn,
+    note: reason,
+  })
+}
+
+/** Changes what a sitting tenant pays. Deliberate, and logged, because the
+ *  room's own rent never touches them. */
+export function setAgreedRent(
+  stored: Stored,
+  tenancy: Tenancy,
+  agreedRent: number,
+  note: string,
+): Stored {
+  return log(overrideTenancy(stored, tenancy.id, { agreedRent }), {
+    building: tenancy.building,
+    room: tenancy.room,
+    action: 'tenancy-rent',
+    from: String(tenancy.agreedRent),
+    to: String(agreedRent),
+    note: `${tenancy.name} — ${note}`,
+  })
+}
+
+/**
+ * Applies a change to a tenancy, wherever it lives.
+ *
+ * One recorded in this browser is edited in place; a seeded one gets an
+ * override, because the seed is never mutated.
+ */
+function overrideTenancy(stored: Stored, id: string, patch: TenancyOverride): Stored {
+  if (stored.added.some((t) => t.id === id)) {
+    return {
+      ...stored,
+      added: stored.added.map((t) => {
+        if (t.id !== id) return t
+        const next = { ...t, ...patch }
+        if (patch.leavingOn === null) delete next.leavingOn
+        return next as Tenancy
+      }),
+    }
+  }
+  return {
+    ...stored,
+    tenancies: { ...stored.tenancies, [id]: { ...stored.tenancies[id], ...patch } },
+  }
+}
+
+const formatRupiahPlain = (n: number) => `Rp${n.toLocaleString('id-ID')}`
 
 export function setRent(
   stored: Stored,
@@ -361,7 +511,9 @@ export function setFacilities(
 }
 
 const photosOf = (stored: Stored, building: string) =>
-  stored.buildings[building]?.photos ?? SEED.find((b) => b.number === building)?.photos ?? []
+  stored.buildings[building]?.photos ??
+  SEED_BUILDINGS.find((b) => b.number === building)?.photos ??
+  []
 
 const withPhotos = (stored: Stored, building: string, photos: BuildingPhoto[]): Stored => ({
   ...stored,

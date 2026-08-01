@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
 import type { AuditEntry } from '@/lib/management/store'
 
@@ -12,10 +13,6 @@ import type { AuditEntry } from '@/lib/management/store'
  */
 export function describe(entry: AuditEntry): string {
   switch (entry.action) {
-    case 'status':
-      return `Status ${entry.from} → ${entry.to}${
-        entry.effectiveFrom ? `, berlaku ${entry.effectiveFrom}` : ''
-      }`
     case 'rent':
       return `Sewa ${formatRupiah(Number(entry.from))} → ${formatRupiah(Number(entry.to))}`
     case 'block':
@@ -36,16 +33,30 @@ export function describe(entry: AuditEntry): string {
       return `Nama foto ${entry.from} → ${entry.to}`
     case 'survey':
       return `Survei ${entry.from} → ${entry.to}`
+    case 'tenancy-start':
+      return `${entry.to} masuk${entry.effectiveFrom ? ` ${formatDate(entry.effectiveFrom)}` : ''}`
+    case 'tenancy-notice':
+      return `${entry.from} memberi tahu akan keluar ${formatDate(entry.to)}`
+    case 'tenancy-notice-cancel':
+      return `${entry.to} membatalkan pemberitahuan keluar`
+    case 'tenancy-end':
+      return `${entry.from} keluar ${formatDate(entry.to)}`
+    case 'tenancy-rent':
+      return `Sewa penghuni ${formatRupiah(Number(entry.from))} → ${formatRupiah(Number(entry.to))}`
   }
 }
 
 export const ACTION_LABEL: Record<AuditEntry['action'], string> = {
-  status: 'Status kamar',
-  rent: 'Harga',
+  rent: 'Harga kamar',
   block: 'Blokir',
   unblock: 'Buka blokir',
   facility: 'Fasilitas',
   tenancy: 'Tipe penghuni',
+  'tenancy-start': 'Penghuni masuk',
+  'tenancy-notice': 'Pemberitahuan keluar',
+  'tenancy-notice-cancel': 'Pemberitahuan dibatalkan',
+  'tenancy-end': 'Penghuni keluar',
+  'tenancy-rent': 'Sewa penghuni',
   'photo-add': 'Foto ditambah',
   'photo-remove': 'Foto dihapus',
   'photo-cover': 'Sampul',

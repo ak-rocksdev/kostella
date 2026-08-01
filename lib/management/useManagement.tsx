@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { Building } from '@/lib/content/management/buildings'
 import * as store from './store'
+import { useToday } from './today'
 
 /**
  * The stored blob, read as an external store.
@@ -20,6 +21,10 @@ function useStored() {
 
 export function useManagement() {
   const stored = useStored()
+  /* Room occupancy derives from tenancies, which are dated — so the merge needs
+     to know what day it is. Null on the server, where the reference day stands
+     in and produces the same arrangement. */
+  const today = useToday()
 
   /** Returns false when the change could not be persisted — a full quota. */
   const apply = useCallback(
@@ -27,12 +32,15 @@ export function useManagement() {
     [],
   )
 
-  const buildings = useMemo(() => store.merge(stored), [stored])
+  const buildings = useMemo(() => store.merge(stored, today), [stored, today])
   const surveys = useMemo(() => store.mergeSurveys(stored), [stored])
+  const tenancies = useMemo(() => store.mergeTenancies(stored, today), [stored, today])
 
   return {
     buildings,
     surveys,
+    tenancies,
+    today,
     log: stored.log,
     actor: stored.actor,
     apply,
@@ -49,5 +57,6 @@ export function useManagement() {
  */
 export function useLiveBuildings(): Building[] {
   const stored = useStored()
-  return useMemo(() => store.merge(stored), [stored])
+  const today = useToday()
+  return useMemo(() => store.merge(stored, today), [stored, today])
 }

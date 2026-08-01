@@ -1,5 +1,14 @@
-import { Check, Tag, Wrench, type LucideIcon } from 'lucide-react'
+import {
+  CalendarClock,
+  Check,
+  DoorOpen,
+  Tag,
+  UserRoundCheck,
+  Wrench,
+  type LucideIcon,
+} from 'lucide-react'
 import type { ToastInput } from '@/components/ui/Toast'
+import { formatDate } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
 
 /**
@@ -25,17 +34,71 @@ const recorded = (actor: string): Pick<ToastInput, 'detail' | 'action'> => ({
 
 type Args = { building: string; actor: string }
 
-export const statusToast = (
+/* Tenants. `statusToast` stood here and went with `setStatus`: a room is no
+   longer marked taken, somebody moves into it. */
+
+export const moveInToast = (
   { building, actor }: Args,
   room: string,
-  to: 'terisi' | 'kosong',
-  effectiveFrom: string,
+  name: string,
+  movedIn: string,
 ): ToastInput => ({
-  title: withRoom(building, room, `ditandai ${to}`),
+  title: withRoom(building, room, `${name} masuk`),
+  detail: `Mulai ${formatDate(movedIn)} · tercatat atas ${actor}`,
+  icon: UserRoundCheck as LucideIcon,
+  tone: 'success',
+  action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
+})
+
+export const noticeToast = (
+  { building, actor }: Args,
+  room: string,
+  name: string,
+  leavingOn: string,
+): ToastInput => ({
+  title: withRoom(building, room, `${name} akan keluar ${formatDate(leavingOn)}`),
+  // Says the thing a manager acts on, not merely that a field changed.
+  detail: `Kamar masih terisi sampai dikonfirmasi · tercatat atas ${actor}`,
+  icon: CalendarClock as LucideIcon,
+  tone: 'attention',
+  action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
+})
+
+export const noticeCancelledToast = (
+  { building, actor }: Args,
+  room: string,
+  name: string,
+): ToastInput => ({
+  title: withRoom(building, room, `${name} jadi tetap tinggal`),
+  ...recorded(actor),
   icon: Check as LucideIcon,
   tone: 'success',
+})
+
+export const moveOutToast = (
+  { building, actor }: Args,
+  room: string,
+  name: string,
+  endedOn: string,
+): ToastInput => ({
+  title: withRoom(building, room, `${name} keluar`),
+  detail: `Kamar kosong sejak ${formatDate(endedOn)} · tercatat atas ${actor}`,
+  icon: DoorOpen as LucideIcon,
+  tone: 'success',
+  action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
+})
+
+export const tenantRentToast = (
+  { building, actor }: Args,
+  room: string,
+  name: string,
+  from: number,
+  to: number,
+): ToastInput => ({
+  title: withRoom(building, room, `sewa ${name} ${formatRupiah(from)} → ${formatRupiah(to)}`),
   ...recorded(actor),
-  detail: `Berlaku ${effectiveFrom} · tercatat atas ${actor}`,
+  icon: Tag as LucideIcon,
+  tone: 'success',
 })
 
 export const rentToast = (
@@ -44,7 +107,8 @@ export const rentToast = (
   from: number,
   to: number,
 ): ToastInput => ({
-  title: withRoom(building, room, `sewa ${formatRupiah(from)} → ${formatRupiah(to)}`),
+  title: withRoom(building, room, `harga jadi ${formatRupiah(to)}`),
+  detail: `Dari ${formatRupiah(from)} · berlaku untuk penghuni berikutnya · ${actor}`,
   icon: Tag as LucideIcon,
   tone: 'success',
   ...recorded(actor),

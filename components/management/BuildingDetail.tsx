@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CalendarClock, Layers, TrendingUp, Wrench } from 'lucide-react'
+import { ArrowLeft, CalendarClock, Layers, TrendingUp, UserRound, Wrench } from 'lucide-react'
 import { FloorGrid, FloorGridLegend, type Floor } from '@/components/ui/FloorGrid'
 import { MetricCard } from '@/components/ui/MetricCard'
 import { SectionLabel } from '@/components/ui/SectionLabel'
@@ -10,6 +10,7 @@ import { BuildingSwitcher } from './BuildingSwitcher'
 import { FacilitiesPanel } from './FacilitiesPanel'
 import { PhotoPanel } from './PhotoPanel'
 import { RoomActions } from './RoomActions'
+import type { Tenancy } from '@/lib/content/management/tenancies'
 import { MetricNote } from './MetricNote'
 import { RoomHistory } from './RoomHistory'
 import {
@@ -21,6 +22,7 @@ import {
   tenancyLabel,
   type Building,
 } from '@/lib/content/management/buildings'
+import { formatDate } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
 import { useManagement } from '@/lib/management/useManagement'
 
@@ -58,6 +60,7 @@ export function BuildingDetail({ number }: { number: string }) {
         type: r.type,
         price: formatRupiah(r.rent),
         blocked: Boolean(r.blocked),
+        ...(r.tenant?.leavingOn ? { leavingOn: formatDate(r.tenant.leavingOn) } : {}),
       })),
   }))
 
@@ -159,15 +162,25 @@ export function BuildingDetail({ number }: { number: string }) {
 
           {room ? (
             <>
-              <div className="mt-6 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-t border-line pt-5">
-                <span className="font-figure text-[17px] font-semibold">Kamar {room.room}</span>
-                <span className="text-[14px] text-ink-soft">
-                  {room.floor} · {room.type} · {formatRupiah(room.rent)}/bulan
-                </span>
-                {room.blocked && (
-                  <span className="text-[13px] text-held">
-                    diblokir sejak {room.blocked.since} — {room.blocked.note}
+              <div className="mt-6 border-t border-line pt-5">
+                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                  <span className="font-figure text-[17px] font-semibold">Kamar {room.room}</span>
+                  <span className="text-[14px] text-ink-soft">
+                    {room.floor} · {room.type} · {formatRupiah(room.rent)}/bulan
                   </span>
+                  {room.blocked && (
+                    <span className="text-[13px] text-held">
+                      diblokir sejak {formatDate(room.blocked.since)} — {room.blocked.note}
+                    </span>
+                  )}
+                </div>
+                {/* Who is behind the door. The grid answers whether a room is
+                    taken; a manager standing in front of it needs the name, the
+                    number they can reach, and what that person actually pays —
+                    which is not necessarily the room's asking price above. */}
+                {room.tenant && <TenantLine tenant={room.tenant} />}
+                {!room.tenant && room.incoming && (
+                  <TenantLine tenant={room.incoming} incoming />
                 )}
               </div>
               <RoomActions building={building} room={room} />
@@ -175,7 +188,7 @@ export function BuildingDetail({ number }: { number: string }) {
             </>
           ) : (
             <p className="mt-6 border-t border-line pt-5 text-[14px] text-ink-soft">
-              Pilih kamar di kisi untuk mengubah status, harga, atau memblokirnya.
+              Pilih kamar di kisi untuk melihat penghuninya dan mencatat perubahan.
             </p>
           )}
         </section>
@@ -258,5 +271,35 @@ function RoomTable({
         </tbody>
       </table>
     </div>
+  )
+}
+
+/**
+ * The person in a room, on one line.
+ *
+ * Rent is stated here as well as on the room above because the two can differ:
+ * the room's figure is what the next tenant would pay, this one is what this
+ * tenant agreed to. Where they disagree the difference is the point, so it is
+ * said rather than left to be noticed.
+ */
+function TenantLine({ tenant, incoming }: { tenant: Tenancy; incoming?: boolean }) {
+  return (
+    <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-soft">
+      <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+        <UserRound size={14} strokeWidth={1.9} aria-hidden className="shrink-0" />
+        {tenant.name}
+      </span>
+      <span>{tenant.occupation}</span>
+      <span>{tenant.phone}</span>
+      <span>
+        {incoming ? 'masuk' : 'sejak'} {formatDate(tenant.movedIn)}
+      </span>
+      <span>{formatRupiah(tenant.agreedRent)}/bulan</span>
+      {tenant.leavingOn && (
+        <span className="font-semibold text-held">
+          keluar {formatDate(tenant.leavingOn)}
+        </span>
+      )}
+    </p>
   )
 }
