@@ -54,8 +54,8 @@ Buildings and rooms come first because every other record points at a room.
 |---|---|---|---|
 | 1 ✅ | **Buildings & rooms** — the data spine, the building switcher, room states, per-building facilities and tenancy, and the audit log every later phase writes to | `/management/buildings`, `/management/activity` | `2026-08-01-management-01-buildings-rooms.md` |
 | 2 ✅ | **Dashboard** — today's surveys, what needs attention, portfolio occupancy | `/management` | `2026-08-01-management-02-dashboard.md` |
-| 3 | **Tenants & contracts** — who is in which room, move-in date, contract end, deposit, expiry warnings | `/management/tenants` | not written yet |
-| 4 | **Billing** — rent, electricity, laundry, other services, penalties; paid / unpaid / short-paid with the reason | `/management/billing` | not written yet |
+| 3 | **Tenants** — who is in which room, since when, what they agreed to pay, the monthly due date derived from their move-in, and notice of departure | `/management/tenants` | `2026-08-01-management-03-tenants.md` |
+| 4 | **Billing** — rent, electricity, laundry, other services, penalties; paid / unpaid / short-paid with the reason. Phase 3 gives the due date; this gives whether it was met | `/management/billing` | not written yet |
 | 5 | **Reports** — monthly income, occupancy, arrears for the manager | `/management/reports` | not written yet |
 | 6 | **Owner view** — its own shell, its own navigation; aggregates and trends, no individuals | `/owner` | not written yet |
 
@@ -104,6 +104,13 @@ Carried forward and re-asked as each phase makes it concrete:
 - Real data for the four invented buildings (358, 355, 364, 2A).
 - Real photographs. Three shipped images are Cove's product photography.
 - What a manager actually does in a day that this panel is missing.
+- **Does Kostella raise rent on a sitting tenant, or only for the next one?**
+  Phase 3 assumes the latter and stores an agreed rent per tenant, because the
+  alternative silently re-prices people already living there. If they do raise
+  it across the board, the per-tenant figure becomes needless bookkeeping.
+- **Is a guardian contact always available?** Phase 3 requires one, on the
+  reasoning that a khusus-putri kos must be able to reach a family. A karyawan
+  renting alone may not want to give one.
 - **Does a building's name change when a neighbour is added?** The rule drops
   the number where a district holds one building, so "Kostella Setiabudi"
   becomes "Kostella Setiabudi 18" the day a second Setiabudi building opens —
