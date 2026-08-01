@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { RotateCcw } from "lucide-react";
+import { Select } from "@/components/ui/Select";
 import { ToastProvider } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { ACTORS, setActor } from "@/lib/management/store";
@@ -12,6 +13,15 @@ const NAV = [
   { href: "/management/buildings", label: "Gedung" },
   { href: "/management/activity", label: "Aktivitas" },
 ];
+
+/* What each role would actually reach. Three names in a list say nothing about
+   why you would pick one, and the audit log is the only reason the choice
+   exists — so each option states its scope. */
+const ACTOR_SCOPE: Record<string, string> = {
+  "Pengelola 362": "Satu gedung",
+  "Pengelola Grogol": "Semua gedung di Grogol",
+  "Kantor Pusat": "Semua kawasan",
+};
 
 /**
  * The frame every management screen sits in.
@@ -71,22 +81,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
             {/* Chosen, not authenticated — and labelled that way. Without it an
               audit log records one anonymous user and proves nothing. */}
-            <label className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-paper px-3 text-[13px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-plum sm:px-4">
-              <span className="whitespace-nowrap text-ink-soft">
-                Masuk sebagai
-              </span>
-              <select
+            <div className="ml-auto shrink-0">
+              <Select
+                label="Masuk sebagai"
+                align="end"
                 value={actor}
-                onChange={(e) => apply((s) => setActor(s, e.target.value))}
-                className="cursor-pointer appearance-none bg-transparent py-2 text-[13px] font-semibold focus:outline-none"
-              >
-                {ACTORS.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
-            </label>
+                onChange={(next) => apply((s) => setActor(s, next))}
+                options={ACTORS.map((a) => ({
+                  value: a,
+                  label: a,
+                  detail: ACTOR_SCOPE[a],
+                }))}
+              />
+            </div>
           </div>
         </header>
 

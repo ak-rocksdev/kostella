@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { DoorOpen, Tag, UserRoundCheck, Wrench } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { Select } from '@/components/ui/Select'
 import { useToast } from '@/components/ui/Toast'
 import { blockToast, rentToast, statusToast } from './changeToast'
 import { budgetSteps } from '@/lib/content/beranda'
@@ -135,17 +136,16 @@ export function RoomActions({ building, room }: { building: Building; room: Room
         >
           <label className="basis-44">
             <span className="mb-1.5 block text-[13px] font-semibold">Sewa per bulan</span>
-            <select
-              value={rent}
-              onChange={(e) => setRentValue(Number(e.target.value))}
-              className={`${field} cursor-pointer`}
-            >
-              {budgetSteps.map((step) => (
-                <option key={step} value={step}>
-                  {formatRupiah(step)}
-                </option>
-              ))}
-            </select>
+            <Select
+              variant="field"
+              label="Sewa per bulan"
+              value={String(rent)}
+              onChange={(next) => setRentValue(Number(next))}
+              options={budgetSteps.map((step) => ({
+                value: String(step),
+                label: formatRupiah(step),
+              }))}
+            />
           </label>
           <label className="min-w-0 flex-1 basis-60">
             <span className="mb-1.5 block text-[13px] font-semibold">Alasan</span>
