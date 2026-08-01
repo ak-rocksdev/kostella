@@ -12,10 +12,15 @@ import type { Status } from '@/lib/content/types'
  * they must not look pressable — but at zero radius they read as unstyled in a
  * world where nothing else has a hard corner.
  */
-const cells: Record<Status, string> = {
+const cells: Record<Status | 'blocked', string> = {
   available: 'border-2 border-available bg-available text-white',
   held: 'border border-held text-held bg-[repeating-linear-gradient(45deg,#fff_0_4px,#F5E3D7_4px_8px)]',
   occupied: 'border border-line bg-occupied-soft text-occupied-faded',
+  /* Blocked is hatched and dashed rather than given another colour: it is not a
+     fourth availability state, it is a room withdrawn from all of them. The
+     cell's label says "diblokir", so the pattern never carries it alone. */
+  blocked:
+    'border border-dashed border-ink-soft text-ink-soft bg-[repeating-linear-gradient(135deg,transparent_0_5px,var(--color-stone)_5px_10px)]',
 }
 
 export type Room = {
@@ -23,6 +28,15 @@ export type Room = {
   status: Status
   type?: string
   price?: string
+  /**
+   * Withdrawn for maintenance. Management only — the public grid never sets it,
+   * because a visitor does not need to know why a room is unavailable, only
+   * that it is.
+   *
+   * Carried as a flag rather than a fourth status: a blocked room is still
+   * occupied-or-not underneath, and merging the two would lose that.
+   */
+  blocked?: boolean
 }
 
 type RoomCellProps = Room & {
@@ -31,8 +45,19 @@ type RoomCellProps = Room & {
   onSelect?: (room: Room) => void
 }
 
-export function RoomCell({ room, status, type, price, selected, compact, onSelect }: RoomCellProps) {
-  const label = { available: 'tersedia', held: 'dibooking', occupied: 'terisi' }[status]
+export function RoomCell({
+  room,
+  status,
+  type,
+  price,
+  blocked,
+  selected,
+  compact,
+  onSelect,
+}: RoomCellProps) {
+  const label = blocked
+    ? 'diblokir'
+    : { available: 'tersedia', held: 'dibooking', occupied: 'terisi' }[status]
 
   return (
     <button
@@ -46,7 +71,7 @@ export function RoomCell({ room, status, type, price, selected, compact, onSelec
         compact ? 'min-w-16 px-2.5 py-2' : 'min-w-27 px-3.5 py-3',
         onSelect ? 'cursor-pointer' : 'cursor-default',
         selected && 'outline-2 outline-offset-2 outline-plum',
-        cells[status],
+        blocked ? cells.blocked : cells[status],
       )}
     >
       <span aria-hidden className="text-[15px] font-medium">

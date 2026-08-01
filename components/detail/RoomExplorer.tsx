@@ -7,7 +7,10 @@ import { ReceiptTable } from '@/components/ui/ReceiptTable'
 import { HouseRules } from './HouseRules'
 import { RoomPanel } from './RoomPanel'
 import { Sekitar } from './Sekitar'
-import { defaultRoom, floors, receiptFor, receiptNote } from '@/lib/content/detail'
+import { defaultRoom, receiptFor, receiptNote, property } from '@/lib/content/detail'
+import { findLive, publicFloors } from '@/lib/content/management/public'
+import { floors as SEED_FLOORS } from '@/lib/content/detail'
+import { useLiveBuildings } from '@/lib/management/useManagement'
 
 /**
  * The property's body, driven by one piece of state: which room you picked.
@@ -27,6 +30,13 @@ import { defaultRoom, floors, receiptFor, receiptNote } from '@/lib/content/deta
 export function RoomExplorer() {
   const [room, setRoom] = useState(defaultRoom)
   const receipt = receiptFor(room)
+  const buildings = useLiveBuildings()
+
+  // The grid a visitor reads is built from the same records the manager edits —
+  // the label above it says "sama dengan halaman publik", and this is what
+  // makes that true rather than decorative.
+  const live = findLive(buildings, property.number)
+  const floors = live ? publicFloors(live) : SEED_FLOORS
 
   return (
     <div className="wrap grid items-start gap-x-12 gap-y-14 pt-14 pb-16 sm:gap-y-16 sm:pb-24 lg:grid-cols-[1.5fr_1fr]">

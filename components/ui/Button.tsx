@@ -13,6 +13,10 @@ type ButtonProps = {
   href?: string
   disabled?: boolean
   className?: string
+  /** Added for the management panel, where actions act rather than navigate. */
+  onClick?: () => void
+  /** `submit` so a form's own validation runs before the handler. */
+  type?: 'button' | 'submit'
 }
 
 /* Border width only. The colour belongs to the variant — setting a colour here
@@ -45,6 +49,8 @@ export function Button({
   href,
   disabled,
   className,
+  onClick,
+  type = 'button',
 }: ButtonProps) {
   const classes = cn(base, sizes[size], variants[variant], disabled && 'opacity-45', className)
 
@@ -57,7 +63,12 @@ export function Button({
   }
 
   return (
-    <button type="button" disabled={disabled} className={cn(classes, disabled && 'cursor-default')}>
+    <button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(classes, disabled ? 'cursor-default' : 'cursor-pointer')}
+    >
       {children}
     </button>
   )

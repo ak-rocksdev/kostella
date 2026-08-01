@@ -147,23 +147,29 @@ export function availabilityLabel(result: SearchResult) {
    that reaches nothing, and a new building brings its own options with it. */
 
 /**
- * Only facilities that actually vary.
+ * The facets, built from whatever the buildings currently offer.
  *
- * Every building has AC, so an "AC" filter narrows nothing — it is one more
- * control to read for no answer. This drops it automatically rather than by a
- * hard-coded exclusion, so it comes back on its own the day a building without
- * AC is added.
- */
-export const facilityFacet = [...new Set(results.flatMap((r) => r.facilities))]
-  .filter((facility) => results.some((r) => !r.facilities.includes(facility)))
-  .sort((a, b) => a.localeCompare(b, 'id'))
-
-/**
- * Tenancy types present in the inventory. Nothing here is "khusus putra" today,
- * so that option is not offered — a filter guaranteed to return nothing is a
+ * A function, not a constant, because a manager can now change what a building
+ * offers. Ticking Laundry has to move its chip from one building to two — the
+ * filter itself changes, not just a row of text — and a value computed once at
+ * module load could never do that.
+ *
+ * Facilities every building has are dropped: an "AC" chip that narrows nothing
+ * is one more control to read for no answer. It returns on its own the day a
+ * building without AC exists. Tenancies work the same way, so "khusus putra" is
+ * not offered while nothing is — a filter guaranteed to return nothing is a
  * dead end dressed as a choice.
  */
-export const tenancyFacet = [...new Set(results.map((r) => r.tenancy))]
+export function buildFacets(rows: SearchResult[]) {
+  return {
+    facilities: [...new Set(rows.flatMap((r) => r.facilities))]
+      .filter((facility) => rows.some((r) => !r.facilities.includes(facility)))
+      .sort((a, b) => a.localeCompare(b, 'id')),
+    tenancies: [...new Set(rows.map((r) => r.tenancy))],
+  }
+}
+
+export type Facets = ReturnType<typeof buildFacets>
 
 /** Walking-time brackets, in minutes. */
 export const walkFacet = [10, 15]

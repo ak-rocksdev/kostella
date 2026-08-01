@@ -5,13 +5,7 @@ import { Chip } from '@/components/ui/Chip'
 import { Segmented } from '@/components/ui/Segmented'
 import { Switch } from '@/components/ui/Switch'
 import { budget, budgetSteps } from '@/lib/content/beranda'
-import {
-  facilityFacet,
-  tenancyFacet,
-  tenancyShort,
-  walkFacet,
-  type Tenancy,
-} from '@/lib/content/pencarian'
+import { tenancyShort, walkFacet, type Facets, type Tenancy } from '@/lib/content/pencarian'
 import { formatRupiah } from '@/lib/format'
 
 export type Filters = {
@@ -71,10 +65,14 @@ export function isDefault(filters: Filters) {
  */
 export function SearchFilters({
   filters,
+  facets,
   onChange,
   countWith,
 }: {
   filters: Filters
+  /** Built from what the buildings currently offer, so a manager ticking a
+   *  facility changes the available chips. */
+  facets: Facets
   onChange: (next: Filters) => void
   /** Results remaining if `override` were applied on top of the current state. */
   countWith: (override: Partial<Filters>) => number
@@ -100,7 +98,7 @@ export function SearchFilters({
       <div className="no-scrollbar -mx-5 flex items-center gap-2.5 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0">
         {/* The brand's second claim, and the figure the hero already asked for.
             A native select keeps the keyboard and the mobile wheel for free. */}
-        <label className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-paper px-4 text-[14px] font-medium">
+        <label className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-paper px-4 text-[14px] font-medium has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-plum">
           <span className="whitespace-nowrap">Budget maks.</span>
           <select
             value={filters.maxRent}
@@ -128,7 +126,7 @@ export function SearchFilters({
               label: 'Semua penghuni',
               count: countWith({ tenancy: null }),
             },
-            ...tenancyFacet.map((tenancy) => ({
+            ...facets.tenancies.map((tenancy) => ({
               value: tenancy,
               label: tenancyShort[tenancy],
               count: countWith({ tenancy }),
@@ -167,7 +165,7 @@ export function SearchFilters({
         aria-label="Fasilitas"
         className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0"
       >
-        {facilityFacet.map((facility) => {
+        {facets.facilities.map((facility) => {
           const selected = filters.facilities.includes(facility)
           const count = countWith({
             facilities: [...new Set([...filters.facilities, facility])],

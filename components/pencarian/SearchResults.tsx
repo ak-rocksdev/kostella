@@ -7,7 +7,9 @@ import { ResultCard } from './ResultCard'
 import { ResultsMap } from './ResultsMap'
 import { defaultFilters, isDefault, ResetFilters, SearchFilters, type Filters } from './SearchFilters'
 import { budget, budgetSteps } from '@/lib/content/beranda'
-import { results, type SearchResult } from '@/lib/content/pencarian'
+import { buildFacets, results as SEED_RESULTS, type SearchResult } from '@/lib/content/pencarian'
+import { findLive, liveResult } from '@/lib/content/management/public'
+import { useLiveBuildings } from '@/lib/management/useManagement'
 import { formatRupiah } from '@/lib/format'
 import { routes } from '@/lib/routes'
 
@@ -28,7 +30,7 @@ function matches(result: SearchResult, filters: Filters) {
  * leaves the counts saying nothing about the way out. This looks the other
  * direction and names one filter to remove.
  */
-function bestRelaxation(filters: Filters) {
+function bestRelaxation(results: SearchResult[], filters: Filters) {
   const candidates: Array<{ label: string; next: Filters }> = []
 
   if (filters.tenancy) candidates.push({ label: 'tipe penghuni', next: { ...filters, tenancy: null } })
@@ -61,10 +63,12 @@ function bestRelaxation(filters: Filters) {
  * filter worth dropping, and always offers the way back.
  */
 function NoMatches({
+  results,
   filters,
   onChange,
   onReset,
 }: {
+  results: SearchResult[]
   filters: Filters
   onChange: (next: Filters) => void
   onReset: () => void
@@ -76,7 +80,7 @@ function NoMatches({
   const cheapest = blockedByBudget.length ? Math.min(...blockedByBudget.map((r) => r.rent)) : null
   // Snap to a figure the control can actually show.
   const nextStep = cheapest ? budgetSteps.find((step) => step >= cheapest) : undefined
-  const relax = nextStep ? undefined : bestRelaxation(filters)
+  const relax = nextStep ? undefined : bestRelaxation(results, filters)
 
   return (
     <div className="rounded-card border border-dashed border-line px-6 py-10 text-center">
@@ -124,13 +128,25 @@ export function SearchResults({ initialMaxRent }: { initialMaxRent?: number }) {
     initialMaxRent ? { ...defaultFilters, maxRent: initialMaxRent } : defaultFilters,
   )
   const [picked, setPicked] = useState<string | null>(null)
+  const buildings = useLiveBuildings()
 
-  const visible = useMemo(() => results.filter((r) => matches(r, filters)), [filters])
+  // Presentation and location stay in the content file; rent, vacancy,
+  // facilities and tenancy come from the records a manager edits.
+  const results = useMemo(
+    () => SEED_RESULTS.map((r) => liveResult(r, findLive(buildings, r.number))),
+    [buildings],
+  )
+
+  const visible = useMemo(() => results.filter((r) => matches(r, filters)), [results, filters])
 
   // Counted against the other facets, so an option never advertises results the
   // rest of the filter has already excluded.
   const countWith = (override: Partial<Filters>) =>
     results.filter((r) => matches(r, { ...filters, ...override })).length
+
+  // The filter chips are built from what the buildings actually offer, so a
+  // manager ticking a facility changes the filter itself, not just a row.
+  const facets = useMemo(() => buildFacets(results), [results])
 
   // Derived rather than stored: filtering out the selected property would
   // otherwise leave a pin lit on the map with no card beside it.
@@ -139,7 +155,12 @@ export function SearchResults({ initialMaxRent }: { initialMaxRent?: number }) {
 
   return (
     <div className="wrap-wide pt-8 pb-16 sm:pb-24">
-      <SearchFilters filters={filters} onChange={setFilters} countWith={countWith} />
+      <SearchFilters
+        filters={filters}
+        facets={facets}
+        onChange={setFilters}
+        countWith={countWith}
+      />
 
       <div className="mt-7 mb-5 flex flex-wrap items-center justify-between gap-x-6">
         {/* aria-live so the count is announced when a filter changes — the whole
@@ -170,6 +191,7 @@ export function SearchResults({ initialMaxRent }: { initialMaxRent?: number }) {
             ))
           ) : (
             <NoMatches
+              results={results}
               filters={filters}
               onChange={setFilters}
               onReset={() => setFilters(defaultFilters)}

@@ -33,7 +33,12 @@ export function SearchBar({ onDark = false }: { onDark?: boolean }) {
   const nearest = areaChips.find((chip) => chip.label === area)?.nearest;
   const cheapest = inArea[0];
 
-  const cell = "flex flex-1 flex-col gap-1 px-6 py-4 text-left";
+  const cell =
+    "flex flex-1 flex-col gap-1 px-6 py-4 text-left " +
+    // Cincin fokus milik sel, bukan <select> di dalamnya: `appearance-none`
+    // menghapus tampilan asli kontrolnya, jadi selnya yang jadi kontrol
+    // bagi mata. Tanpa ini pengguna keyboard tidak melihat apa pun.
+    "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-plum";
   const label = "text-[13px] font-semibold whitespace-nowrap text-ink";
   const control =
     "w-full cursor-pointer appearance-none bg-transparent text-[15px] text-ink-soft focus:outline-none";

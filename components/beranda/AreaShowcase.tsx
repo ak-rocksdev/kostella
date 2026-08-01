@@ -9,6 +9,8 @@ import { Reveal } from '@/components/ui/Reveal'
 import { formatRupiah } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { vacantRoomsIn, type Area } from '@/lib/content/beranda'
+import { findLive, liveProperty } from '@/lib/content/management/public'
+import { useLiveBuildings } from '@/lib/management/useManagement'
 
 /** Gap between cards, in px. Paging has to know it to land on a card edge. */
 const GAP = 20
@@ -29,6 +31,12 @@ const GAP = 20
  * one area rather than as a loose row of buildings.
  */
 export function AreaShowcase({ area }: { area: Area }) {
+  const buildings = useLiveBuildings()
+  // Presentation and location stay in the content file; rent, availability,
+  // facilities and tenancy come from the records a manager edits. A property
+  // with no management record — Beranda lists 2C where the search screen lists
+  // 2A3 — passes through unchanged, leaving that contradiction visible.
+  const properties = area.properties.map((p) => liveProperty(p, findLive(buildings, p.number)))
   const trackRef = useRef<HTMLUListElement>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(true)
@@ -76,7 +84,7 @@ export function AreaShowcase({ area }: { area: Area }) {
     })
   }
 
-  const cheapest = Math.min(...area.properties.map((property) => property.priceFrom))
+  const cheapest = Math.min(...properties.map((property) => property.priceFrom))
 
   return (
     <div className="rail-bleed grid gap-10 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-14">
@@ -96,13 +104,13 @@ export function AreaShowcase({ area }: { area: Area }) {
         <dl className="mt-9 flex gap-10">
           <div>
             <dd className="font-figure text-[32px] leading-none font-semibold tracking-[-0.02em]">
-              {area.properties.length}
+              {properties.length}
             </dd>
             <dt className="mt-2 text-[14px] text-ink-soft">gedung</dt>
           </div>
           <div>
             <dd className="font-figure text-[32px] leading-none font-semibold tracking-[-0.02em] text-available">
-              {vacantRoomsIn(area)}
+              {vacantRoomsIn({ ...area, properties })}
             </dd>
             <dt className="mt-2 text-[14px] text-ink-soft">kamar kosong</dt>
           </div>
@@ -163,7 +171,7 @@ export function AreaShowcase({ area }: { area: Area }) {
           onScroll={sync}
           className="no-scrollbar -ms-4 -me-4 -my-8 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-ps-4 py-8 ps-4 pe-9 sm:pe-12"
         >
-          {area.properties.map((property, i) => (
+          {properties.map((property, i) => (
             <li
               key={property.number}
               className="w-[78vw] max-w-[340px] shrink-0 snap-start sm:w-[320px] lg:w-[340px]"
@@ -179,7 +187,7 @@ export function AreaShowcase({ area }: { area: Area }) {
           ))}
 
           <li className="w-[78vw] max-w-[340px] shrink-0 snap-start sm:w-[280px]">
-            <Reveal delay={area.properties.length * 90} className="h-full">
+            <Reveal delay={properties.length * 90} className="h-full">
               <EndCap />
             </Reveal>
           </li>

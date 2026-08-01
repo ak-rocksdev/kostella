@@ -309,7 +309,7 @@ system. Verify it explicitly.
 
 ## Verification
 
-Recorded here when the phase ships, not asserted in advance.
+Run on 2026-08-01 against the built code, not asserted in advance.
 
 1. `npx tsc --noEmit`, `npm run lint`, `npm run build` clean.
 2. Every derived figure cross-checked by hand once against the room records —
@@ -334,6 +334,44 @@ Recorded here when the phase ships, not asserted in advance.
 10. Keyboard: floor grid, switcher, room panel, facility checklist and log
     filters all operable without a mouse, with visible focus.
 11. Contrast measured on the blocked-room treatment and the status text.
+
+### Results
+
+All eleven pass. Figures cross-checked by hand: 21 rooms (8+6+4+3), 6 free,
+booked 9,30 + 4,65 + 4,95 + 6,30 = Rp 25,2 jt.
+
+Blocking room 362/211 moved occupancy from **5/8 to 5/7** — the blocked room
+left the denominator, so the rate rose, which is the behaviour the definition
+demands and the reason it was written out.
+
+The public loop holds in both directions. Blocking 211 turned the search screen's
+362 line from "3 dari 8 kamar kosong" to "1 dari 7", and the public detail grid
+shows that room as "terisi" — a visitor learns they cannot take it, not why.
+Ticking Laundry on 351 moved the search screen's Laundry chip from **1 to 2**;
+the filter changed, not just a row of text.
+
+A schema version bumped by hand reset cleanly to the seed with no error screen.
+`Atur ulang data demo` returned 6/8 to 5/8 and cleared the key.
+
+Contrast, composited by hand because Tailwind emits `oklab()` for
+opacity-modified colours and a naive rgb parse reads it as nonsense: prototype
+banner 5,44:1 · blocked-cell hatch 5,75:1 · held text on card 6,31:1 · secondary
+text 6,12:1 · availability green 5,03:1. All above the 4,5:1 floor.
+
+### Two defects the verification found
+
+**Keyboard focus was invisible on every `<select>` in the product**, public
+screens included. Each carried `focus:outline-none` to suppress the browser's
+own ring, on the assumption the wrapping pill would show focus instead — and
+nothing ever made it do so. Because `:focus-visible` is a subset of `:focus`,
+that one utility removed the indicator entirely. The ring now sits on the
+wrapping label via `has-[:focus-visible]`, verified by checking the selector
+matches rather than by scripting `.focus()`, which does not reliably trigger
+`:focus-visible`.
+
+**The panel had no navigation below 640px.** The header was a single flex row;
+the wordmark and the actor selector consumed the width and squeezed the nav to
+nothing. It wraps to a second row on a phone now.
 
 ## Invented in this phase
 
