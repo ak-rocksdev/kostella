@@ -26,6 +26,11 @@ reads. That shared surface is the thesis; every phase below serves it.
 An owner is a franchise partner. They are entitled to know how their building
 performs; they are not entitled to the names of the people living in it.
 
+Both read one **append-only audit log**, written by every phase. Who changed a
+price, who marked a room taken, and when — those questions arrive as disputes,
+long after the fact, and are unanswerable unless the record was kept at the
+time. Phase 1 builds it so no later phase has to retrofit it.
+
 ## Constraint that shapes everything
 
 The site is a **static export** — no backend, no database. State changes are
@@ -40,7 +45,7 @@ Buildings and rooms come first because every other record points at a room.
 
 | # | Phase | Route | Spec |
 |---|---|---|---|
-| 1 | **Buildings & rooms** — the data spine, the building switcher, the room list and its states | `/management/buildings` | `2026-08-01-management-01-buildings-rooms.md` |
+| 1 | **Buildings & rooms** — the data spine, the building switcher, room states, and the audit log every later phase writes to | `/management/buildings`, `/management/activity` | `2026-08-01-management-01-buildings-rooms.md` |
 | 2 | **Dashboard** — the screen the bundle designs: metrics, floor grid with actions, today's surveys | `/management` | not written yet |
 | 3 | **Tenants & contracts** — who is in which room, move-in date, contract end, deposit, expiry warnings | `/management/tenants` | not written yet |
 | 4 | **Billing** — rent, electricity, laundry, other services, penalties; paid / unpaid / short-paid with the reason | `/management/billing` | not written yet |

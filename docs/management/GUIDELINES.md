@@ -42,6 +42,18 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] No screenshot committed to the repo shows a full phone number or a real
       name.
 
+## Auditability
+
+- [ ] Every action that changes a record writes an **audit entry**: who, when,
+      which room, from what value to what value.
+- [ ] Changing a price or withdrawing a room **requires a stated reason**. A
+      change without one is the change an auditor cannot resolve later.
+- [ ] The log is **append-only**. A mistake is corrected by another logged
+      change, never by editing or deleting an entry.
+- [ ] A status change records the date it takes **effect**, which is not always
+      the date it was entered. Billing reads that date.
+      *Left out of the phase-1 draft; billing would have had to retrofit it.*
+
 ## Roles
 
 - [ ] The **owner** view shows aggregates and trends. It never lists individual
@@ -55,6 +67,11 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] The site is a **static export**. State changes live in `localStorage`,
       are visible only in the browser that made them, and vanish when it is
       cleared.
+- [ ] Stored data carries a **schema version**. A mismatch discards and
+      reseeds — loudly and predictably — rather than reading a stale shape.
+      *Otherwise a deploy breaks a demo already in progress.*
+- [ ] There is a **reset to seeded state**. Without one, the second pitch of the
+      day starts from whatever the first left behind.
 - [ ] Any screen that appears to save something says on screen that it is a
       prototype. A client must never leave the demo believing data persists.
 - [ ] Nothing in the UI implies a backend, a login, or multi-user sync that
