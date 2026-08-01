@@ -86,16 +86,21 @@ export function BuildingDetail({ number }: { number: string }) {
       {/* Only the lines that report an exception are marked. Marking all four
           would be decoration and would bury the one that matters. */}
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Percentage leads and the count follows it. The fraction alone made a
+            reader do the division to compare two buildings; the percentage alone
+            hid how few rooms it is a percentage of. */}
         <MetricCard
           label="Okupansi"
-          value={`${o.occupied}/${o.lettable}`}
+          value={`${Math.round(o.rate * 100)}%`}
           detail={
             o.blocked > 0 ? (
               <MetricNote icon={Wrench} tone="attention">
-                {o.blocked} kamar diblokir, di luar hitungan
+                {o.occupied} dari {o.lettable} kamar · {o.blocked} diblokir, di luar hitungan
               </MetricNote>
             ) : (
-              <MetricNote>{Math.round(o.rate * 100)}% dari kamar yang bisa disewakan</MetricNote>
+              <MetricNote>
+                {o.occupied} dari {o.lettable} kamar yang bisa disewakan
+              </MetricNote>
             )
           }
         />

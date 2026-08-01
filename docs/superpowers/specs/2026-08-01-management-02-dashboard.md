@@ -160,3 +160,53 @@ Contrast on the new tones — Baru 13,3:1, Dikonfirmasi 5,0:1, attention icon
 - The attention rules. Which of these a manager actually wants flagged, and
   what else they watch for daily, is the one question worth asking them about
   this screen.
+
+## Addendum, 2026-08-01 — occupancy as a figure
+
+Requested after the phase landed: an owner must be able to read occupancy as a
+percentage *and* a count, per building and for the whole portfolio.
+
+The audit found percentage on one screen only — the building detail card — and
+no portfolio rate anywhere. The panel could say how full one building was and
+not how full the business was.
+
+Now, from one function (`portfolio().roomRate`, `occupancy().rate`), in three
+places that cannot disagree:
+
+| Where | Reads |
+|---|---|
+| `/management` strip | `63%` · 19 dari 30 kamar · 6 gedung |
+| `/management` scoped to 362 | `63%` · 5 dari 8 kamar · 1 gedung |
+| `/management/buildings` strip | `63%` · 19 dari 30 kamar yang bisa disewakan |
+| Each building row | `63%` · dari 8 kamar, over its bar |
+| Building detail card | `63%` · 5 dari 8 kamar yang bisa disewakan |
+
+Denominator is **lettable** — total minus blocked — everywhere. When anything is
+blocked the figure says so, because 29 lettable sitting beside 30 total
+otherwise reads as a miscount.
+
+### Cut rather than shipped
+
+A second rate, revenue occupancy (`booked / potential`), and a line reading
+"the empty rooms are the expensive ones". The test set before building it was
+that it fire on plausible data. It never did:
+
+```
+sekarang                 63% kamar   64% pendapatan   selisih  −1
+Setiabudi kosong total   53% kamar   52% pendapatan   selisih  +1
+Dago kosong total        57% kamar   59% pendapatan   selisih  −2
+```
+
+Kos rents span 1,4 to 2,4 million, not an order of magnitude, so the two rates
+track. The rupiah are still on every strip — as rupiah, which is what a decision
+needs.
+
+### Verified
+
+Portfolio 19/30 cross-checked against the six buildings summed by hand.
+Blocking 351/201 moved the strip to 66% · 19 dari 29 · 1 diblokir and the row to
+60% · dari 5 kamar, both correct, and unblocking restored them. Contrast 17,9:1
+on the percentage and 6,4:1 on the count. No horizontal scroll at 390px.
+
+**Not shown: trend.** Nothing stores history, so there is no honest
+month-on-month arrow. It arrives with phase 5, or not at all.

@@ -79,7 +79,13 @@ export function Dashboard() {
       <div className="mt-6">
         <PortfolioBar
           items={[
-            { label: 'Gedung', value: totals.buildings, detail: `${totals.rooms} kamar` },
+            {
+              label: 'Okupansi',
+              value: `${Math.round(totals.roomRate * 100)}%`,
+              detail: `${totals.occupied} dari ${totals.lettable} kamar${
+                totals.blocked > 0 ? `, ${totals.blocked} diblokir` : ''
+              } · ${totals.buildings} gedung`,
+            },
             {
               label: 'Kamar kosong',
               value: totals.free,
@@ -115,38 +121,38 @@ export function Dashboard() {
               {attention.map((item) => {
                 const Icon = item.icon
                 return (
-                <li key={item.id}>
-                  <Link
-                    href={item.href}
-                    className="group flex items-start gap-3 rounded-card bg-paper p-4 shadow-card transition-[box-shadow] duration-200 hover:shadow-lift"
-                  >
-                    <span
-                      aria-hidden
-                      className={cn(
-                        'mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full',
-                        item.tone === 'attention'
-                          ? 'bg-held-soft text-held'
-                          : 'bg-stone text-ink-soft',
-                      )}
+                  <li key={item.id}>
+                    <Link
+                      href={item.href}
+                      className="group flex items-start gap-3 rounded-card bg-paper p-4 shadow-card transition-[box-shadow] duration-200 hover:shadow-lift"
                     >
-                      <Icon size={15} strokeWidth={1.9} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[14px] leading-[1.35] font-semibold">
-                        {item.title}
+                      <span
+                        aria-hidden
+                        className={cn(
+                          'mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full',
+                          item.tone === 'attention'
+                            ? 'bg-held-soft text-held'
+                            : 'bg-stone text-ink-soft',
+                        )}
+                      >
+                        <Icon size={15} strokeWidth={1.9} />
                       </span>
-                      <span className="mt-1 block text-[13px] leading-[1.45] text-ink-soft">
-                        {item.detail}
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[14px] leading-[1.35] font-semibold">
+                          {item.title}
+                        </span>
+                        <span className="mt-1 block text-[13px] leading-[1.45] text-ink-soft">
+                          {item.detail}
+                        </span>
                       </span>
-                    </span>
-                    <ArrowRight
-                      size={16}
-                      strokeWidth={1.75}
-                      aria-hidden
-                      className="mt-1 shrink-0 text-ink-soft transition-[translate] duration-200 group-hover:translate-x-1"
-                    />
-                  </Link>
-                </li>
+                      <ArrowRight
+                        size={16}
+                        strokeWidth={1.75}
+                        aria-hidden
+                        className="mt-1 shrink-0 text-ink-soft transition-[translate] duration-200 group-hover:translate-x-1"
+                      />
+                    </Link>
+                  </li>
                 )
               })}
             </ul>
@@ -154,7 +160,12 @@ export function Dashboard() {
             // Says the check ran. "Nothing here" would be indistinguishable
             // from a list that failed to load.
             <p className="flex items-center gap-3 rounded-card border border-dashed border-line px-5 py-8 text-[14px] text-ink-soft">
-              <CircleCheck size={18} strokeWidth={1.9} aria-hidden className="shrink-0 text-available" />
+              <CircleCheck
+                size={18}
+                strokeWidth={1.9}
+                aria-hidden
+                className="shrink-0 text-available"
+              />
               Tidak ada kamar diblokir, gedung tanpa foto, atau kamar dibooking yang menggantung.
             </p>
           )}

@@ -371,13 +371,29 @@ export function cheapestFree(b: Building): number | null {
 /** Across the whole portfolio, for the buildings-list metrics. */
 export function portfolio(all: Building[]) {
   const each = all.map(occupancy)
+  const lettable = each.reduce((n, o) => n + o.lettable, 0)
+  const occupied = each.reduce((n, o) => n + o.occupied, 0)
+  const booked = all.reduce((n, b) => n + monthlyBooked(b), 0)
+  const potential = all.reduce((n, b) => n + monthlyPotential(b), 0)
+
   return {
     buildings: all.length,
     rooms: each.reduce((n, o) => n + o.total, 0),
+    lettable,
+    occupied,
     free: each.reduce((n, o) => n + o.free, 0),
     held: each.reduce((n, o) => n + o.held, 0),
     blocked: each.reduce((n, o) => n + o.blocked, 0),
-    booked: all.reduce((n, b) => n + monthlyBooked(b), 0),
-    potential: all.reduce((n, b) => n + monthlyPotential(b), 0),
+    booked,
+    potential,
+    /* Weighted by actual rooms, not by averaging each building's percentage —
+       a four-room building must not count as much as a twelve-room one.
+
+       Rooms only. A revenue-share percentage was built here and removed: across
+       plausible scenarios it stayed within two points of this one, because a
+       kos portfolio's rents span 1,4 to 2,4 million rather than an order of
+       magnitude. Two figures that always agree are noise dressed as insight.
+       The rupiah are still reported, as rupiah, which is what a decision needs. */
+    roomRate: lettable > 0 ? occupied / lettable : 0,
   }
 }

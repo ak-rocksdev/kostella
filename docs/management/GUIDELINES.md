@@ -31,6 +31,24 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] A figure the client has not confirmed is marked `placeholder: true` in
       the data with a comment saying what it would take to replace it.
       *Four invented buildings on Beranda carry this flag.*
+- [ ] **A rate is never shown without the counts it divides, and never the
+      other way round.** "63%" alone hides that it is 63% of eight rooms;
+      "5/8" alone makes the reader divide before they can compare two
+      buildings.
+- [ ] **A denominator says why it is not the number beside it.** When a room
+      is blocked the strip reads 29 lettable next to 30 total; without
+      "1 diblokir, di luar hitungan" that looks like a miscount.
+- [ ] **No figure appears twice in one block.** *The building row briefly read
+      "5/8 kamar" directly above a legend already saying "5 terisi", and
+      "+1 diblokir" beside a badge already saying "1 kamar dalam perbaikan".*
+- [ ] **A derived insight must fire on plausible data before it ships.**
+      Set the test before building it, and cut it when it fails.
+      *A "the empty rooms are the expensive ones" line was written, then
+      removed: across every scenario tried — emptying the priciest building,
+      then the cheapest — room occupancy and revenue occupancy stayed within
+      two points, because kos rents span 1,4 to 2,4 million rather than an
+      order of magnitude. Two figures that always agree are noise dressed as
+      insight.*
 
 ## Personal data
 

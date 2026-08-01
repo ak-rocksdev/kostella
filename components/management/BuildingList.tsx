@@ -38,9 +38,7 @@ export function BuildingList() {
   // single building in Bandung above the four-building Grogol cluster; the
   // screen exists to answer "where do I work today", and its order should too.
   const freeIn = (district: string) =>
-    buildings
-      .filter((b) => b.district === district)
-      .reduce((n, b) => n + occupancy(b).free, 0)
+    buildings.filter((b) => b.district === district).reduce((n, b) => n + occupancy(b).free, 0)
 
   const districts = [...new Set(buildings.map((b) => b.district))].sort(
     (a, b) => freeIn(b) - freeIn(a) || a.localeCompare(b, 'id'),
@@ -60,17 +58,20 @@ export function BuildingList() {
         <PortfolioBar
           items={[
             {
+              // The portfolio question, and it was missing entirely: the panel
+              // could state one building's occupancy but never the whole.
+              label: 'Okupansi',
+              value: `${Math.round(totals.roomRate * 100)}%`,
+              detail: `${totals.occupied} dari ${totals.lettable} kamar yang bisa disewakan${
+                totals.blocked > 0 ? ` · ${totals.blocked} diblokir, di luar hitungan` : ''
+              }`,
+            },
+            {
               label: 'Gedung dimodelkan',
               value: totals.buildings,
               // Not "dikelola": Kostella operates 31. Saying 6 without saying so
               // would read as the whole portfolio.
-              detail: `dari 31 dikelola · ${districts.length} kawasan`,
-            },
-            {
-              label: 'Kamar',
-              value: totals.rooms,
-              detail:
-                totals.blocked > 0 ? `${totals.blocked} diblokir` : 'tidak ada yang diblokir',
+              detail: `dari 31 dikelola · ${totals.rooms} kamar`,
             },
             {
               label: 'Kamar kosong',
@@ -143,7 +144,17 @@ function BuildingRow({ building, all }: { building: Building; all: Building[] })
         )}
       </span>
 
-      <span className="w-full sm:w-44">
+      <span className="w-full sm:w-48">
+        {/* The percentage sits with the bar it describes: the bar compares two
+            buildings at a glance, the number is what gets written down.
+
+            It gives the denominator, not the fraction. "5/8" here would have sat
+            directly above a legend that already reads "5 terisi" — the same
+            figure twice, one of them doing no work. */}
+        <span className="mb-1.5 flex items-baseline gap-2">
+          <span className="font-figure text-[15px] font-semibold">{Math.round(o.rate * 100)}%</span>
+          <span className="text-[12px] text-ink-soft">dari {o.lettable} kamar</span>
+        </span>
         <OccupancyBar occupancy={o} />
       </span>
 
