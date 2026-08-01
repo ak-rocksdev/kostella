@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse' | 'warn' | 'restore'
 type Size = 'sm' | 'md' | 'lg'
 
 type ButtonProps = {
@@ -40,6 +40,15 @@ const variants: Record<Variant, string> = {
   ghost: 'border-transparent bg-transparent text-plum hover:bg-plum-soft',
   // Plum focus rings are unreadable on the dark franchise block.
   inverse: 'border-transparent bg-stone text-ink hover:bg-line focus-visible:outline-stone',
+  /* Two variants for actions that change what a room *is*, rather than just
+     editing it. They borrow the status colours already in use — a withdrawn
+     room is amber in the floor grid and the room table, so the control that
+     withdraws it is amber too. Colour here marks consequence, not importance:
+     the shape stays identical to `secondary` so nothing reads as more primary
+     than its neighbours. */
+  warn: 'border-held/45 bg-held-soft/40 text-held hover:border-held hover:bg-held-soft focus-visible:outline-held',
+  restore:
+    'border-available/45 bg-available/8 text-available hover:border-available hover:bg-available/15 focus-visible:outline-available',
 }
 
 export function Button({

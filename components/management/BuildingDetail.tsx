@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, CalendarClock, Layers, TrendingUp, Wrench } from 'lucide-react'
 import { FloorGrid, FloorGridLegend, type Floor } from '@/components/ui/FloorGrid'
 import { MetricCard } from '@/components/ui/MetricCard'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { BuildingSwitcher } from './BuildingSwitcher'
 import { FacilitiesPanel } from './FacilitiesPanel'
 import { RoomActions } from './RoomActions'
+import { MetricNote } from './MetricNote'
 import { RoomHistory } from './RoomHistory'
 import {
   areaLabel,
@@ -41,6 +42,7 @@ export function BuildingDetail({ number }: { number: string }) {
   }
 
   const o = occupancy(building)
+  const gap = monthlyPotential(building) - monthlyBooked(building)
   const room = building.rooms.find((r) => r.room === selected) ?? null
 
   // Grouped for the grid, in the building's own floor order — top down, so it
@@ -80,28 +82,60 @@ export function BuildingDetail({ number }: { number: string }) {
         </div>
       </div>
 
+      {/* Only the lines that report an exception are marked. Marking all four
+          would be decoration and would bury the one that matters. */}
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Okupansi"
           value={`${o.occupied}/${o.lettable}`}
           detail={
-            o.blocked > 0
-              ? `${o.blocked} kamar diblokir, di luar hitungan`
-              : `${Math.round(o.rate * 100)}% dari kamar yang bisa disewakan`
+            o.blocked > 0 ? (
+              <MetricNote icon={Wrench} tone="attention">
+                {o.blocked} kamar diblokir, di luar hitungan
+              </MetricNote>
+            ) : (
+              <MetricNote>{Math.round(o.rate * 100)}% dari kamar yang bisa disewakan</MetricNote>
+            )
           }
         />
         <MetricCard
           label="Kamar kosong"
           value={o.free}
           tone="available"
-          detail={o.held > 0 ? `${o.held} lagi dibooking` : 'tidak ada yang dibooking'}
+          detail={
+            o.held > 0 ? (
+              <MetricNote icon={CalendarClock} tone="attention">
+                {o.held} lagi dibooking, belum masuk
+              </MetricNote>
+            ) : (
+              <MetricNote>tidak ada yang dibooking</MetricNote>
+            )
+          }
         />
         <MetricCard
           label="Terisi bulan ini"
           value={jt(monthlyBooked(building))}
-          detail={`dari ${jt(monthlyPotential(building))} bila penuh`}
+          detail={
+            gap > 0 ? (
+              // The gap, not the ceiling. "dari Rp 5,0 jt bila penuh" made the
+              // manager do the subtraction to reach the number they care about.
+              <MetricNote icon={TrendingUp} tone="attention">
+                {jt(gap)} belum terisi dari {jt(monthlyPotential(building))}
+              </MetricNote>
+            ) : (
+              <MetricNote tone="available">penuh — tidak ada potensi yang menganggur</MetricNote>
+            )
+          }
         />
-        <MetricCard label="Total kamar" value={o.total} detail={`${building.floors.length} lantai`} />
+        <MetricCard
+          label="Total kamar"
+          value={o.total}
+          detail={
+            <MetricNote icon={Layers}>
+              {building.floors.length} lantai
+            </MetricNote>
+          }
+        />
       </div>
 
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">

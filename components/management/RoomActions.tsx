@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { DoorOpen, Tag, UserRoundCheck, Wrench } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { useToast } from '@/components/ui/Toast'
+import { blockToast, rentToast, statusToast } from './changeToast'
 import { budgetSteps } from '@/lib/content/beranda'
 import type { Building, RoomState } from '@/lib/content/management/buildings'
 import { setBlocked, setRent, setStatus } from '@/lib/management/store'
@@ -28,9 +31,18 @@ const field =
  *
  * Inline forms rather than modals: a modal needs a focus trap, an escape route
  * and a scroll lock to be correct, and buys nothing here.
+ *
+ * All three keep the same shape — none of them is more primary than the others
+ * in the moment, and giving one a filled treatment would compete with the
+ * `Simpan` inside the form it opens. What differs is consequence, so that is
+ * what the colour marks: blocking a room withdraws it from letting and takes
+ * the amber already used for a blocked cell in the grid and the room table.
+ * Icons carry the recognition; the words still carry the meaning.
  */
 export function RoomActions({ building, room }: { building: Building; room: RoomState }) {
-  const { apply } = useManagement()
+  const { apply, actor } = useManagement()
+  const { show } = useToast()
+  const ctx = { building: building.number, actor }
   const [open, setOpen] = useState<'status' | 'rent' | 'block' | null>(null)
 
   const [effectiveFrom, setEffectiveFrom] = useState(today())
@@ -47,19 +59,41 @@ export function RoomActions({ building, room }: { building: Building; room: Room
   const toggleStatus = () => {
     const next = room.status === 'occupied' ? 'available' : 'occupied'
     apply((s) => setStatus(s, building.number, room, next, effectiveFrom))
+    show(statusToast(ctx, room.room, next === 'occupied' ? 'terisi' : 'kosong', effectiveFrom))
     close()
   }
 
   return (
     <div className="mt-5 border-t border-line pt-5">
       <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" size="sm" onClick={() => setOpen(open === 'status' ? null : 'status')}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setOpen(open === 'status' ? null : 'status')}
+        >
+          {room.status === 'occupied' ? (
+            <DoorOpen size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
+          ) : (
+            <UserRoundCheck size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
+          )}
           {room.status === 'occupied' ? 'Tandai kosong' : 'Tandai terisi'}
         </Button>
-        <Button variant="secondary" size="sm" onClick={() => setOpen(open === 'rent' ? null : 'rent')}>
+
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setOpen(open === 'rent' ? null : 'rent')}
+        >
+          <Tag size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
           Atur harga
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => setOpen(open === 'block' ? null : 'block')}>
+
+        <Button
+          variant={room.blocked ? 'restore' : 'warn'}
+          size="sm"
+          onClick={() => setOpen(open === 'block' ? null : 'block')}
+        >
+          <Wrench size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
           {room.blocked ? 'Buka blokir' : 'Blokir untuk perbaikan'}
         </Button>
       </div>
@@ -95,6 +129,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
           onSubmit={(e) => {
             e.preventDefault()
             apply((s) => setRent(s, building.number, room, rent, note.trim()))
+            show(rentToast(ctx, room.room, room.rent, rent))
             close()
           }}
         >
@@ -141,6 +176,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 note.trim(),
               ),
             )
+            show(blockToast(ctx, room.room, !room.blocked))
             close()
           }}
         >

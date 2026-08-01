@@ -1,6 +1,8 @@
 'use client'
 
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { useToast } from '@/components/ui/Toast'
+import { facilityToast, tenancyToast } from './changeToast'
 import {
   FACILITIES,
   tenancyLabel,
@@ -31,12 +33,15 @@ const TENANCIES: TenancyId[] = ['putri', 'putra', 'campur']
  * filters each matching half the inventory.
  */
 export function FacilitiesPanel({ building }: { building: Building }) {
-  const { apply } = useManagement()
+  const { apply, actor } = useManagement()
+  const { show } = useToast()
+  const ctx = { building: building.number, actor }
 
   const toggle = (id: FacilityId, label: string) => {
     const before = building.facilities
     const after = before.includes(id) ? before.filter((f) => f !== id) : [...before, id]
     apply((s) => setFacilities(s, building.number, before, after, id, label))
+    show(facilityToast(ctx, label, after.includes(id)))
   }
 
   return (
@@ -85,7 +90,7 @@ export function FacilitiesPanel({ building }: { building: Building }) {
                   name={`tenancy-${building.number}`}
                   className="sr-only"
                   checked={on}
-                  onChange={() =>
+                  onChange={() => {
                     apply((s) =>
                       setTenancy(
                         s,
@@ -95,7 +100,8 @@ export function FacilitiesPanel({ building }: { building: Building }) {
                         tenancyLabel[id],
                       ),
                     )
-                  }
+                    show(tenancyToast(ctx, tenancyLabel[id]))
+                  }}
                 />
                 {tenancyLabel[id]}
               </label>
