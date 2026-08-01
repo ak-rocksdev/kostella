@@ -67,11 +67,17 @@ export function BuildingList() {
               }`,
             },
             {
-              label: 'Gedung dimodelkan',
+              label: 'Gedung',
               value: totals.buildings,
-              // Not "dikelola": Kostella operates 31. Saying 6 without saying so
-              // would read as the whole portfolio.
-              detail: `dari 31 dikelola · ${totals.rooms} kamar`,
+              // Kostella operates 31 (PRODUCT.md, confirmed). Saying 6 without
+              // saying so would read as the whole portfolio.
+              //
+              // The label was "Gedung dimodelkan" and a reader asked what it
+              // meant. "Dimodelkan" is a word for the people building this, not
+              // for the people running kos — exactly what the copy guideline
+              // warns against. The caveat belongs in the sentence below, in
+              // plain words, not compressed into a term of art in the label.
+              detail: `dari 31 yang dikelola Kostella · ${totals.rooms} kamar`,
             },
             {
               label: 'Kamar kosong',

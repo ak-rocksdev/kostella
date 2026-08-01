@@ -18,6 +18,15 @@ Check this list before opening a pull request, and again before demoing.
       "Tagihan", "Penghuni" while its route reads `/management/billing`.
 - [ ] `admin` is not used for this panel. It is reserved for the Kostella HQ
       tier that will later manage users, tariffs and all 31 buildings.
+- [ ] **A label uses the operator's vocabulary, never the builder's.** Words
+      like *dimodelkan*, *entitas*, *status sinkron* describe how the thing was
+      made; a pengelola names what they manage. If a label needs the reader to
+      know how the software works, rewrite it.
+      *A strip cell read "Gedung dimodelkan" and the first person to see it
+      asked what it meant. It now reads "Gedung", with "dari 31 yang dikelola
+      Kostella" underneath.*
+- [ ] **A caveat goes in the sentence, not compressed into the label.** The
+      label names the thing; the line below it carries the qualification.
 
 ## Figures
 
