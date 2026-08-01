@@ -68,3 +68,35 @@ Client Components are kept to where state or the DOM genuinely requires them:
 Read the specs in `docs/superpowers/specs/` before changing anything visual —
 they record which design-system rules the code is holding to, and where it
 knowingly departs from the prototype.
+
+---
+
+# Deployment
+
+Live at **https://kostella.hyperscore.cloud**.
+
+The site ships as **static files** — `output: 'export'` in `next.config.ts`.
+There is no Node process on the server: nginx serves the build folder directly.
+It can do that because the site has no API routes, no server actions and no
+middleware, and every route prerenders. The cost is `images.unoptimized`, since
+the image optimiser is a server feature.
+
+`next start` therefore does not work. `npm run dev` is unaffected, and
+`npx serve out` previews a production build.
+
+```bash
+ssh hyperscore-vps /srv/www/kostella/deploy/deploy.sh   # deploy
+ssh hyperscore-vps /srv/www/kostella/deploy/rollback.sh  # revert, no rebuild
+```
+
+Neither needs sudo. A deploy builds in a separate working copy and only then
+moves the `current` symlink, so the site stays up throughout — measured at 146
+requests during a full deploy with zero non-200 responses, not assumed. Five
+releases are kept, so a rollback is a symlink move rather than another build.
+
+**`deploy/README.md` is the reference** for the server layout, why it is shaped
+that way, and the two steps that do need sudo (installing the nginx vhost, and
+Certbot).
+
+Server access details are in `server-info.md`, which is gitignored — this
+repository is public.

@@ -21,3 +21,6 @@ next-env.d.ts
 # Browser-automation artifacts from agent sessions. Three of these were swept
 # into the repo by `git add -A` and purged from history before the first push.
 .playwright-mcp/
+
+# Detail akses server — repo ini publik
+server-info.md
