@@ -13,11 +13,13 @@ type PropertyCardProps = Property & {
 }
 
 /**
- * A property, led by its number.
+ * A property, led by its name.
  *
- * Kostella doesn't name its buildings, it numbers them — real house numbers on
- * Jl. Dr. Susilo. The numeral over the photo is that identity, so it is set
- * large rather than tucked into the caption.
+ * It was led by its number, because the brief described a numbering system —
+ * real house numbers on Jl. Dr. Susilo — and the numeral was set large over the
+ * photograph as the building's identity. Both are gone: the client asked for
+ * names, so a card now reads "Kostella Grogol 362" with the street beneath it,
+ * and the number survives only inside that name. See `lib/content/naming.ts`.
  *
  * Availability sits on the photograph rather than beside the price. It is the
  * brand's first claim and the thing a visitor scans for, so it should be

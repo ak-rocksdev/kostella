@@ -27,8 +27,8 @@ const availabilityTone = {
  * the only thing there is to do with it.
  *
  * Same materials as the property card on the landing page — 16px radius, the
- * three-layer resting shadow, the number as a small marker beside the street,
- * the price ranged right at full weight. The 32px Archivo Expanded numeral this
+ * three-layer resting shadow, the name leading with the street beneath it, the
+ * price ranged right at full weight. The 32px Archivo Expanded numeral this
  * used to lead with belonged to the previous world.
  *
  * Selection is a ring, not a border swap. A border that only exists when active
