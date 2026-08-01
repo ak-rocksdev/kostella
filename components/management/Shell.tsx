@@ -9,7 +9,10 @@ import { cn } from '@/lib/cn'
 import { ACTORS, setActor } from '@/lib/management/store'
 import { useManagement } from '@/lib/management/useManagement'
 
+/* Order is the manager's day: what needs me, then where I work, then the
+   record of what changed. */
 const NAV = [
+  { href: '/management', label: 'Hari ini', exact: true },
   { href: '/management/buildings', label: 'Gedung' },
   { href: '/management/activity', label: 'Aktivitas' },
 ]
@@ -59,7 +62,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="no-scrollbar order-3 flex w-full gap-1 overflow-x-auto sm:order-none sm:w-auto"
             >
               {NAV.map((item) => {
-                const active = pathname.startsWith(item.href)
+                // `/management` is a prefix of every other route, so the
+                // dashboard would otherwise read as active everywhere.
+                const active = item.exact
+                  ? pathname === item.href || pathname === `${item.href}/`
+                  : pathname.startsWith(item.href)
                 return (
                   <Link
                     key={item.href}

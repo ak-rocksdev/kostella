@@ -34,6 +34,8 @@ export function describe(entry: AuditEntry): string {
       return `Sampul ${entry.from} → ${entry.to}`
     case 'photo-label':
       return `Nama foto ${entry.from} → ${entry.to}`
+    case 'survey':
+      return `Survei ${entry.from} → ${entry.to}`
   }
 }
 
@@ -48,6 +50,7 @@ export const ACTION_LABEL: Record<AuditEntry['action'], string> = {
   'photo-remove': 'Foto dihapus',
   'photo-cover': 'Sampul',
   'photo-label': 'Nama foto',
+  survey: 'Survei',
 }
 
 /**

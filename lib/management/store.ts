@@ -18,6 +18,7 @@ import {
   type RoomState,
   type TenancyId,
 } from '@/lib/content/management/buildings'
+import { surveys as SEED_SURVEYS, type Survey, type SurveyStatus } from '@/lib/content/management/surveys'
 import type { Status } from '@/lib/content/types'
 
 /**
@@ -43,6 +44,7 @@ export type AuditAction =
   | 'photo-remove'
   | 'photo-cover'
   | 'photo-label'
+  | 'survey'
 
 export type AuditEntry = {
   id: string
@@ -78,6 +80,8 @@ type Stored = {
   rooms: Record<string, RoomOverride>
   /** Keyed "362". */
   buildings: Record<string, BuildingOverride>
+  /** Keyed by survey id. Only the fields a manager can change. */
+  surveys: Record<string, { status: SurveyStatus; note?: string }>
   log: AuditEntry[]
 }
 
@@ -96,6 +100,7 @@ const empty = (): Stored => ({
   actor: ACTORS[0],
   rooms: {},
   buildings: {},
+  surveys: {},
   log: [],
 })
 
@@ -226,6 +231,14 @@ export function merge(stored: Stored): Building[] {
         return merged
       }),
     }
+  })
+}
+
+/** Seeded viewings with any status a manager has changed applied on top. */
+export function mergeSurveys(stored: Stored): Survey[] {
+  return SEED_SURVEYS.map((survey) => {
+    const o = stored.surveys[survey.id]
+    return o ? { ...survey, status: o.status, note: o.note ?? survey.note } : survey
   })
 }
 
@@ -411,6 +424,36 @@ export function setPhotoLabel(
     ),
     { building, action: 'photo-label', from: photo.label, to: label },
   )
+}
+
+const SURVEY_WORD: Record<SurveyStatus, string> = {
+  baru: 'baru',
+  dikonfirmasi: 'dikonfirmasi',
+  selesai: 'selesai',
+  batal: 'batal',
+}
+
+export function setSurveyStatus(
+  stored: Stored,
+  survey: Survey,
+  status: SurveyStatus,
+  note?: string,
+): Stored {
+  const next: Stored = {
+    ...stored,
+    surveys: {
+      ...stored.surveys,
+      [survey.id]: { status, note: note ?? stored.surveys[survey.id]?.note },
+    },
+  }
+  return log(next, {
+    building: survey.building,
+    room: survey.room,
+    action: 'survey',
+    from: SURVEY_WORD[survey.status],
+    to: SURVEY_WORD[status],
+    note,
+  })
 }
 
 export function setTenancy(

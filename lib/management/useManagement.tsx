@@ -28,9 +28,11 @@ export function useManagement() {
   )
 
   const buildings = useMemo(() => store.merge(stored), [stored])
+  const surveys = useMemo(() => store.mergeSurveys(stored), [stored])
 
   return {
     buildings,
+    surveys,
     log: stored.log,
     actor: stored.actor,
     apply,
