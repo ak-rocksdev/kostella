@@ -10,6 +10,7 @@ import { formatRupiah } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { vacantRoomsIn, type Area } from '@/lib/content/beranda'
 import { scaleSentence } from '@/lib/content/company'
+import { kostellaName } from '@/lib/content/naming'
 import { findLive, liveProperty } from '@/lib/content/management/public'
 import { useLiveBuildings } from '@/lib/management/useManagement'
 
@@ -37,7 +38,18 @@ export function AreaShowcase({ area }: { area: Area }) {
   // facilities and tenancy come from the records a manager edits. A property
   // with no management record — Beranda lists 2C where the search screen lists
   // 2A3 — passes through unchanged, leaving that contradiction visible.
-  const properties = area.properties.map((p) => liveProperty(p, findLive(buildings, p.number)))
+  /* A property with a management record gets its name from there. One without
+     — Beranda lists 2C, 358, 355, 364 and 2A, which the panel does not model —
+     gets the same name derived from the area it is already filed under, so a
+     row of cards does not read half "Kostella Grogol 362" and half
+     "Jl. Dr. Susilo 2 No. 358". Nothing is invented: the district and number
+     are already on the record. */
+  const properties = area.properties.map((p) => {
+    const live = liveProperty(p, findLive(buildings, p.number))
+    return live.name
+      ? live
+      : { ...live, name: kostellaName(area.name, p.number, area.properties.length > 1) }
+  })
   const trackRef = useRef<HTMLUListElement>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(true)

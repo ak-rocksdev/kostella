@@ -76,24 +76,28 @@ export function PropertyCard({
         <span className="absolute top-3 left-3">
           <StatusBadge status={status} count={count} />
         </span>
-
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div>
-          {/* The number stays the naming system, but as a marker beside the
-              street rather than 56px of display type over the photograph. The
-              old treatment needed its own scrim to stay legible and left the
-              picture doing nothing. */}
-          {/* The name leads and the street follows it. The number stays as a
-              marker because it is still how Kostella identifies a building —
-              and where four sit on one street, it is the only thing that tells
-              them apart. */}
+          {/* The name leads, with the street under it.
+
+              The number badge beside it was dropped once every card had a
+              name: "Kostella Grogol 362" already ends in the number, so the
+              badge printed it twice on one line and a screen reader read
+              "Kostella 362, Kostella Grogol 362". It earned its place when the
+              title was the street and the number was the only thing telling
+              four buildings on one street apart. The name does that now.
+
+              It stays where there is no name — a card falling back to the
+              street still needs it. */}
           <p className="flex items-baseline gap-2 text-[15px] leading-[1.35] font-semibold text-ink">
-            <span className="rounded-badge bg-stone px-1.5 py-0.5 font-figure text-[13px] leading-[1.4] tracking-[0.01em] text-ink">
-              <span className="sr-only">Kostella </span>
-              {number}
-            </span>
+            {!name && (
+              <span className="rounded-badge bg-stone px-1.5 py-0.5 font-figure text-[13px] leading-[1.4] tracking-[0.01em] text-ink">
+                <span className="sr-only">Kostella </span>
+                {number}
+              </span>
+            )}
             {name ?? street}
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-[13px] text-ink-soft">

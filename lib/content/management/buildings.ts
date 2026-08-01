@@ -11,6 +11,7 @@
  * screens stating the same fact differently.
  */
 import type { Status } from '../types'
+import { kostellaName } from '../naming'
 
 /* ── Facilities ───────────────────────────────────────────────────────────
    A fixed list, stored by id. Not tidiness: `facilityFacet` on the search
@@ -35,8 +36,7 @@ export const FACILITIES = [
 
 export type FacilityId = (typeof FACILITIES)[number]['id']
 
-export const facilityLabel = (id: FacilityId) =>
-  FACILITIES.find((f) => f.id === id)?.label ?? id
+export const facilityLabel = (id: FacilityId) => FACILITIES.find((f) => f.id === id)?.label ?? id
 
 /* ── Tenancy ──────────────────────────────────────────────────────────────
    One id, two labels. Beranda used to store "Khusus putri" while the search
@@ -305,9 +305,7 @@ export const areaLabel = (b: Building) => `${b.district}, ${b.city}`
  */
 export function buildingName(building: Building, all: Building[] = buildings): string {
   const sharing = all.filter((b) => b.district === building.district).length
-  return sharing > 1
-    ? `Kostella ${building.district} ${building.number}`
-    : `Kostella ${building.district}`
+  return kostellaName(building.district, building.number, sharing > 1)
 }
 
 /* ── Derived ──────────────────────────────────────────────────────────────
@@ -355,9 +353,7 @@ export const monthlyPotential = (b: Building) =>
 
 /** What it earns as things stand. Held rooms are excluded — nobody is paying. */
 export const monthlyBooked = (b: Building) =>
-  b.rooms
-    .filter((r) => !r.blocked && r.status === 'occupied')
-    .reduce((sum, r) => sum + r.rent, 0)
+  b.rooms.filter((r) => !r.blocked && r.status === 'occupied').reduce((sum, r) => sum + r.rent, 0)
 
 /** The frame that leads: the public card, the search result, the gallery. */
 export const coverPhoto = (b: Building) => b.photos[0]

@@ -60,19 +60,20 @@ export function ResultCard({
 
       <div className="flex flex-1 flex-col gap-2 py-4 pr-4 text-left sm:pr-5">
         <div>
+          {/* The number badge only where there is no name to carry it — see
+              PropertyCard, which made the same call for the same reason. */}
           <p className="flex flex-wrap items-baseline gap-2 text-[16px] leading-[1.35] font-semibold">
-            <span className="rounded-badge bg-stone px-1.5 py-0.5 font-figure text-[13px] leading-[1.4] font-semibold text-ink">
-              <span className="sr-only">Kostella </span>
-              {result.number}
-            </span>
+            {!result.name && (
+              <span className="rounded-badge bg-stone px-1.5 py-0.5 font-figure text-[13px] leading-[1.4] font-semibold text-ink">
+                <span className="sr-only">Kostella </span>
+                {result.number}
+              </span>
+            )}
             {result.name ?? result.street}
           </p>
-          {result.name && (
-            <p className="mt-1 text-[13px] text-ink-soft">{result.street}</p>
-          )}
+          {result.name && <p className="mt-1 text-[13px] text-ink-soft">{result.street}</p>}
           <p className="mt-1.5 text-[13px] leading-[1.5] text-ink-soft">
-            {tenancyLabels[result.tenancy]} · {result.facilities.join(' · ')} ·{' '}
-            {walkLabel(result)}
+            {tenancyLabels[result.tenancy]} · {result.facilities.join(' · ')} · {walkLabel(result)}
           </p>
         </div>
 

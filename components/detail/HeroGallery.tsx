@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { photos as SEED_PHOTOS, property } from '@/lib/content/detail'
+import { buildingName } from '@/lib/content/management/buildings'
 import { findLive, publicGallery } from '@/lib/content/management/public'
 import { useLiveBuildings } from '@/lib/management/useManagement'
 import { routes } from '@/lib/routes'
@@ -25,7 +26,8 @@ export function HeroGallery() {
 
   // The same photographs the manager curates. Falls back to the bundle's set
   // where a building has none, so the page never opens on an empty frame.
-  const live = publicGallery(findLive(buildings, property.number))
+  const record = findLive(buildings, property.number)
+  const live = publicGallery(record)
   const photos = live.length > 0 ? live : SEED_PHOTOS
   const upcoming = [1, 2].map((offset) => (active + offset) % photos.length)
 
@@ -80,14 +82,17 @@ export function HeroGallery() {
 
       <div className="flex flex-wrap items-center gap-x-8 gap-y-4 pt-7">
         <div>
-          <h1 className="flex flex-wrap items-baseline gap-2.5 text-[clamp(1.5rem,3vw,2rem)] leading-[1.2] font-semibold tracking-[-0.02em]">
-            <span className="rounded-badge bg-stone px-2 py-0.5 font-figure text-[15px] leading-[1.4] font-semibold">
-              <span className="sr-only">Kostella </span>
-              {property.number}
-            </span>
-            {property.address}
+          {/* The name leads, as it does on every card and throughout the
+              panel. It was the address, under a badge carrying the bare
+              number — so this page was the one place a visitor could not
+              match what they had just clicked. The badge is gone with it:
+              "Kostella Grogol 362" already contains the number, and the two
+              side by side would print it twice. */}
+          <h1 className="text-[clamp(1.5rem,3vw,2rem)] leading-[1.2] font-semibold tracking-[-0.02em]">
+            {record ? buildingName(record, buildings) : property.address}
           </h1>
-          <p className="mt-2 text-[15px] leading-[1.6] text-ink-soft">{property.distances}</p>
+          <p className="mt-2 text-[15px] leading-[1.6] text-ink-soft">{property.address}</p>
+          <p className="mt-1 text-[14px] leading-[1.6] text-ink-soft">{property.distances}</p>
         </div>
         {/* Full width on a phone: a lone button shoved to the right edge reads
             as an afterthought, and this is the screen's primary action. */}

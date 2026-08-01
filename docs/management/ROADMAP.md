@@ -104,3 +104,11 @@ Carried forward and re-asked as each phase makes it concrete:
 - Real data for the four invented buildings (358, 355, 364, 2A).
 - Real photographs. Three shipped images are Cove's product photography.
 - What a manager actually does in a day that this panel is missing.
+- **Does a building's name change when a neighbour is added?** The rule drops
+  the number where a district holds one building, so "Kostella Setiabudi"
+  becomes "Kostella Setiabudi 18" the day a second Setiabudi building opens —
+  a building renamed because a *different* one appeared, with signage,
+  contracts and bookmarks left wrong. Always numbering avoids it and reads
+  clumsier for a lone building. Left as designed until the client answers,
+  because it is their naming, not ours. Rule lives in
+  `lib/content/naming.ts`.
