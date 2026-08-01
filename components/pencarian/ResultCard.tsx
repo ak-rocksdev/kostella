@@ -52,6 +52,7 @@ export function ResultCard({
           src={result.photo}
           alt=""
           fill
+          unoptimized={result.photo.startsWith('data:')}
           sizes="(min-width: 640px) 220px, 112px"
           className="object-cover transition-[scale] duration-[500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
         />

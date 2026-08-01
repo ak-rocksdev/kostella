@@ -21,9 +21,11 @@ function useStored() {
 export function useManagement() {
   const stored = useStored()
 
-  const apply = useCallback((fn: (s: store.Stored) => store.Stored) => {
-    store.write(fn(store.getSnapshot()))
-  }, [])
+  /** Returns false when the change could not be persisted — a full quota. */
+  const apply = useCallback(
+    (fn: (s: store.Stored) => store.Stored) => store.write(fn(store.getSnapshot())),
+    [],
+  )
 
   const buildings = useMemo(() => store.merge(stored), [stored])
 

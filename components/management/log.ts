@@ -26,6 +26,14 @@ export function describe(entry: AuditEntry): string {
       return `Fasilitas — ${entry.to}`
     case 'tenancy':
       return `Tipe penghuni ${entry.from} → ${entry.to}`
+    case 'photo-add':
+      return `Foto ditambahkan — ${entry.note ?? 'tanpa nama'}`
+    case 'photo-remove':
+      return `Foto dihapus — ${entry.note ?? 'tanpa nama'}`
+    case 'photo-cover':
+      return `Sampul ${entry.from} → ${entry.to}`
+    case 'photo-label':
+      return `Nama foto ${entry.from} → ${entry.to}`
   }
 }
 
@@ -36,6 +44,10 @@ export const ACTION_LABEL: Record<AuditEntry['action'], string> = {
   unblock: 'Buka blokir',
   facility: 'Fasilitas',
   tenancy: 'Tipe penghuni',
+  'photo-add': 'Foto ditambah',
+  'photo-remove': 'Foto dihapus',
+  'photo-cover': 'Sampul',
+  'photo-label': 'Nama foto',
 }
 
 /**

@@ -68,6 +68,7 @@ export function PropertyCard({
           src={photo}
           alt=""
           fill
+          unoptimized={photo.startsWith('data:')}
           sizes={sizes}
           className="object-cover transition-[scale] duration-[500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
         />

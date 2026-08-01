@@ -6,6 +6,7 @@ import { ArrowRight, Wrench } from 'lucide-react'
 import { PortfolioBar } from './PortfolioBar'
 import {
   buildingName,
+  coverPhoto,
   monthlyBooked,
   monthlyPotential,
   occupancy,
@@ -179,8 +180,9 @@ function BuildingRow({ building, all }: { building: Building; all: Building[] })
  */
 function Facade({ building }: { building: Building }) {
   const base = 'relative size-16 shrink-0 overflow-hidden rounded-badge sm:size-20'
+  const cover = coverPhoto(building)
 
-  if (!building.photo) {
+  if (!cover) {
     return (
       <span className={`${base} flex items-center justify-center bg-stone`}>
         <span className="font-figure text-[17px] font-bold text-ink-soft">{building.number}</span>
@@ -192,10 +194,13 @@ function Facade({ building }: { building: Building }) {
   return (
     <span className={`${base} bg-photo-bg`}>
       <Image
-        src={building.photo}
+        src={cover.src}
         alt=""
         fill
         sizes="80px"
+        // Added photos are data URLs, which the optimiser cannot fetch and
+        // does not need to — they were already resized on the way in.
+        unoptimized={cover.src.startsWith('data:')}
         className="object-cover"
       />
     </span>

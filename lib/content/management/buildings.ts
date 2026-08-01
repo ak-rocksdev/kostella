@@ -59,6 +59,14 @@ export const tenancyShort: Record<TenancyId, string> = {
 
 /* ── Records ──────────────────────────────────────────────────────────────*/
 
+export type BuildingPhoto = {
+  id: string
+  /** A path under /images for seeded photos, a data URL for added ones. */
+  src: string
+  /** What the photograph shows. Printed under the gallery on the public page. */
+  label: string
+}
+
 export type Blocked = {
   /** ISO date the room was withdrawn. */
   since: string
@@ -87,11 +95,14 @@ export type Building = {
   district: string
   city: string
   /**
-   * Facade photograph. Optional on purpose: reusing one building's photo for
-   * another asserts they look alike, which is worse than showing none. Where it
-   * is absent the UI renders a labelled placeholder instead.
+   * The building's photographs, cover first.
+   *
+   * An array rather than one facade, because the public detail page runs a
+   * gallery and a manager needs to decide which frame leads it. Empty is a
+   * legitimate state and the UI says so — borrowing another building's photo to
+   * fill the gap would assert they look alike.
    */
-  photo?: string
+  photos: BuildingPhoto[]
   /** Top floor first, so the grid reads like a building elevation. */
   floors: string[]
   rooms: RoomState[]
@@ -121,7 +132,13 @@ const KOSTELLA_362: Building = {
   street: 'Jl. Dr. Susilo 2 No. 362',
   district: 'Grogol',
   city: 'Jakarta Barat',
-  photo: '/images/tampak-depan.jpg',
+  photos: [
+    { id: '362-depan', src: '/images/tampak-depan.jpg', label: 'Tampak depan' },
+    { id: '362-superior', src: '/images/kamar-superior.jpg', label: 'Kamar Superior' },
+    { id: '362-standard', src: '/images/kamar-standard.jpg', label: 'Kamar Standard' },
+    { id: '362-mandi', src: '/images/kamar-mandi.jpg', label: 'Kamar mandi dalam' },
+    { id: '362-bersama', src: '/images/ruang-bersama.jpg', label: 'Ruang bersama' },
+  ],
   floors: ['Lantai 3', 'Lantai 2', 'Lantai 1'],
   facilities: ['kamar-mandi-dalam', 'ac', 'wifi'],
   tenancy: 'putri',
@@ -154,6 +171,7 @@ const PLACEHOLDERS: Building[] = [
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'dapur-bersama'],
     tenancy: 'campur',
+    photos: [],
     placeholder: true,
     rooms: [
       { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_550_000, status: 'available' },
@@ -172,6 +190,7 @@ const PLACEHOLDERS: Building[] = [
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['ac', 'wifi', 'laundry'],
     tenancy: 'putri',
+    photos: [],
     placeholder: true,
     rooms: [
       { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_650_000, status: 'occupied' },
@@ -188,6 +207,7 @@ const PLACEHOLDERS: Building[] = [
     floors: ['Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'parkir-motor'],
     tenancy: 'campur',
+    photos: [],
     placeholder: true,
     rooms: [
       { room: '101', floor: 'Lantai 1', type: 'Pojok', rent: 2_100_000, status: 'occupied' },
@@ -211,6 +231,7 @@ const OTHER_DISTRICTS: Building[] = [
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'wifi', 'laundry'],
     tenancy: 'campur',
+    photos: [],
     placeholder: true,
     rooms: [
       { room: '201', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000, status: 'occupied' },
@@ -228,6 +249,7 @@ const OTHER_DISTRICTS: Building[] = [
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['ac', 'wifi', 'dapur-bersama', 'parkir-motor'],
     tenancy: 'putri',
+    photos: [],
     placeholder: true,
     rooms: [
       { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_400_000, status: 'available' },
@@ -316,6 +338,9 @@ export const monthlyBooked = (b: Building) =>
   b.rooms
     .filter((r) => !r.blocked && r.status === 'occupied')
     .reduce((sum, r) => sum + r.rent, 0)
+
+/** The frame that leads: the public card, the search result, the gallery. */
+export const coverPhoto = (b: Building) => b.photos[0]
 
 /** Cheapest room a visitor could actually take. Null when none is free. */
 export function cheapestFree(b: Building): number | null {

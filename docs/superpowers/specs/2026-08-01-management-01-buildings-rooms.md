@@ -52,8 +52,18 @@ Out of scope, and why:
   will be more than one thing worth exporting.
 - A separate page per room. The panel on the building page carries everything a
   room has; a route for it would be a click with nothing new behind it.
-- Photographs. Managing them means uploading them, which means a backend and a
-  file store. The three Cove images stay until the client supplies their own.
+- ~~Photographs.~~ **Added 2026-08-01 at the client's request.** A building now
+  carries an ordered `photos[]`; the first is the cover the public card and the
+  search result show, the rest are the detail page's gallery. There is no file
+  store, so a chosen file is redrawn through a canvas — long edge capped at
+  1200px, JPEG q0.78 — and kept as a data URL. A 2400×1600 test file went in at
+  131 KB and stored at 22 KB.
+
+  That budget is the reason for the rest of the design: `localStorage` is ~5 MB
+  for the whole panel including the audit log, so photos are capped at six per
+  building and `write()` now reports failure instead of swallowing it. A manager
+  who fills the quota is told at the time rather than finding the photo gone
+  after a reload.
 - Distances and area copy. Editable in principle — it would let the client fix
   "Central Park 0,2 km", which is roughly 1,5 km — but they are marketing facts,
   not operations. Candidate for a later phase.

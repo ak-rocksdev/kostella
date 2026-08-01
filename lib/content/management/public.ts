@@ -20,6 +20,7 @@ import type { SearchResult } from '../pencarian'
 import {
   buildingName,
   cheapestFree,
+  coverPhoto,
   facilityLabel,
   occupancy,
   tenancyLabel,
@@ -57,6 +58,9 @@ export function liveProperty(base: Property, building?: Building): Property {
   return {
     ...base,
     name: buildingName(building),
+    // The cover a manager chose. Falls back to the bundle's stock image only
+    // where a building has no photographs yet.
+    photo: coverPhoto(building)?.src ?? base.photo,
     tenancy: tenancyLabel[building.tenancy],
     facilities: facilityLabels(building),
     // Falls back to the base figure when nothing is free: a card still has to
@@ -78,6 +82,9 @@ export function liveResult(base: SearchResult, building?: Building): SearchResul
   return {
     ...base,
     name: buildingName(building),
+    // The cover a manager chose. Falls back to the bundle's stock image only
+    // where a building has no photographs yet.
+    photo: coverPhoto(building)?.src ?? base.photo,
     tenancy: building.tenancy,
     facilities: facilityLabels(building),
     rent: cheapest ?? base.rent,
@@ -114,6 +121,16 @@ export function publicFloors(building: Building) {
       })),
   }))
 }
+
+/**
+ * The public gallery for one building.
+ *
+ * Empty until a manager adds something, and the caller keeps its own fallback
+ * for that — a property with no photographs should show the bundle's stock
+ * rather than an empty frame.
+ */
+export const publicGallery = (building: Building | undefined) =>
+  building?.photos.map((p) => ({ src: p.src, label: p.label })) ?? []
 
 /** One room's live figures, or undefined where the building is not managed. */
 export const liveRoom = (building: Building | undefined, room: string) =>

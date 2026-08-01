@@ -1,27 +1,27 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { RotateCcw } from "lucide-react";
-import { Select } from "@/components/ui/Select";
-import { ToastProvider } from "@/components/ui/Toast";
-import { cn } from "@/lib/cn";
-import { ACTORS, setActor } from "@/lib/management/store";
-import { useManagement } from "@/lib/management/useManagement";
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { RotateCcw } from 'lucide-react'
+import { Select } from '@/components/ui/Select'
+import { ToastProvider } from '@/components/ui/Toast'
+import { cn } from '@/lib/cn'
+import { ACTORS, setActor } from '@/lib/management/store'
+import { useManagement } from '@/lib/management/useManagement'
 
 const NAV = [
-  { href: "/management/buildings", label: "Gedung" },
-  { href: "/management/activity", label: "Aktivitas" },
-];
+  { href: '/management/buildings', label: 'Gedung' },
+  { href: '/management/activity', label: 'Aktivitas' },
+]
 
 /* What each role would actually reach. Three names in a list say nothing about
    why you would pick one, and the audit log is the only reason the choice
    exists — so each option states its scope. */
 const ACTOR_SCOPE: Record<string, string> = {
-  "Pengelola 362": "Satu gedung",
-  "Pengelola Grogol": "Semua gedung di Grogol",
-  "Kantor Pusat": "Semua kawasan",
-};
+  'Pengelola 362': 'Satu gedung',
+  'Pengelola Grogol': 'Semua gedung di Grogol',
+  'Kantor Pusat': 'Semua kawasan',
+}
 
 /**
  * The frame every management screen sits in.
@@ -36,8 +36,8 @@ const ACTOR_SCOPE: Record<string, string> = {
  * one system.
  */
 export function Shell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const { actor, apply, reset } = useManagement();
+  const pathname = usePathname()
+  const { actor, apply, reset } = useManagement()
 
   return (
     <ToastProvider>
@@ -49,10 +49,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="wrap-wide flex flex-wrap items-center gap-x-4 gap-y-2 py-2.5 sm:h-16 sm:flex-nowrap sm:gap-x-8 sm:py-0">
             <Link
               href="/management/buildings"
-              className="text-[20px] font-semibold tracking-[-0.01em] whitespace-nowrap"
+              className="inline-flex min-h-11 items-center text-[20px] font-semibold tracking-[-0.01em] whitespace-nowrap"
             >
-              Kostella{" "}
-              <span className="font-medium text-ink-soft">Pengelola</span>
+              Kostella <span className="font-medium text-ink-soft">Pengelola</span>
             </Link>
 
             <nav
@@ -60,22 +59,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="no-scrollbar order-3 flex w-full gap-1 overflow-x-auto sm:order-none sm:w-auto"
             >
               {NAV.map((item) => {
-                const active = pathname.startsWith(item.href);
+                const active = pathname.startsWith(item.href)
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    aria-current={active ? "page" : undefined}
+                    aria-current={active ? 'page' : undefined}
                     className={cn(
-                      "inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[14px] font-medium transition-colors",
-                      active
-                        ? "bg-ink text-stone"
-                        : "text-ink-soft hover:bg-stone hover:text-ink",
+                      'inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[14px] font-medium transition-colors',
+                      active ? 'bg-ink text-stone' : 'text-ink-soft hover:bg-stone hover:text-ink',
                     )}
                   >
                     {item.label}
                   </Link>
-                );
+                )
               })}
             </nav>
 
@@ -99,8 +96,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
         {/* Not a toast, not dismissible. The one sentence a client must not miss. */}
         <p className="border-b border-held/25 bg-held-soft/60 px-5 py-2 text-center text-[13px] text-held sm:px-8">
-          Prototipe — perubahan tersimpan di browser ini saja, tidak terkirim ke
-          mana pun.
+          Prototipe — perubahan tersimpan di browser ini saja, tidak terkirim ke mana pun.
         </p>
 
         <main className="flex-1">{children}</main>
@@ -120,5 +116,5 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </footer>
       </div>
     </ToastProvider>
-  );
+  )
 }

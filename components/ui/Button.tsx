@@ -22,8 +22,12 @@ type ButtonProps = {
 /* Border width only. The colour belongs to the variant — setting a colour here
    too would collide on the same property, and source order rather than intent
    would decide which one wins. */
+/* `min-h-11` = 44px on every size. `sm` and `md` computed to 35px and 38px,
+   under the touch floor this project's own guidelines set — measured on a
+   phone, not eyeballed. Padding still sets the horizontal rhythm; the minimum
+   only ever grows the box. */
 const base =
-  'inline-flex items-center justify-center rounded-full border font-body font-semibold leading-[1.2] transition-colors duration-200'
+  'inline-flex min-h-11 items-center justify-center rounded-full border font-body font-semibold leading-[1.2] transition-colors duration-200'
 
 const sizes: Record<Size, string> = {
   sm: 'px-4 py-2 text-[14px]',

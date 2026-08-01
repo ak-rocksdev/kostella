@@ -3,7 +3,9 @@
 import Image from 'next/image'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { photos, property } from '@/lib/content/detail'
+import { photos as SEED_PHOTOS, property } from '@/lib/content/detail'
+import { findLive, publicGallery } from '@/lib/content/management/public'
+import { useLiveBuildings } from '@/lib/management/useManagement'
 import { routes } from '@/lib/routes'
 
 /**
@@ -19,6 +21,12 @@ import { routes } from '@/lib/routes'
  */
 export function HeroGallery() {
   const [active, setActive] = useState(0)
+  const buildings = useLiveBuildings()
+
+  // The same photographs the manager curates. Falls back to the bundle's set
+  // where a building has none, so the page never opens on an empty frame.
+  const live = publicGallery(findLive(buildings, property.number))
+  const photos = live.length > 0 ? live : SEED_PHOTOS
   const upcoming = [1, 2].map((offset) => (active + offset) % photos.length)
 
   return (
@@ -30,6 +38,7 @@ export function HeroGallery() {
             alt={photos[active].label}
             fill
             priority
+            unoptimized={photos[active].src.startsWith('data:')}
             sizes="(min-width: 1024px) 66vw, 100vw"
             className="object-cover"
           />
@@ -55,6 +64,7 @@ export function HeroGallery() {
                 src={photos[index].src}
                 alt={`Lihat ${photos[index].label}`}
                 fill
+                unoptimized={photos[index].src.startsWith('data:')}
                 sizes="(min-width: 1024px) 33vw, 50vw"
                 className="object-cover"
               />

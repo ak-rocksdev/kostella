@@ -107,7 +107,9 @@ Check this list before opening a pull request, and again before demoing.
 
 - [ ] Keyboard reachable: every action has a visible focus ring and a sane tab
       order. Tables are navigable without a mouse.
-- [ ] Touch targets ≥ 44px.
+- [ ] Touch targets ≥ 44px — **measured in the browser**, not assumed from
+      padding. *`Button` computed to 35px at `sm` and 38px at `md` for weeks
+      under this very rule, because nobody read the box.*
 - [ ] Contrast ≥ 4.5:1 for body text, measured — not eyeballed.
 - [ ] Status is never carried by colour alone; a word accompanies every hue.
 - [ ] Works down to 390px. A data table gets a deliberate small-screen form,

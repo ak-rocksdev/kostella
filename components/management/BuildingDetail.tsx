@@ -8,6 +8,7 @@ import { MetricCard } from '@/components/ui/MetricCard'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { BuildingSwitcher } from './BuildingSwitcher'
 import { FacilitiesPanel } from './FacilitiesPanel'
+import { PhotoPanel } from './PhotoPanel'
 import { RoomActions } from './RoomActions'
 import { MetricNote } from './MetricNote'
 import { RoomHistory } from './RoomHistory'
@@ -174,7 +175,10 @@ export function BuildingDetail({ number }: { number: string }) {
           )}
         </section>
 
-        <FacilitiesPanel building={building} />
+        <div className="flex flex-col gap-6">
+          <PhotoPanel building={building} />
+          <FacilitiesPanel building={building} />
+        </div>
       </div>
 
       <section className="mt-8">
@@ -225,7 +229,7 @@ function RoomTable({
                 <button
                   type="button"
                   onClick={() => onSelect(room.room)}
-                  className="cursor-pointer font-figure text-[15px] font-semibold underline-offset-4 hover:underline"
+                  className="inline-flex min-h-11 cursor-pointer items-center font-figure text-[15px] font-semibold underline-offset-4 hover:underline"
                 >
                   {room.room}
                 </button>

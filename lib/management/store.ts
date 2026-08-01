@@ -13,6 +13,7 @@ import {
   buildings as SEED,
   type Building,
   type Blocked,
+  type BuildingPhoto,
   type FacilityId,
   type RoomState,
   type TenancyId,
@@ -31,7 +32,17 @@ import type { Status } from '@/lib/content/types'
 const KEY = 'kostella.management.v1'
 const VERSION = 1
 
-export type AuditAction = 'status' | 'rent' | 'block' | 'unblock' | 'facility' | 'tenancy'
+export type AuditAction =
+  | 'status'
+  | 'rent'
+  | 'block'
+  | 'unblock'
+  | 'facility'
+  | 'tenancy'
+  | 'photo-add'
+  | 'photo-remove'
+  | 'photo-cover'
+  | 'photo-label'
 
 export type AuditEntry = {
   id: string
@@ -58,7 +69,7 @@ type RoomOverride = Partial<Pick<RoomState, 'status' | 'rent'>> & {
   blocked?: Blocked | null
 }
 
-type BuildingOverride = Partial<Pick<Building, 'facilities' | 'tenancy'>>
+type BuildingOverride = Partial<Pick<Building, 'facilities' | 'tenancy' | 'photos'>>
 
 type Stored = {
   version: number
@@ -150,14 +161,27 @@ export function getServerSnapshot(): Stored {
   return SERVER_SNAPSHOT
 }
 
-function write(next: Stored) {
+/**
+ * Returns false when the change could not be persisted.
+ *
+ * It used to swallow the failure. That was tolerable while everything stored
+ * here was a few bytes; a photograph can exhaust the ~5 MB `localStorage`
+ * budget on its own, and a manager watching an image appear and then vanish on
+ * reload deserves to be told at the time.
+ *
+ * The in-memory value is kept either way, so the current session stays coherent
+ * even when the write fails.
+ */
+function write(next: Stored): boolean {
   cached = next
   emit()
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') return true
   try {
     window.localStorage.setItem(KEY, JSON.stringify(next))
+    return true
   } catch {
-    // Private browsing, or quota. The change stays in memory for this session.
+    // Quota exhausted, or storage blocked entirely by the browser.
+    return false
   }
 }
 
@@ -186,6 +210,7 @@ export function merge(stored: Stored): Building[] {
       ...building,
       facilities: b?.facilities ?? building.facilities,
       tenancy: b?.tenancy ?? building.tenancy,
+      photos: b?.photos ?? building.photos,
       rooms: building.rooms.map((room) => {
         const r = stored.rooms[`${building.number}/${room.room}`]
         if (!r) return room
@@ -320,6 +345,72 @@ export function setFacilities(
     from: before.includes(changed) ? `${label}: ada` : `${label}: tidak ada`,
     to: after.includes(changed) ? `${label}: ada` : `${label}: tidak ada`,
   })
+}
+
+const photosOf = (stored: Stored, building: string) =>
+  stored.buildings[building]?.photos ?? SEED.find((b) => b.number === building)?.photos ?? []
+
+const withPhotos = (stored: Stored, building: string, photos: BuildingPhoto[]): Stored => ({
+  ...stored,
+  buildings: { ...stored.buildings, [building]: { ...stored.buildings[building], photos } },
+})
+
+export function addPhoto(stored: Stored, building: string, photo: BuildingPhoto): Stored {
+  const before = photosOf(stored, building)
+  return log(withPhotos(stored, building, [...before, photo]), {
+    building,
+    action: 'photo-add',
+    from: `${before.length} foto`,
+    to: `${before.length + 1} foto`,
+    note: photo.label,
+  })
+}
+
+export function removePhoto(stored: Stored, building: string, photo: BuildingPhoto): Stored {
+  const before = photosOf(stored, building)
+  return log(
+    withPhotos(
+      stored,
+      building,
+      before.filter((p) => p.id !== photo.id),
+    ),
+    {
+      building,
+      action: 'photo-remove',
+      from: `${before.length} foto`,
+      to: `${before.length - 1} foto`,
+      note: photo.label,
+    },
+  )
+}
+
+/** Cover is simply first, so promoting one is a reorder rather than a flag. */
+export function setCover(stored: Stored, building: string, photo: BuildingPhoto): Stored {
+  const before = photosOf(stored, building)
+  const next = [photo, ...before.filter((p) => p.id !== photo.id)]
+  return log(withPhotos(stored, building, next), {
+    building,
+    action: 'photo-cover',
+    from: before[0]?.label ?? '—',
+    to: photo.label,
+  })
+}
+
+export function setPhotoLabel(
+  stored: Stored,
+  building: string,
+  photo: BuildingPhoto,
+  label: string,
+): Stored {
+  const before = photosOf(stored, building)
+  return log(
+    withPhotos(
+      stored,
+      building,
+      before.map((p) => (p.id === photo.id ? { ...p, label } : p)),
+    ),
+    { building, action: 'photo-label', from: photo.label, to: label },
+  )
 }
 
 export function setTenancy(
