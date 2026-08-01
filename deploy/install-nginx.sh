@@ -25,6 +25,14 @@ fail() { printf "\n\033[31mGAGAL: %s\033[0m\n" "$1" >&2; exit 1; }
 [ -f "$SRC" ]        || fail "vhost tidak ditemukan: $SRC"
 [ -f "$ROOT/index.html" ] || fail "hasil build tidak ada: $ROOT/index.html (jalankan deploy.sh dulu)"
 
+# Certbot menyunting vhost yang terpasang untuk menambahkan blok TLS. Skrip ini
+# menimpa berkas itu, jadi dijalankan setelah SSL aktif akan mematikan HTTPS.
+if [ "${FORCE:-0}" != "1" ] && grep -q "managed by Certbot" "$AVAIL" 2>/dev/null; then
+  fail "vhost terpasang sudah disunting Certbot. Menimpanya akan mematikan HTTPS.
+       Sunting $SRC, jalankan skrip ini dengan FORCE=1, lalu jalankan ulang:
+       sudo certbot --nginx -d $SITE"
+fi
+
 step "1/5  Salin vhost ke sites-available"
 if [ -f "$AVAIL" ]; then
   cp -a "$AVAIL" "${AVAIL}.bak.$(date +%Y%m%d_%H%M%S)"
