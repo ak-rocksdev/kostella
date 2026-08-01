@@ -35,9 +35,7 @@ export function ActivityLog() {
 
   return (
     <div className="wrap-wide py-8 sm:py-10">
-      <h1 className="text-[clamp(1.5rem,3vw,2rem)] leading-[1.2] font-semibold tracking-[-0.02em]">
-        Aktivitas
-      </h1>
+      <h1 className="text-[28px] leading-[1.2] font-semibold tracking-[-0.02em]">Aktivitas</h1>
       <p className="mt-2 max-w-[60ch] text-[15px] leading-[1.6] text-ink-soft">
         Setiap perubahan tercatat: siapa, kapan, dari nilai berapa ke berapa. Catatan tidak bisa
         disunting atau dihapus — koreksi dilakukan dengan perubahan baru, yang juga tercatat.

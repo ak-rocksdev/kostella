@@ -30,6 +30,7 @@ type PropertyCardProps = Property & {
  */
 export function PropertyCard({
   number,
+  name,
   street,
   area,
   distances,
@@ -83,16 +84,20 @@ export function PropertyCard({
               street rather than 56px of display type over the photograph. The
               old treatment needed its own scrim to stay legible and left the
               picture doing nothing. */}
+          {/* The name leads and the street follows it. The number stays as a
+              marker because it is still how Kostella identifies a building —
+              and where four sit on one street, it is the only thing that tells
+              them apart. */}
           <p className="flex items-baseline gap-2 text-[15px] leading-[1.35] font-semibold text-ink">
             <span className="rounded-badge bg-stone px-1.5 py-0.5 font-figure text-[13px] leading-[1.4] tracking-[0.01em] text-ink">
               <span className="sr-only">Kostella </span>
               {number}
             </span>
-            {street}
+            {name ?? street}
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-[13px] text-ink-soft">
             <MapPin size={14} strokeWidth={1.5} aria-hidden className="shrink-0" />
-            {area}
+            {name ? street : area}
           </p>
         </div>
 

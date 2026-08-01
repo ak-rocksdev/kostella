@@ -12,6 +12,9 @@ import { cn } from '@/lib/cn'
  *
  * `detail` is where a metric earns its place — a number alone invites the
  * question the detail line should already have answered.
+ *
+ * Fixed size, not clamped: an operator works at a consistent width and a figure
+ * that shrinks with the window is harder to compare, not more responsive.
  */
 export function MetricCard({
   label,
@@ -32,7 +35,7 @@ export function MetricCard({
       <p className="text-[13px] font-semibold text-ink-soft">{label}</p>
       <p
         className={cn(
-          'mt-2 font-figure text-[clamp(1.75rem,3vw,2.25rem)] leading-none font-bold tracking-[-0.02em]',
+          'mt-2 font-figure text-[32px] leading-none font-bold tracking-[-0.02em]',
           tone === 'available' ? 'text-available' : 'text-ink',
         )}
       >

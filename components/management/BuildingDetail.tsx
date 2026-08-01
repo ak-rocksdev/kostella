@@ -11,6 +11,8 @@ import { FacilitiesPanel } from './FacilitiesPanel'
 import { RoomActions } from './RoomActions'
 import { RoomHistory } from './RoomHistory'
 import {
+  areaLabel,
+  buildingName,
   monthlyBooked,
   monthlyPotential,
   occupancy,
@@ -69,11 +71,11 @@ export function BuildingDetail({ number }: { number: string }) {
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-3">
         <BuildingSwitcher current={building.number} />
         <div>
-          <h1 className="text-[clamp(1.375rem,2.5vw,1.75rem)] leading-[1.2] font-semibold tracking-[-0.02em]">
-            {building.street}
+          <h1 className="text-[24px] leading-[1.2] font-semibold tracking-[-0.02em]">
+            {buildingName(building, buildings)}
           </h1>
           <p className="mt-1 text-[14px] text-ink-soft">
-            {tenancyLabel[building.tenancy]} · {building.area}
+            {building.street} · {tenancyLabel[building.tenancy]} · {areaLabel(building)}
           </p>
         </div>
       </div>

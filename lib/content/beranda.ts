@@ -115,6 +115,12 @@ export const vacantRooms: VacantRoom[] = [
 
 export type Property = {
   number: string
+  /**
+   * `Kostella Grogol 362` — derived by the management records, so a rename
+   * happens in one place. Absent for properties with no management record,
+   * where the street is shown instead.
+   */
+  name?: string
   street: string
   area: string
   distances: string[]

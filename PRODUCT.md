@@ -49,8 +49,21 @@ Every design and product decision serves one of those two claims.
 tenure 14 months. Jakarta, Bandung, and Bali.
 
 **Documented cluster:** Grogol, Jakarta Barat, along Jl. Dr. Susilo. Buildings
-are identified by their real house numbers — 362, 361, 360, 351, 2A3, 2C — never
-by invented names. Rooms are numbered the same way.
+carry their real house numbers — 362, 361, 360, 351, 2A3, 2C. Rooms are numbered
+the same way.
+
+**Buildings are named as well as numbered, set by the client on 2026-08-01.**
+The name is `Kostella <district>`, with the house number kept only where the
+district holds more than one building: `Kostella Sudirman`, but `Kostella Grogol
+362`. It is derived from the records, never typed, so adding a second building
+to a district renames both correctly.
+
+This reverses the source brief, which said buildings are identified by house
+number "never by invented names". The client's reason is recognisability: a
+manager with 31 buildings, and a renter comparing them, both read a place name
+faster than a three-digit number. The number is not abandoned — it remains the
+identity on every card and the only thing distinguishing the four buildings that
+share one street in Grogol.
 
 **Documented building (362):** Khusus putri. Standard Rp1.650.000, Superior
 Rp1.950.000, Pojok Rp2.100.000. Rooms 101/105/107 on floor one, 205/208/211/212

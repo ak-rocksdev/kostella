@@ -45,8 +45,10 @@ named the comparison set. Seed keys 39ac8395 and dcb6575e, both discharged.
 - **Motion.** Entrances are a single staggered reveal per section, driven from
   JavaScript so content is never hidden without it. Hover is a lift plus a slow
   photo scale sharing one easing. Nothing else animates.
-- **Numbers stay, quietly.** Real building numbers remain the naming system,
-  expressed as a refined marker rather than as display type dominating a photo.
+- **Named and numbered.** A building leads with `Kostella <district>` and carries
+  its house number as a marker beside it. The name is derived, never typed. The
+  number is not decoration: where four buildings share one street, it is the only
+  thing that tells them apart.
 - **Language and tone are unchanged.** Indonesian, "kamu" for tenants and "Anda"
   for owners, sentence case, no emoji, no superlatives, real figures.
 

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
+import { buildingName } from '@/lib/content/management/buildings'
 import { useManagement } from '@/lib/management/useManagement'
 
 /**
@@ -18,15 +19,15 @@ export function BuildingSwitcher({ current }: { current: string }) {
   return (
     <label className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-paper px-4 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-plum">
       <span className="sr-only">Pilih gedung</span>
-      <span className="font-figure text-[15px] font-semibold">Kostella</span>
+
       <select
         value={current}
         onChange={(e) => router.push(`/management/buildings/${e.target.value}`)}
-        className="cursor-pointer appearance-none bg-transparent py-2 pr-1 font-figure text-[15px] font-semibold focus:outline-none"
+        className="cursor-pointer appearance-none bg-transparent py-2 pr-1 text-[15px] font-semibold focus:outline-none"
       >
         {buildings.map((b) => (
           <option key={b.number} value={b.number}>
-            {b.number}
+            {buildingName(b, buildings)}
           </option>
         ))}
       </select>

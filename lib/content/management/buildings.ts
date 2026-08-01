@@ -80,10 +80,18 @@ export type RoomState = {
 }
 
 export type Building = {
-  /** The real house number. Kostella names buildings by number, never by name. */
+  /** The real house number. Still the identity — see `buildingName`. */
   number: string
   street: string
-  area: string
+  /** Short, and the word the building is named after: 'Grogol', 'Sudirman'. */
+  district: string
+  city: string
+  /**
+   * Facade photograph. Optional on purpose: reusing one building's photo for
+   * another asserts they look alike, which is worse than showing none. Where it
+   * is absent the UI renders a labelled placeholder instead.
+   */
+  photo?: string
   /** Top floor first, so the grid reads like a building elevation. */
   floors: string[]
   rooms: RoomState[]
@@ -111,7 +119,9 @@ export type Building = {
 const KOSTELLA_362: Building = {
   number: '362',
   street: 'Jl. Dr. Susilo 2 No. 362',
-  area: 'Grogol, Jakarta Barat',
+  district: 'Grogol',
+  city: 'Jakarta Barat',
+  photo: '/images/tampak-depan.jpg',
   floors: ['Lantai 3', 'Lantai 2', 'Lantai 1'],
   facilities: ['kamar-mandi-dalam', 'ac', 'wifi'],
   tenancy: 'putri',
@@ -139,7 +149,8 @@ const PLACEHOLDERS: Building[] = [
   {
     number: '351',
     street: 'Jl. Dr. Susilo 2 No. 351',
-    area: 'Grogol, Jakarta Barat',
+    district: 'Grogol',
+    city: 'Jakarta Barat',
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'dapur-bersama'],
     tenancy: 'campur',
@@ -156,7 +167,8 @@ const PLACEHOLDERS: Building[] = [
   {
     number: '360',
     street: 'Jl. Dr. Susilo 2 No. 360',
-    area: 'Grogol, Jakarta Barat',
+    district: 'Grogol',
+    city: 'Jakarta Barat',
     floors: ['Lantai 2', 'Lantai 1'],
     facilities: ['ac', 'wifi', 'laundry'],
     tenancy: 'putri',
@@ -171,7 +183,8 @@ const PLACEHOLDERS: Building[] = [
   {
     number: '2A3',
     street: 'Jl. Dr. Susilo 2A No. 3',
-    area: 'Grogol, Jakarta Barat',
+    district: 'Grogol',
+    city: 'Jakarta Barat',
     floors: ['Lantai 1'],
     facilities: ['kamar-mandi-dalam', 'ac', 'parkir-motor'],
     tenancy: 'campur',
@@ -184,9 +197,76 @@ const PLACEHOLDERS: Building[] = [
   },
 ]
 
-export const buildings: Building[] = [KOSTELLA_362, ...PLACEHOLDERS]
+/* Two districts away from Grogol, so the naming rule is visible rather than
+   theoretical: these carry no house number in their name because nothing else
+   shares their district, while the four Grogol buildings keep theirs.
+   PRODUCT.md confirms the portfolio spans Jakarta, Bandung and Bali; which
+   districts, and what is in them, is invented. */
+const OTHER_DISTRICTS: Building[] = [
+  {
+    number: '18',
+    street: 'Jl. Setiabudi Tengah No. 18',
+    district: 'Setiabudi',
+    city: 'Jakarta Selatan',
+    floors: ['Lantai 2', 'Lantai 1'],
+    facilities: ['kamar-mandi-dalam', 'ac', 'wifi', 'laundry'],
+    tenancy: 'campur',
+    placeholder: true,
+    rooms: [
+      { room: '201', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000, status: 'occupied' },
+      { room: '202', floor: 'Lantai 2', type: 'Superior', rent: 2_400_000, status: 'available' },
+      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000, status: 'occupied' },
+      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000, status: 'occupied' },
+      { room: '103', floor: 'Lantai 1', type: 'Standard', rent: 2_100_000, status: 'held' },
+    ],
+  },
+  {
+    number: '7',
+    street: 'Jl. Ir. H. Juanda No. 7',
+    district: 'Dago',
+    city: 'Bandung',
+    floors: ['Lantai 2', 'Lantai 1'],
+    facilities: ['ac', 'wifi', 'dapur-bersama', 'parkir-motor'],
+    tenancy: 'putri',
+    placeholder: true,
+    rooms: [
+      { room: '201', floor: 'Lantai 2', type: 'Standard', rent: 1_400_000, status: 'available' },
+      { room: '202', floor: 'Lantai 2', type: 'Standard', rent: 1_400_000, status: 'available' },
+      { room: '101', floor: 'Lantai 1', type: 'Standard', rent: 1_400_000, status: 'occupied' },
+      { room: '102', floor: 'Lantai 1', type: 'Standard', rent: 1_400_000, status: 'occupied' },
+    ],
+  },
+]
+
+export const buildings: Building[] = [KOSTELLA_362, ...PLACEHOLDERS, ...OTHER_DISTRICTS]
 
 export const findBuilding = (number: string) => buildings.find((b) => b.number === number)
+
+/** Full address line, so the two halves are never joined two different ways. */
+export const areaLabel = (b: Building) => `${b.district}, ${b.city}`
+
+/**
+ * The building's name, derived rather than typed.
+ *
+ * Named after its district — `Kostella Sudirman` — with the house number kept
+ * **only where the district holds more than one building**. Four buildings sit
+ * on one street in Grogol, so there the number is the sole distinguishing fact
+ * and dropping it would leave four identical names; elsewhere it is noise.
+ *
+ * Derived means adding a building in a new district renames nothing, and adding
+ * a second building to a district renames both — correctly, and without anyone
+ * remembering to.
+ *
+ * This reverses the source brief, which said buildings are identified by house
+ * number "never by invented names". Reversed at the client's direction on
+ * 2026-08-01; PRODUCT.md records it.
+ */
+export function buildingName(building: Building, all: Building[] = buildings): string {
+  const sharing = all.filter((b) => b.district === building.district).length
+  return sharing > 1
+    ? `Kostella ${building.district} ${building.number}`
+    : `Kostella ${building.district}`
+}
 
 /* ── Derived ──────────────────────────────────────────────────────────────
    Every count on every screen comes from here. Nothing stores a total.

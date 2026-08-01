@@ -33,6 +33,8 @@ export const tenancyShort: Record<Tenancy, string> = {
 
 export type SearchResult = {
   number: string
+  /** See `Property.name`. */
+  name?: string
   street: string
   tenancy: Tenancy
   facilities: string[]

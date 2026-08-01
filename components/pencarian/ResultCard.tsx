@@ -64,8 +64,11 @@ export function ResultCard({
               <span className="sr-only">Kostella </span>
               {result.number}
             </span>
-            {result.street}
+            {result.name ?? result.street}
           </p>
+          {result.name && (
+            <p className="mt-1 text-[13px] text-ink-soft">{result.street}</p>
+          )}
           <p className="mt-1.5 text-[13px] leading-[1.5] text-ink-soft">
             {tenancyLabels[result.tenancy]} · {result.facilities.join(' · ')} ·{' '}
             {walkLabel(result)}

@@ -18,6 +18,7 @@
 import type { Property } from '../beranda'
 import type { SearchResult } from '../pencarian'
 import {
+  buildingName,
   cheapestFree,
   facilityLabel,
   occupancy,
@@ -55,6 +56,7 @@ export function liveProperty(base: Property, building?: Building): Property {
 
   return {
     ...base,
+    name: buildingName(building),
     tenancy: tenancyLabel[building.tenancy],
     facilities: facilityLabels(building),
     // Falls back to the base figure when nothing is free: a card still has to
@@ -75,6 +77,7 @@ export function liveResult(base: SearchResult, building?: Building): SearchResul
 
   return {
     ...base,
+    name: buildingName(building),
     tenancy: building.tenancy,
     facilities: facilityLabels(building),
     rent: cheapest ?? base.rent,
