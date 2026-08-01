@@ -52,8 +52,8 @@ Buildings and rooms come first because every other record points at a room.
 
 | # | Phase | Route | Spec |
 |---|---|---|---|
-| 1 | **Buildings & rooms** — the data spine, the building switcher, room states, per-building facilities and tenancy, and the audit log every later phase writes to | `/management/buildings`, `/management/activity` | `2026-08-01-management-01-buildings-rooms.md` |
-| 2 | **Dashboard** — the screen the bundle designs: metrics, floor grid with actions, today's surveys | `/management` | not written yet |
+| 1 ✅ | **Buildings & rooms** — the data spine, the building switcher, room states, per-building facilities and tenancy, and the audit log every later phase writes to | `/management/buildings`, `/management/activity` | `2026-08-01-management-01-buildings-rooms.md` |
+| 2 ✅ | **Dashboard** — today's surveys, what needs attention, portfolio occupancy | `/management` | `2026-08-01-management-02-dashboard.md` |
 | 3 | **Tenants & contracts** — who is in which room, move-in date, contract end, deposit, expiry warnings | `/management/tenants` | not written yet |
 | 4 | **Billing** — rent, electricity, laundry, other services, penalties; paid / unpaid / short-paid with the reason | `/management/billing` | not written yet |
 | 5 | **Reports** — monthly income, occupancy, arrears for the manager | `/management/reports` | not written yet |
