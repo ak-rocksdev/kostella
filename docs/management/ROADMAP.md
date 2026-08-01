@@ -54,7 +54,7 @@ Buildings and rooms come first because every other record points at a room.
 |---|---|---|---|
 | 1 ✅ | **Buildings & rooms** — the data spine, the building switcher, room states, per-building facilities and tenancy, and the audit log every later phase writes to | `/management/buildings`, `/management/activity` | `2026-08-01-management-01-buildings-rooms.md` |
 | 2 ✅ | **Dashboard** — today's surveys, what needs attention, portfolio occupancy | `/management` | `2026-08-01-management-02-dashboard.md` |
-| 3 | **Tenants** — who is in which room, since when, what they agreed to pay, the monthly due date derived from their move-in, and notice of departure | `/management/tenants` | `2026-08-01-management-03-tenants.md` |
+| 3 ✅ | **Tenants** — who is in which room, since when, what they agreed to pay, the monthly due date derived from their move-in, and notice of departure | `/management/tenants` | `2026-08-01-management-03-tenants.md` |
 | 4 | **Billing** — rent, electricity, laundry, other services, penalties; paid / unpaid / short-paid with the reason. Phase 3 gives the due date; this gives whether it was met | `/management/billing` | not written yet |
 | 5 | **Reports** — monthly income, occupancy, arrears for the manager | `/management/reports` | not written yet |
 | 6 | **Owner view** — its own shell, its own navigation; aggregates and trends, no individuals | `/owner` | not written yet |
