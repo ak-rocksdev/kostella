@@ -1,4 +1,4 @@
-import { CalendarClock, Tag, UserRoundCheck, Wrench, type LucideIcon } from 'lucide-react'
+import { Check, Tag, Wrench, type LucideIcon } from 'lucide-react'
 import type { ToastInput } from '@/components/ui/Toast'
 import { formatRupiah } from '@/lib/format'
 
@@ -32,8 +32,8 @@ export const statusToast = (
   effectiveFrom: string,
 ): ToastInput => ({
   title: withRoom(building, room, `ditandai ${to}`),
-  icon: UserRoundCheck as LucideIcon,
-  tone: to === 'kosong' ? 'available' : 'neutral',
+  icon: Check as LucideIcon,
+  tone: 'success',
   ...recorded(actor),
   detail: `Berlaku ${effectiveFrom} · tercatat atas ${actor}`,
 })
@@ -46,7 +46,7 @@ export const rentToast = (
 ): ToastInput => ({
   title: withRoom(building, room, `sewa ${formatRupiah(from)} → ${formatRupiah(to)}`),
   icon: Tag as LucideIcon,
-  tone: 'neutral',
+  tone: 'success',
   ...recorded(actor),
 })
 
@@ -62,7 +62,9 @@ export const blockToast = (
     ? `Hilang dari halaman publik · tercatat atas ${actor}`
     : `Kembali tampil di halaman publik · tercatat atas ${actor}`,
   icon: Wrench as LucideIcon,
-  tone: blocked ? 'attention' : 'available',
+  // Blocking withdraws a room from letting — the mark matches the amber cell it
+  // just created. Unblocking puts it back, which is a plain success.
+  tone: blocked ? 'attention' : 'success',
   action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
 })
 
@@ -73,8 +75,8 @@ export const facilityToast = (
 ): ToastInput => ({
   title: `${facility} ${on ? 'ditambahkan' : 'dihapus'}`,
   detail: `Kartu properti, hasil pencarian, dan filter ikut berubah · ${actor}`,
-  icon: CalendarClock as LucideIcon,
-  tone: 'neutral',
+  icon: Check as LucideIcon,
+  tone: 'success',
   action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
 })
 
@@ -84,6 +86,7 @@ export const tenancyToast = (
 ): ToastInput => ({
   title: `Tipe penghuni jadi ${to}`,
   detail: `Kartu properti dan filter pencarian ikut berubah · ${actor}`,
-  tone: 'neutral',
+  icon: Check as LucideIcon,
+  tone: 'success',
   action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
 })

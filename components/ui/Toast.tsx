@@ -17,26 +17,27 @@ import { cn } from '@/lib/cn'
 /**
  * Confirmation that something was saved.
  *
- * A change a manager makes has no page reload to confirm it and no server round
- * trip to wait on, so without this the only evidence is a number quietly
- * changing somewhere on screen. The toast says what changed, in the product's
- * own words — "Kamar 105 · sewa jadi Rp1.800.000", never "Berhasil disimpan".
+ * A change here has no page reload to confirm it and no server round trip to
+ * wait on, so without this the only evidence is a number quietly moving
+ * somewhere on screen. This says what changed, in the product's own words —
+ * "Wifi ditambahkan", never "Berhasil disimpan".
  *
- * The surface is the system's one dark layer rather than a status colour. Green
- * and amber already mean *available* and *withdrawn* here; spending green on
- * "saved" would overload the vocabulary the rest of the panel depends on. Only
- * the icon is tinted, and only where the action itself carries a consequence.
+ * Success reads green. That overlaps the availability green the floor grid uses,
+ * and the overlap is acceptable: this is a transient overlay, not a status
+ * painted on content, and a green tick is the one signal nobody has to learn.
+ * Where an action carries a consequence — withdrawing a room from letting — the
+ * mark goes amber instead, matching the blocked cell it just created.
  *
  * `role="status"` with `aria-live="polite"` so a screen reader hears the same
- * confirmation. Announced without stealing focus — the manager is mid-task.
+ * confirmation, announced without stealing focus from a manager mid-task.
  */
 
-type Tone = 'neutral' | 'attention' | 'available'
+type Tone = 'success' | 'attention'
 
 export type ToastInput = {
   /** What changed, specifically. Not "Berhasil". */
   title: string
-  /** Who, or where it was recorded. One line. */
+  /** Who, or what else moved because of it. One line. */
   detail?: string
   icon?: LucideIcon
   tone?: Tone
@@ -48,8 +49,9 @@ type Toast = ToastInput & { id: number }
 
 const ToastContext = createContext<{ show: (t: ToastInput) => void } | null>(null)
 
-/** Long enough to read a line and a half without hurrying the reader. */
-const DISMISS_AFTER = 5000
+/** Long enough to read a line and a half, and to reach for the link. */
+const DISMISS_AFTER = 5500
+const LEAVE_DURATION = 200
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
@@ -61,8 +63,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const show = useCallback((input: ToastInput) => {
     const id = (nextId.current += 1)
-    // Newest first, and capped: a burst of changes should not build a column
-    // that covers the screen someone is working in.
+    // Newest first, capped: a burst of edits should not build a column over the
+    // screen someone is working in.
     setToasts((current) => [{ ...input, id }, ...current].slice(0, 3))
   }, [])
 
@@ -74,10 +76,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         role="status"
         aria-live="polite"
-        // Bottom-end and fixed, clear of the sticky header and of the actions
-        // themselves. `pointer-events-none` on the stack so it never blocks a
-        // click; each toast re-enables its own.
-        className="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[380px]"
+        // `flex-col-reverse` so the newest sits closest to the corner the stack
+        // is anchored to, which is where the eye already is.
+        className="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col-reverse gap-2 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[380px]"
       >
         {toasts.map((toast) => (
           <ToastCard key={toast.id} toast={toast} onDismiss={() => dismiss(toast.id)} />
@@ -92,63 +93,82 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 
   useEffect(() => {
     const out = setTimeout(() => setLeaving(true), DISMISS_AFTER)
-    const gone = setTimeout(onDismiss, DISMISS_AFTER + 200)
+    const gone = setTimeout(onDismiss, DISMISS_AFTER + LEAVE_DURATION)
     return () => {
       clearTimeout(out)
       clearTimeout(gone)
     }
   }, [onDismiss])
 
+  const tone = toast.tone ?? 'success'
   const Icon = toast.icon ?? Check
-  const iconTone: Record<Tone, string> = {
-    neutral: 'text-stone',
-    attention: 'text-held-soft',
-    available: 'text-available',
-  }
 
   return (
     <div
       className={cn(
-        'pointer-events-auto flex items-start gap-3 rounded-card bg-ink px-4 py-3.5 text-stone shadow-lift',
+        // The card itself never intercepts a click. A confirmation that covers
+        // the control you were about to press is worse than no confirmation —
+        // it appeared over the tenancy buttons and swallowed them. Only the two
+        // things you can actually use take pointer events back.
+        'pointer-events-none relative overflow-hidden rounded-card bg-ink text-stone shadow-lift',
         leaving
           ? 'animate-[kst-toast-out_200ms_ease-in_forwards]'
           : 'animate-[kst-toast-in_260ms_cubic-bezier(0.16,1,0.3,1)_both]',
       )}
     >
+      <div className="flex items-start gap-3 px-4 pt-3.5 pb-4">
+        {/* Solid fill, white mark. A tinted circle reads as information; a
+            filled one reads as done. */}
+        <span
+          aria-hidden
+          className={cn(
+            'mt-px inline-flex size-7 shrink-0 items-center justify-center rounded-full',
+            tone === 'success' ? 'bg-available text-white' : 'bg-held text-white',
+          )}
+        >
+          <Icon size={16} strokeWidth={2.5} />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] leading-[1.35] font-semibold">{toast.title}</p>
+          {toast.detail && (
+            <p className="mt-1 text-[13px] leading-[1.45] text-stone/70">{toast.detail}</p>
+          )}
+          {toast.action && (
+            <Link
+              href={toast.action.href}
+              onClick={onDismiss}
+              // Stone, not the accent. The availability green measures 3,56:1 on
+              // this dark surface — under the 4,5 floor for 13px text. The green
+              // belongs to the mark and the rail, where it carries meaning
+              // without having to be read.
+              className="pointer-events-auto mt-2 inline-flex min-h-9 items-center text-[13px] font-semibold text-stone underline underline-offset-4 transition-colors hover:text-white focus-visible:outline-stone"
+            >
+              {toast.action.label}
+            </Link>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Tutup pemberitahuan"
+          className="pointer-events-auto -mt-0.5 -mr-1 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-stone/60 transition-colors hover:bg-white/10 hover:text-stone focus-visible:outline-stone"
+        >
+          <X size={15} strokeWidth={2} aria-hidden />
+        </button>
+      </div>
+
+      {/* How long it will stay. The toast carries a link, so the reader needs to
+          know whether there is time to reach it. */}
       <span
         aria-hidden
         className={cn(
-          'mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-white/12',
-          iconTone[toast.tone ?? 'neutral'],
+          'absolute inset-x-0 bottom-0 h-[3px] origin-left',
+          tone === 'success' ? 'bg-available' : 'bg-held',
         )}
-      >
-        <Icon size={14} strokeWidth={2.25} />
-      </span>
-
-      <div className="min-w-0 flex-1">
-        <p className="text-[14px] leading-[1.4] font-semibold">{toast.title}</p>
-        {toast.detail && (
-          <p className="mt-1 text-[13px] leading-[1.45] text-stone/70">{toast.detail}</p>
-        )}
-        {toast.action && (
-          <Link
-            href={toast.action.href}
-            onClick={onDismiss}
-            className="mt-2 inline-flex min-h-9 items-center text-[13px] font-semibold text-stone underline underline-offset-4 hover:text-white focus-visible:outline-stone"
-          >
-            {toast.action.label}
-          </Link>
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={onDismiss}
-        aria-label="Tutup pemberitahuan"
-        className="-mr-1 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-stone/60 transition-colors hover:bg-white/10 hover:text-stone focus-visible:outline-stone"
-      >
-        <X size={15} strokeWidth={2} aria-hidden />
-      </button>
+        style={{ animation: `kst-toast-drain ${DISMISS_AFTER}ms linear forwards` }}
+      />
     </div>
   )
 }

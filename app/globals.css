@@ -289,6 +289,18 @@
   }
 }
 
+/* The toast's remaining time, draining left to right. Not decoration: the toast
+   carries a link, and knowing how long it will stay is what makes the link
+   usable. Reduced motion flattens the duration so the rail simply sits full. */
+@keyframes kst-toast-drain {
+  from {
+    scale: 1 1;
+  }
+  to {
+    scale: 0 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
