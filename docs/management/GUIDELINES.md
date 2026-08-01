@@ -155,6 +155,16 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] Status is never carried by colour alone; a word accompanies every hue.
 - [ ] Works down to 390px. A data table gets a deliberate small-screen form,
       not a horizontal scrollbar by accident.
+- [ ] **Cells in a row align by shared rows, not by luck.** A strip whose
+      labels happen to be the same length is one wording change away from
+      breaking. `grid-rows-subgrid` keeps label, value and detail in step
+      whatever the copy does.
+      *Renaming "Gedung" to "Total gedung yang dikelola" wrapped one label to
+      two lines and pushed its value out of step with the one beside it, at
+      every phone width.*
+- [ ] **Resize the viewport, do not resize the window and assume.** Chrome
+      will not go below ~500px wide; a screenshot labelled 390 may be 500.
+      *A layout break at 320, 360 and 390 was invisible in exactly that way.*
 - [ ] `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean.
 
 ## Verification

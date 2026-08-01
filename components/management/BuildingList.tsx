@@ -67,7 +67,9 @@ export function BuildingList() {
               }`,
             },
             {
-              label: 'Gedung',
+              // "Gedung · 6" left the reader to supply the verb — six what,
+              // out of what. The label carries the whole statement now.
+              label: 'Total gedung yang dikelola',
               value: totals.buildings,
               /* Every figure here is counted from the records, including this
                  one. It read "dari 31 yang dikelola Kostella" — 31 typed by

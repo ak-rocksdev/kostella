@@ -26,6 +26,15 @@ export function PortfolioBar({
           key={item.label}
           className={cn(
             'px-5 py-4',
+            /* Subgrid, so label / value / detail line up across every cell in a
+               row no matter how long one label runs. Before this, a label that
+               wrapped to two lines pushed its own value down and left it out of
+               step with the value beside it — which is what happened the moment
+               "Gedung" became "Total gedung yang dikelola", at every phone
+               width. Padding the shortest label to two lines would have fixed
+               the same thing by putting dead space above three values on a wide
+               screen. */
+            'grid grid-rows-subgrid row-span-3 content-start',
             // Hairlines between cells only — the card's own edge closes the row.
             // Which side they fall on changes with the column count.
             i % 2 === 1 && 'border-l border-line',
