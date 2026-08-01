@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Archivo, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
+import { positioningSentence } from '@/lib/content/company'
 
 /* Archivo carries the brand twice over, distinguished by width rather than by
    being a different family:
@@ -22,8 +23,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: 'Kostella — Beranda',
-  description:
-    'Kos milik dan dikelola sendiri sejak 2008. 31 gedung di Jakarta, Bandung, dan Bali. Kamar yang tampil di sini benar-benar kosong hari ini.',
+  description: `${positioningSentence} Kamar yang tampil di sini benar-benar kosong hari ini.`,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

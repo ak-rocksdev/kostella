@@ -40,6 +40,20 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] A figure the client has not confirmed is marked `placeholder: true` in
       the data with a comment saying what it would take to replace it.
       *Four invented buildings on Beranda carry this flag.*
+- [ ] **What the client claims and what the system counts are never mixed on
+      one screen.** A claim is legitimate on the public site, where a company
+      states things about itself. In the panel it must not sit beside derived
+      figures: there it reads as data, and nothing will ever update it.
+      *The buildings strip said "dari 31 yang dikelola Kostella" beside counts
+      taken from the records. The 31 was typed by hand, read off the client's
+      current website — a snapshot of a marketing page that may already be
+      stale, which the system has no way to notice. Whoever inherits the app
+      would reasonably read it as data and wonder why it never moves.*
+- [ ] **Every claim is written once.** `lib/content/company.ts` holds what
+      Kostella says about itself — building count, cities, founding year —
+      with `confirmed: false` until the client confirms it.
+      *That one number had been typed into five places across three pages and
+      the meta description. Changing it meant finding all five.*
 - [ ] **A rate is never shown without the counts it divides, and never the
       other way round.** "63%" alone hides that it is 63% of eight rooms;
       "5/8" alone makes the reader divide before they can compare two

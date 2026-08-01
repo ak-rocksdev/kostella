@@ -10,6 +10,8 @@
  * real Kostella images. The four shipped here are stand-ins from the design
  * bundle, and two properties share one file.
  */
+
+import { claimed, positioningSentence } from './company'
 import { routes } from '../routes'
 import type { Status } from './types'
 /* No cycle: detail.ts does not import this file. */
@@ -105,12 +107,54 @@ export type VacantRoom = {
 
 /** Cheapest first, so raising the budget adds rooms to the bottom of the list. */
 export const vacantRooms: VacantRoom[] = [
-  { building: '351', room: '302', type: 'Standard', rent: 1_550_000, vacancy: 'kosong hari ini', area: 'Trisakti/Untar' },
-  { building: '362', room: '105', type: 'Standard', rent: 1_650_000, vacancy: 'kosong hari ini', area: 'Trisakti/Untar' },
-  { building: '362', room: '211', type: 'Standard', rent: 1_650_000, vacancy: 'kosong 1 Agu', area: 'Trisakti/Untar' },
-  { building: '351', room: '108', type: 'Superior', rent: 1_950_000, vacancy: 'kosong 3 Agu', area: 'Trisakti/Untar' },
-  { building: '362', room: '205', type: 'Superior', rent: 1_950_000, vacancy: 'kosong 1 Agu', area: 'Trisakti/Untar' },
-  { building: '2A3', room: '108', type: 'Pojok', rent: 2_100_000, vacancy: 'kosong 5 Agu', area: 'Trisakti/Untar' },
+  {
+    building: '351',
+    room: '302',
+    type: 'Standard',
+    rent: 1_550_000,
+    vacancy: 'kosong hari ini',
+    area: 'Trisakti/Untar',
+  },
+  {
+    building: '362',
+    room: '105',
+    type: 'Standard',
+    rent: 1_650_000,
+    vacancy: 'kosong hari ini',
+    area: 'Trisakti/Untar',
+  },
+  {
+    building: '362',
+    room: '211',
+    type: 'Standard',
+    rent: 1_650_000,
+    vacancy: 'kosong 1 Agu',
+    area: 'Trisakti/Untar',
+  },
+  {
+    building: '351',
+    room: '108',
+    type: 'Superior',
+    rent: 1_950_000,
+    vacancy: 'kosong 3 Agu',
+    area: 'Trisakti/Untar',
+  },
+  {
+    building: '362',
+    room: '205',
+    type: 'Superior',
+    rent: 1_950_000,
+    vacancy: 'kosong 1 Agu',
+    area: 'Trisakti/Untar',
+  },
+  {
+    building: '2A3',
+    room: '108',
+    type: 'Pojok',
+    rent: 2_100_000,
+    vacancy: 'kosong 5 Agu',
+    area: 'Trisakti/Untar',
+  },
 ]
 
 export type Property = {
@@ -378,9 +422,9 @@ export const caraSewa = {
 /** The franchise block addresses owners, so the copy switches to formal "Anda". */
 export const franchise = {
   eyebrow: 'Punya kos?',
-  body: 'Kami mengelola 31 gedung. Kami juga bisa mengelola milik Anda.',
+  body: `Kami mengelola ${claimed.buildings} gedung. Kami juga bisa mengelola milik Anda.`,
   cta: 'Pelajari kemitraan',
-  numeral: '31',
+  numeral: String(claimed.buildings),
 } as const
 
 const phone = '0812 8000 0362'
@@ -388,10 +432,10 @@ const phone = '0812 8000 0362'
 export const footer = {
   /**
    * One line of who Kostella is, for the reader who scrolled past everything
-   * else. Every figure in it is from PRODUCT.md.
+   * else. Every figure in it is a claim the client makes, not one this system
+   * counts — see `company.ts`, which is where they are edited.
    */
-  positioning:
-    'Kos milik dan dikelola sendiri sejak 2008. 31 gedung di Jakarta, Bandung, dan Bali.',
+  positioning: positioningSentence,
 
   navLabel: 'Jelajahi',
 

@@ -69,15 +69,16 @@ export function BuildingList() {
             {
               label: 'Gedung',
               value: totals.buildings,
-              // Kostella operates 31 (PRODUCT.md, confirmed). Saying 6 without
-              // saying so would read as the whole portfolio.
-              //
-              // The label was "Gedung dimodelkan" and a reader asked what it
-              // meant. "Dimodelkan" is a word for the people building this, not
-              // for the people running kos — exactly what the copy guideline
-              // warns against. The caveat belongs in the sentence below, in
-              // plain words, not compressed into a term of art in the label.
-              detail: `dari 31 yang dikelola Kostella · ${totals.rooms} kamar`,
+              /* Every figure here is counted from the records, including this
+                 one. It read "dari 31 yang dikelola Kostella" — 31 typed by
+                 hand, taken from the client's current website, sitting beside
+                 derived numbers as though the system had counted it too.
+
+                 It could not: the system knows six buildings. The claim may
+                 already be stale and nothing here would notice, and whoever
+                 inherits this app would reasonably read it as data and wonder
+                 why it never moves. A panel states what it can count. */
+              detail: `${districts.length} kawasan · ${totals.rooms} kamar`,
             },
             {
               label: 'Kamar kosong',

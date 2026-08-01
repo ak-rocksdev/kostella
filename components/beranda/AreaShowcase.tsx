@@ -9,6 +9,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { formatRupiah } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { vacantRoomsIn, type Area } from '@/lib/content/beranda'
+import { scaleSentence } from '@/lib/content/company'
 import { findLive, liveProperty } from '@/lib/content/management/public'
 import { useLiveBuildings } from '@/lib/management/useManagement'
 
@@ -117,9 +118,8 @@ export function AreaShowcase({ area }: { area: Area }) {
         </dl>
 
         <p className="mt-6 text-[15px] text-ink-soft">
-          Mulai{' '}
-          <span className="font-figure font-semibold text-ink">{formatRupiah(cheapest)}</span> per
-          bulan
+          Mulai <span className="font-figure font-semibold text-ink">{formatRupiah(cheapest)}</span>{' '}
+          per bulan
         </p>
 
         {/* Paging buttons, not a scrollbar replacement: the track is a native
@@ -244,9 +244,7 @@ function EndCap() {
         <p className="mt-3 text-[24px] leading-[1.2] font-semibold tracking-[-0.02em]">
           Lihat semua kawasan
         </p>
-        <p className="mt-3 text-[14px] leading-[1.6] text-white/75">
-          31 gedung di Jakarta, Bandung, dan Bali.
-        </p>
+        <p className="mt-3 text-[14px] leading-[1.6] text-white/75">{scaleSentence}</p>
       </div>
 
       <span
