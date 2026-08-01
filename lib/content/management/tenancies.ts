@@ -118,8 +118,24 @@ export const isCurrent = (tenancy: Tenancy, today: string) =>
 export const isIncoming = (tenancy: Tenancy, today: string) =>
   !hasEnded(tenancy, today) && daysBetween(tenancy.movedIn, today) < 0
 
+/**
+ * Everyone the records say is living in a room right now.
+ *
+ * Normally one. More than one means a replacement's move-in date arrived while
+ * the tenant they were replacing had still not been confirmed out — a manager
+ * who ignored the "seharusnya sudah keluar" prompt for a couple of days. Two
+ * people are then booked into one room, which is a real conflict and gets
+ * surfaced rather than quietly resolved: an earlier version returned the first
+ * match and the replacement simply vanished from the screen.
+ */
+export const currentTenantsOf = (all: Tenancy[], building: string, room: string, today: string) =>
+  all
+    .filter((t) => t.building === building && t.room === room && isCurrent(t, today))
+    // Earliest first, so the one actually sitting there leads.
+    .sort((a, b) => daysBetween(b.movedIn, a.movedIn))
+
 export const currentTenantOf = (all: Tenancy[], building: string, room: string, today: string) =>
-  all.find((t) => t.building === building && t.room === room && isCurrent(t, today))
+  currentTenantsOf(all, building, room, today)[0]
 
 export const incomingTenantOf = (all: Tenancy[], building: string, room: string, today: string) =>
   all.find((t) => t.building === building && t.room === room && isIncoming(t, today))

@@ -2,7 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CalendarClock, Layers, TrendingUp, UserRound, Wrench } from 'lucide-react'
+import {
+  ArrowLeft,
+  CalendarClock,
+  Layers,
+  TrendingUp,
+  UserRound,
+  UsersRound,
+  Wrench,
+} from 'lucide-react'
 import { FloorGrid, FloorGridLegend, type Floor } from '@/components/ui/FloorGrid'
 import { MetricCard } from '@/components/ui/MetricCard'
 import { SectionLabel } from '@/components/ui/SectionLabel'
@@ -37,7 +45,10 @@ export function BuildingDetail({ number }: { number: string }) {
     return (
       <div className="wrap-wide py-16">
         <p className="text-[16px] font-semibold">Gedung {number} tidak ada.</p>
-        <Link href="/management/buildings" className="mt-3 inline-flex text-[15px] font-semibold text-plum">
+        <Link
+          href="/management/buildings"
+          className="mt-3 inline-flex text-[15px] font-semibold text-plum"
+        >
           Kembali ke daftar gedung
         </Link>
       </div>
@@ -139,11 +150,7 @@ export function BuildingDetail({ number }: { number: string }) {
         <MetricCard
           label="Total kamar"
           value={o.total}
-          detail={
-            <MetricNote icon={Layers}>
-              {building.floors.length} lantai
-            </MetricNote>
-          }
+          detail={<MetricNote icon={Layers}>{building.floors.length} lantai</MetricNote>}
         />
       </div>
 
@@ -179,8 +186,25 @@ export function BuildingDetail({ number }: { number: string }) {
                     number they can reach, and what that person actually pays —
                     which is not necessarily the room's asking price above. */}
                 {room.tenant && <TenantLine tenant={room.tenant} />}
-                {!room.tenant && room.incoming && (
-                  <TenantLine tenant={room.incoming} incoming />
+                {!room.tenant && room.incoming && <TenantLine tenant={room.incoming} incoming />}
+                {room.conflict && (
+                  <p className="mt-2 flex items-start gap-2 rounded-badge bg-held-soft px-3 py-2 text-[13px] font-semibold text-held">
+                    <UsersRound
+                      size={15}
+                      strokeWidth={1.9}
+                      aria-hidden
+                      className="mt-0.5 shrink-0"
+                    />
+                    {/* One string rather than interleaved JSX text: the
+                        spaces around an expression at a line break are eaten by
+                        JSX, and this sentence lost one — it rendered
+                        "Penghuni Dbelum dikonfirmasi". */}
+                    <span>
+                      {`${room.conflict.name} tercatat masuk ${formatDate(
+                        room.conflict.movedIn,
+                      )}, tapi ${room.tenant?.name} belum dikonfirmasi keluar. Dua penghuni di satu kamar — selesaikan lewat “Catat keluar”.`}
+                    </span>
+                  </p>
                 )}
               </div>
               <RoomActions building={building} room={room} />
@@ -296,9 +320,7 @@ function TenantLine({ tenant, incoming }: { tenant: Tenancy; incoming?: boolean 
       </span>
       <span>{formatRupiah(tenant.agreedRent)}/bulan</span>
       {tenant.leavingOn && (
-        <span className="font-semibold text-held">
-          keluar {formatDate(tenant.leavingOn)}
-        </span>
+        <span className="font-semibold text-held">keluar {formatDate(tenant.leavingOn)}</span>
       )}
     </p>
   )

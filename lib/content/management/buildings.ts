@@ -12,12 +12,7 @@
  */
 import type { Status } from '../types'
 import { kostellaName } from '../naming'
-import {
-  currentTenantOf,
-  incomingTenantOf,
-  seedTenancies,
-  type Tenancy,
-} from './tenancies'
+import { currentTenantsOf, incomingTenantOf, seedTenancies, type Tenancy } from './tenancies'
 
 /* ── Facilities ───────────────────────────────────────────────────────────
    A fixed list, stored by id. Not tidiness: `facilityFacet` on the search
@@ -112,6 +107,14 @@ export type RoomState = SeedRoom & {
   /** Moving in later. Sets 'held' on an empty room; on an occupied one it is
    *  the replacement lined up behind a tenant who has given notice. */
   incoming?: Tenancy
+  /**
+   * A second person the records also place in this room today.
+   *
+   * Only ever set when a replacement's move-in has arrived and the tenant they
+   * follow was never confirmed out. Two people booked into one room is not a
+   * state to render tidily — it is one to shout about.
+   */
+  conflict?: Tenancy
 }
 
 /** A building as written in the seed, before tenancies decide its rooms. */
@@ -331,12 +334,14 @@ export function withTenancies(
   return seed.map((building) => ({
     ...building,
     rooms: building.rooms.map((room) => {
-      const tenant = currentTenantOf(tenancies, building.number, room.room, today)
+      const current = currentTenantsOf(tenancies, building.number, room.room, today)
+      const [tenant, conflict] = current
       const incoming = incomingTenantOf(tenancies, building.number, room.room, today)
       return {
         ...room,
         status: tenant ? 'occupied' : incoming ? 'held' : 'available',
         ...(tenant ? { tenant } : {}),
+        ...(conflict ? { conflict } : {}),
         ...(incoming ? { incoming } : {}),
       } satisfies RoomState
     }),

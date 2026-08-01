@@ -14,6 +14,7 @@ import { useManagement } from '@/lib/management/useManagement'
 const NAV = [
   { href: '/management', label: 'Hari ini', exact: true },
   { href: '/management/buildings', label: 'Gedung' },
+  { href: '/management/tenants', label: 'Penghuni' },
   { href: '/management/activity', label: 'Aktivitas' },
 ]
 
@@ -73,7 +74,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[14px] font-medium transition-colors',
+                      /* Tighter on a phone. A fourth destination pushed the
+                         strip past 390px and made "Aktivitas" something you had
+                         to scroll sideways to reach. */
+                      'inline-flex min-h-11 shrink-0 items-center rounded-full px-3 text-[14px] font-medium transition-colors sm:px-4',
                       active ? 'bg-ink text-stone' : 'text-ink-soft hover:bg-stone hover:text-ink',
                     )}
                   >

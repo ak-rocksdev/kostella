@@ -297,6 +297,41 @@ The seed must produce, on any day it is opened:
 9. Contrast measured on new tones. Touch targets at 390px with the **viewport**
    resized, not the window — GUIDELINES records why.
 
+### Results, 2026-08-02
+
+All nine pass. Three findings the checks produced, all fixed:
+
+**A replacement could vanish.** With a booked tenant's move-in date reached
+while the tenant they follow had never been confirmed out, two tenancies were
+current on one room and the screen showed only the first. The second person
+simply disappeared. `canStart` prevents *creating* that through the UI, but not
+a manager ignoring the "seharusnya sudah keluar" prompt for two days. Both are
+now shown, on the room and in the attention list, as the conflict it is.
+
+**A swallowed space.** The conflict warning read "Penghuni Dbelum dikonfirmasi
+keluar" — JSX drops whitespace around an expression at a line break.
+
+**Twenty-three controls under the 44px floor.** Every tenant row's building link
+was a flex item, so block-level, at 20px. Each card now carries one "Buka kamar"
+target instead. A fourth navigation destination also pushed "Aktivitas" behind a
+sideways scroll at 390px.
+
+Measured, not assumed:
+
+| Check | Result |
+|---|---|
+| Occupancy unchanged by the rewrite | 19/30, held 2, per building identical |
+| Revenue corrected to agreed rents | Rp 34,6 jt → **Rp 34,3 jt** |
+| Move-in propagates to the public site | 362 went 2 → 1 kamar kosong on `/pencarian` |
+| Leaving date frees a room | Never — occupied at +9, +11, +20, +60 days |
+| Confirmed departure frees it | On the date given, not before: 63% → 50% at +6 |
+| Due date, 31st move-in | 31 Jan · 28 Feb · 30 Nov · **29 Feb 2028** |
+| Second tenancy on an occupied room | Refused; accepted after a leaving date |
+| Audit entry | Building, room, sentence, time, actor, reason |
+| Contrast, conflict tone | 5,06:1 at 13px semibold |
+| Controls under 44px at 390px | None |
+| Console, clock +47 days | No errors |
+
 ## Invented in this phase
 
 - **21 people** — names, phones, guardians, occupations, move-in dates and

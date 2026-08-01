@@ -1,5 +1,14 @@
-import { CalendarClock, DoorOpen, ImageOff, Wrench, type LucideIcon } from 'lucide-react'
-import { daysBetween } from '@/lib/dates'
+import {
+  CalendarClock,
+  DoorOpen,
+  ImageOff,
+  UsersRound,
+  Wrench,
+  type LucideIcon,
+} from 'lucide-react'
+import { daysBetween, formatDate, relativeDays } from '@/lib/dates'
+import { formatRupiah } from '@/lib/format'
+import { daysUntilDue } from '@/lib/content/management/tenancies'
 import {
   buildingName,
   coverPhoto,
@@ -41,6 +50,16 @@ export type Attention = {
  * the hydration failure that caused. `null` means the browser has not reported
  * a date yet, and every day count is simply left off that first paint.
  */
+/**
+ * How much warning a rent reminder gets.
+ *
+ * Three days. Seven was the first choice and was wrong for a monthly kos: with
+ * nineteen tenants due across a month, a seven-day window holds four or five at
+ * any moment and never empties, which turns the list into wallpaper. H-3 is
+ * also the reminder a kos actually sends.
+ */
+const DUE_SOON_DAYS = 3
+
 export function attentionItems(buildings: Building[], today: string | null): Attention[] {
   const items: Attention[] = []
 
@@ -76,15 +95,74 @@ export function attentionItems(buildings: Building[], today: string | null): Att
       })
     }
 
-    if (o.held > 0) {
-      items.push({
-        id: `${building.number}-held`,
-        tone: 'muted',
-        icon: CalendarClock,
-        title: `${o.held} kamar dibooking, belum masuk`,
-        detail: `${name} · belum menghasilkan sewa`,
-        href,
-      })
+    /* Tenants. Nothing below is possible without today, so the whole block
+       waits for the browser rather than guessing from the build date. */
+    if (today) {
+      for (const room of building.rooms) {
+        if (room.incoming && !room.tenant) {
+          items.push({
+            id: `${building.number}-held-${room.room}`,
+            tone: 'muted',
+            icon: CalendarClock,
+            // Named and dated. "1 kamar dibooking" told a manager nothing they
+            // could act on; a name and a date is something they can prepare for.
+            title: `${room.incoming.name} masuk ${formatDate(room.incoming.movedIn)}`,
+            detail: `${name} · kamar ${room.room} · belum menghasilkan sewa`,
+            href,
+          })
+        }
+
+        const tenant = room.tenant
+        if (!tenant) continue
+
+        /* Two people in one room. Happens when a replacement's move-in arrives
+           and nobody confirmed the previous tenant out — the prompt below was
+           ignored long enough for the dates to overlap. */
+        if (room.conflict) {
+          items.push({
+            id: `${building.number}-conflict-${room.room}`,
+            tone: 'attention',
+            icon: UsersRound,
+            title: `Dua penghuni tercatat di kamar ${room.room}`,
+            detail: `${name} · ${tenant.name} belum dikonfirmasi keluar, ${room.conflict.name} sudah masuk ${formatDate(room.conflict.movedIn)}`,
+            href,
+          })
+          continue
+        }
+
+        /* A leaving date that has arrived. The room is still occupied and stays
+           that way until somebody confirms — this is the prompt to do it, and
+           the reason a date alone never frees a room. */
+        if (tenant.leavingOn && daysBetween(tenant.leavingOn, today) >= 0) {
+          const late = daysBetween(tenant.leavingOn, today)
+          items.push({
+            id: `${building.number}-leaving-${room.room}`,
+            tone: 'attention',
+            icon: DoorOpen,
+            title: `${tenant.name} seharusnya sudah keluar`,
+            detail: `${name} · kamar ${room.room} · ${
+              late === 0 ? 'hari ini' : relativeDays(-late)
+            } — kamar masih terhitung terisi sampai dikonfirmasi`,
+            href,
+          })
+          continue
+        }
+
+        /* Rent falling due. Three days, not seven: nineteen tenants spread
+           across a month put roughly two in a three-day window and five in a
+           seven-day one, and a list that is never short stops being read. */
+        const due = daysUntilDue(tenant, today)
+        if (due <= DUE_SOON_DAYS) {
+          items.push({
+            id: `${building.number}-due-${room.room}`,
+            tone: 'muted',
+            icon: CalendarClock,
+            title: `${tenant.name} jatuh tempo ${relativeDays(due)}`,
+            detail: `${name} · kamar ${room.room} · ${formatRupiah(tenant.agreedRent)}`,
+            href,
+          })
+        }
+      }
     }
 
     if (o.lettable > 0 && o.free === o.lettable) {

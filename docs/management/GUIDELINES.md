@@ -165,6 +165,33 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] **Resize the viewport, do not resize the window and assume.** Chrome
       will not go below ~500px wide; a screenshot labelled 390 may be 500.
       *A layout break at 320, 360 and 390 was invisible in exactly that way.*
+- [ ] **A link inside a flex row is a block-level control, not inline text.**
+      WCAG exempts inline links from the 44px floor; a flex item is not one.
+      Measure `display` before claiming the exemption.
+      *Every tenant row's building link measured 20px and read as prose.*
+- [ ] **Adding a navigation destination means re-measuring the strip at 390px.**
+      *A fourth item pushed "Aktivitas" off-screen behind a sideways scroll.*
+
+## Static export
+
+- [ ] **Nothing is rendered from "now" during the server pass.** The HTML is
+      built once and served for weeks; a date read at build time disagrees with
+      the browser on every later day and React throws #418. Date-dependent text
+      comes from `useToday()`, which returns null on the server.
+      *Proven by shifting the browser clock five days forward before the bundle
+      loaded: a clean console became a hydration failure. It would have fired
+      during the pitch, not during development.*
+- [ ] **Seed data holds offsets, not dates.** A module that calls `new Date()`
+      at load bakes the build date into the bundle.
+- [ ] Every date-bearing screen is checked once with the clock shifted weeks
+      ahead, not only on the day it was written.
+
+## JSX text
+
+- [ ] **A sentence built from expressions goes in one template string.** JSX
+      drops the whitespace around an expression that falls at a line break, and
+      Prettier moves line breaks.
+      *A conflict warning shipped reading "Penghuni Dbelum dikonfirmasi".*
 - [ ] `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean.
 
 ## Verification
