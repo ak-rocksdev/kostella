@@ -1,53 +1,77 @@
 /**
  * Search results for Grogol — the four properties near Trisakti/Untar.
  *
- * Availability is stated as a fraction ("3 dari 8 kamar kosong") rather than a
- * badge, because at this stage the reader is comparing buildings and needs to
- * know how much choice each one leaves them.
+ * Every field a filter reads is a number or an enum. This file used to store
+ * display strings ("Rp1.650.000", "12 menit jalan kaki ke Trisakti", "3 dari 8
+ * kamar kosong"), which no filter can compare against; the strings are now
+ * derived from the figures at the bottom of this file, so a card and a filter
+ * can never disagree about the same building.
  */
+import { formatRupiah } from '../format'
 import type { Status } from './types'
 
 export const context = {
   area: 'Trisakti/Untar',
   sort: 'urut jarak terdekat',
-  resultsLabel: '4 properti · Grogol',
 }
 
-export const filters = [
-  'Putri',
-  'Campur',
-  'Kamar mandi dalam',
-  'AC',
-  'Bisa pasutri',
-  '< Rp2 juta',
-] as const
+export type Tenancy = 'putri' | 'putra' | 'campur'
 
-/** Preselected so the results read as a filtered set, not a raw dump. */
-export const defaultFilters = ['Putri']
+/** On a card, where it reads as a sentence about the building. */
+export const tenancyLabels: Record<Tenancy, string> = {
+  putri: 'Khusus putri',
+  putra: 'Khusus putra',
+  campur: 'Campur',
+}
+
+/** In the filter, where the group's legend already supplies "tipe penghuni". */
+export const tenancyShort: Record<Tenancy, string> = {
+  putri: 'Putri',
+  putra: 'Putra',
+  campur: 'Campur',
+}
 
 export type SearchResult = {
   number: string
   street: string
-  tenancy: string
+  tenancy: Tenancy
   facilities: string[]
-  walk: string
-  price: string
-  availability: string
+  /** Minutes on foot to `nearest`. Numeric so distance can be compared. */
+  walkMinutes: number
+  nearest: string
+  /** Cheapest monthly rent in the building, in rupiah. */
+  rent: number
+  /** Rooms free right now. 0 means the building is full. */
+  vacant: number
+  /**
+   * Rooms in the building. Optional because the client stated it for two
+   * buildings only — the label falls back to "sisa N kamar" rather than
+   * inventing a denominator.
+   */
+  total?: number
+  /**
+   * Kept as data rather than derived from `vacant`. A building with rooms free
+   * is "available" and a full one is "occupied", but what makes 360 "held"
+   * rather than available is a booking in progress, which is not visible in
+   * these figures. Guessing a rule here would put a wrong colour on a fact.
+   */
   status: Status
   photo: string
   /** Only 362 has a detail screen; the rest have no data behind them yet. */
   hasDetail: boolean
 }
 
-export const results: SearchResult[] = [
+const unsorted: SearchResult[] = [
   {
     number: '362',
     street: 'Jl. Dr. Susilo 2 No. 362, Grogol',
-    tenancy: 'Khusus putri',
+    tenancy: 'putri',
     facilities: ['Kamar mandi dalam', 'AC', 'Wifi'],
-    walk: '12 menit jalan kaki ke Trisakti',
-    price: 'Rp1.650.000',
-    availability: '3 dari 8 kamar kosong',
+    walkMinutes: 12,
+    nearest: 'Trisakti',
+    rent: 1_650_000,
+    vacant: 3,
+    total: 8,
     status: 'available',
     photo: '/images/tampak-depan.jpg',
     hasDetail: true,
@@ -55,11 +79,13 @@ export const results: SearchResult[] = [
   {
     number: '351',
     street: 'Jl. Dr. Susilo 2 No. 351, Grogol',
-    tenancy: 'Campur',
+    tenancy: 'campur',
     facilities: ['Kamar mandi dalam', 'AC', 'Dapur bersama'],
-    walk: '14 menit jalan kaki ke Trisakti',
-    price: 'Rp1.550.000',
-    availability: '5 dari 12 kamar kosong',
+    walkMinutes: 14,
+    nearest: 'Trisakti',
+    rent: 1_550_000,
+    vacant: 5,
+    total: 12,
     status: 'available',
     photo: '/images/kamar-standard.jpg',
     hasDetail: false,
@@ -67,11 +93,12 @@ export const results: SearchResult[] = [
   {
     number: '360',
     street: 'Jl. Dr. Susilo 2 No. 360, Grogol',
-    tenancy: 'Khusus putri',
+    tenancy: 'putri',
     facilities: ['AC', 'Wifi', 'Laundry'],
-    walk: '12 menit jalan kaki ke Trisakti',
-    price: 'Rp1.650.000',
-    availability: 'sisa 1 kamar',
+    walkMinutes: 12,
+    nearest: 'Trisakti',
+    rent: 1_650_000,
+    vacant: 1,
     status: 'held',
     photo: '/images/kamar-superior.jpg',
     hasDetail: false,
@@ -79,11 +106,12 @@ export const results: SearchResult[] = [
   {
     number: '2A3',
     street: 'Jl. Dr. Susilo 2A No. 3, Grogol',
-    tenancy: 'Campur',
+    tenancy: 'campur',
     facilities: ['Kamar mandi dalam', 'AC', 'Parkir motor'],
-    walk: '10 menit jalan kaki ke Untar',
-    price: 'Rp2.100.000',
-    availability: 'penuh',
+    walkMinutes: 10,
+    nearest: 'Untar',
+    rent: 2_100_000,
+    vacant: 0,
     status: 'occupied',
     photo: '/images/ruang-bersama.jpg',
     hasDetail: false,
@@ -91,10 +119,64 @@ export const results: SearchResult[] = [
 ]
 
 /**
- * An empty result is a dead end unless it offers a way out, so the design pairs
- * the "nothing here" line with the nearest alternative and a way to reach it.
+ * Nearest first — the order `context.sort` has been promising all along.
+ *
+ * It was not true. The header said "urut jarak terdekat" while the array ran
+ * 12, 14, 12, 10 minutes in source order, because distance was a display string
+ * nothing could sort on. Sorted here rather than by hand in the literal, so a
+ * new building lands in the right place on its own.
  */
-export const emptyState = {
+export const results = [...unsorted].sort((a, b) => a.walkMinutes - b.walkMinutes)
+
+/* ── Derived labels ────────────────────────────────────────────────────────
+   Every string a card prints comes from the figures above. */
+
+export const priceLabel = (result: SearchResult) => formatRupiah(result.rent)
+
+export const walkLabel = (result: SearchResult) =>
+  `${result.walkMinutes} menit jalan kaki ke ${result.nearest}`
+
+export function availabilityLabel(result: SearchResult) {
+  if (result.vacant === 0) return 'penuh'
+  if (result.total) return `${result.vacant} dari ${result.total} kamar kosong`
+  return `sisa ${result.vacant} kamar`
+}
+
+/* ── Filter facets ─────────────────────────────────────────────────────────
+   All three are derived from the results, so a facet can never offer an option
+   that reaches nothing, and a new building brings its own options with it. */
+
+/**
+ * Only facilities that actually vary.
+ *
+ * Every building has AC, so an "AC" filter narrows nothing — it is one more
+ * control to read for no answer. This drops it automatically rather than by a
+ * hard-coded exclusion, so it comes back on its own the day a building without
+ * AC is added.
+ */
+export const facilityFacet = [...new Set(results.flatMap((r) => r.facilities))]
+  .filter((facility) => results.some((r) => !r.facilities.includes(facility)))
+  .sort((a, b) => a.localeCompare(b, 'id'))
+
+/**
+ * Tenancy types present in the inventory. Nothing here is "khusus putra" today,
+ * so that option is not offered — a filter guaranteed to return nothing is a
+ * dead end dressed as a choice.
+ */
+export const tenancyFacet = [...new Set(results.map((r) => r.tenancy))]
+
+/** Walking-time brackets, in minutes. */
+export const walkFacet = [10, 15]
+
+/**
+ * The area-level empty state from the design bundle.
+ *
+ * NOT rendered. It used to sit permanently under the results, so the page
+ * showed "Belum ada kamar kosong di Setiabudi" beneath four Grogol properties
+ * on every visit. It belongs to an area this screen never represents; kept here
+ * because the copy is designed and will be needed when area switching is built.
+ */
+export const areaEmptyState = {
   heading: 'Belum ada kamar kosong di Setiabudi.',
   body: 'Yang terdekat ada di Kebayoran, 15 menit.',
   cta: 'Lihat Kebayoran',

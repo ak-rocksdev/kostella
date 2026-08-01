@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Map as LeafletMapInstance, Marker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { cn } from '@/lib/cn'
@@ -77,17 +77,26 @@ export function LeafletMap({
   const container = useRef<HTMLDivElement>(null)
   const markerRefs = useRef(new Map<string, Marker>())
   const leaflet = useRef<typeof import('leaflet') | null>(null)
+  const mapRef = useRef<LeafletMapInstance | null>(null)
+  // Leaflet arrives asynchronously, so the plate sync has to run again once the
+  // map exists — the first pass finds nothing to draw on.
+  const [ready, setReady] = useState(false)
 
-  // The geography is static content, so it is captured once rather than treated
-  // as reactive. Only `activeLabel` changes over the map's life.
+  // The frame and the landmarks are static content, captured once. Buildings
+  // are not: on the search screen they follow the filter.
   const config = useRef({ center, zoom, markers, radiusMetres, fitToContent })
+
+  // Buildings currently on the map, as a value that changes only when the set
+  // does — `markers` is rebuilt on every parent render, so depending on the
+  // array itself would tear the plates down and rebuild them continuously.
+  const buildings = markers.filter((marker) => marker.kind !== 'landmark')
+  const buildingKey = buildings.map((marker) => marker.label).join(',')
 
   useEffect(() => {
     const element = container.current
     if (!element) return
 
     const { center, zoom, markers, radiusMetres, fitToContent } = config.current
-    let map: LeafletMapInstance | undefined
     let cancelled = false
 
     void (async () => {
@@ -95,7 +104,8 @@ export function LeafletMap({
       if (cancelled) return
       leaflet.current = L
 
-      map = L.map(element, { scrollWheelZoom: false }).setView(center, zoom)
+      const map = L.map(element, { scrollWheelZoom: false }).setView(center, zoom)
+      mapRef.current = map
       L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION }).addTo(map)
 
       if (radiusMetres) {
@@ -115,44 +125,71 @@ export function LeafletMap({
         })
       }
 
+      // Landmarks only. Buildings are added by the effect below, which also
+      // owns removing them again.
       for (const marker of markers) {
-        const isBuilding = marker.kind !== 'landmark'
-        const created = L.marker(marker.position, {
-          icon: L.divIcon({
-            className: '',
-            iconSize: undefined,
-            html: isBuilding
-              ? buildingHtml(marker.label, marker.label === activeLabel)
-              : landmarkHtml(marker.label),
-          }),
+        if (marker.kind !== 'landmark') continue
+        L.marker(marker.position, {
+          icon: L.divIcon({ className: '', iconSize: undefined, html: landmarkHtml(marker.label) }),
           interactive: false,
           keyboard: false,
         }).addTo(map)
-
-        if (isBuilding) markerRefs.current.set(marker.label, created)
       }
+
+      setReady(true)
     })()
 
     const refs = markerRefs.current
     return () => {
       cancelled = true
-      map?.remove()
+      mapRef.current?.remove()
+      mapRef.current = null
       refs.clear()
+      setReady(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Repaint the plates when the selection moves, without rebuilding the map.
+  /**
+   * Bring the plates in line with the filtered list.
+   *
+   * The map used to build its markers once from a ref, which meant narrowing
+   * the results left every original pin on the map — five plates beside a list
+   * of one, the map contradicting the page. Frame and tiles are still built
+   * once; only the plates move.
+   */
   useEffect(() => {
     const L = leaflet.current
-    if (!L) return
+    const map = mapRef.current
+    if (!L || !map) return
+
+    const wanted = new Set(buildings.map((marker) => marker.label))
 
     for (const [label, marker] of markerRefs.current) {
-      marker.setIcon(
-        L.divIcon({ className: '', iconSize: undefined, html: buildingHtml(label, label === activeLabel) }),
+      if (wanted.has(label)) continue
+      marker.remove()
+      markerRefs.current.delete(label)
+    }
+
+    for (const marker of buildings) {
+      const icon = L.divIcon({
+        className: '',
+        iconSize: undefined,
+        html: buildingHtml(marker.label, marker.label === activeLabel),
+      })
+      const existing = markerRefs.current.get(marker.label)
+
+      if (existing) {
+        existing.setIcon(icon)
+        continue
+      }
+
+      markerRefs.current.set(
+        marker.label,
+        L.marker(marker.position, { icon, interactive: false, keyboard: false }).addTo(map),
       )
     }
-  }, [activeLabel])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, buildingKey, activeLabel])
 
   return (
     <div

@@ -1,7 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/lib/cn'
-import type { SearchResult } from '@/lib/content/pencarian'
+import {
+  availabilityLabel,
+  priceLabel,
+  tenancyLabels,
+  walkLabel,
+  type SearchResult,
+} from '@/lib/content/pencarian'
 
 const availabilityTone = {
   available: 'text-available',
@@ -61,7 +67,8 @@ export function ResultCard({
             {result.street}
           </p>
           <p className="mt-1.5 text-[13px] leading-[1.5] text-ink-soft">
-            {result.tenancy} · {result.facilities.join(' · ')} · {result.walk}
+            {tenancyLabels[result.tenancy]} · {result.facilities.join(' · ')} ·{' '}
+            {walkLabel(result)}
           </p>
         </div>
 
@@ -70,10 +77,12 @@ export function ResultCard({
             "how much choice does this one leave me". */}
         <div className="mt-auto flex flex-wrap items-end justify-between gap-x-4 gap-y-1 border-t border-line pt-3">
           <p className={cn('text-[13px] font-semibold', availabilityTone[result.status])}>
-            {result.availability}
+            {availabilityLabel(result)}
           </p>
           <p className="text-right">
-            <span className="font-figure text-[20px] leading-none font-bold">{result.price}</span>
+            <span className="font-figure text-[20px] leading-none font-bold">
+              {priceLabel(result)}
+            </span>
             <span className="ml-1 text-[13px] text-ink-soft">/bulan</span>
           </p>
         </div>

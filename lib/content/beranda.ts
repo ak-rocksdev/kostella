@@ -66,6 +66,18 @@ export const budget = {
   initial: 2_100_000,
 } as const
 
+/**
+ * Six steps across the real range, so every option reaches some inventory.
+ *
+ * Shared by the hero's search bar and the search screen's budget filter: the
+ * figure a visitor picks on Beranda has to be one the other screen can also
+ * offer, or carrying it across would land on a value the control cannot show.
+ */
+export const budgetSteps = Array.from(
+  { length: 7 },
+  (_, i) => budget.min + i * ((budget.max - budget.min) / 6),
+)
+
 export type AreaChip = {
   label: string
   /** Areas without inventory get the designed empty state, not a blank list. */

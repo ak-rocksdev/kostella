@@ -3,15 +3,9 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { areaChips, budget, vacantRooms } from "@/lib/content/beranda";
+import { areaChips, budget, budgetSteps, vacantRooms } from "@/lib/content/beranda";
 import { formatRupiah } from "@/lib/format";
 import { routes } from "@/lib/routes";
-
-/** Six steps across the real range, so every option reaches some inventory. */
-const budgetSteps = Array.from(
-  { length: 7 },
-  (_, i) => budget.min + i * ((budget.max - budget.min) / 6),
-);
 
 /**
  * One elevated row: where, how much, go.
@@ -81,7 +75,7 @@ export function SearchBar({ onDark = false }: { onDark?: boolean }) {
 
         <div className="p-2 sm:flex sm:items-center sm:p-0">
           <Link
-            href={routes.pencarian}
+            href={`${routes.pencarian}?budget=${amount}`}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-plum px-7 py-4 text-[15px] font-semibold whitespace-nowrap text-white transition-colors duration-200 hover:bg-plum-deep sm:w-auto"
           >
             {matchCount > 0 ? `Lihat ${matchCount} kamar` : "Lihat semua kamar"}
