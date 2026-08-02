@@ -65,7 +65,6 @@ export type AuditAction =
   | 'pln-record'
   | 'pln-paid'
   | 'charge-add'
-  | 'charge-remove'
   | 'payment-add'
 
 export type AuditEntry = {
@@ -112,8 +111,6 @@ type Stored = {
   pln: Record<string, PlnBill>
   charges: Charge[]
   payments: Payment[]
-  /** Charge ids removed from the seed, so a deletion survives a reload. */
-  removedCharges: string[]
   log: AuditEntry[]
 }
 
@@ -147,7 +144,6 @@ const empty = (): Stored => ({
   pln: {},
   charges: [],
   payments: [],
-  removedCharges: [],
   log: [],
 })
 
@@ -658,11 +654,10 @@ export { write }
 /** Seeded bills and payments with anything recorded here applied on top. */
 export function mergeBilling(stored: Stored, tenancies: Tenancy[], today: string | null) {
   const seed = seedBilling(tenancies, today ?? REFERENCE_DAY)
-  const removed = new Set(stored.removedCharges)
 
   return {
     bills: [...seed.bills.filter((b) => !stored.pln[b.id]), ...Object.values(stored.pln)],
-    charges: [...seed.charges.filter((c) => !removed.has(c.id)), ...stored.charges],
+    charges: [...seed.charges, ...stored.charges],
     payments: [...seed.payments, ...stored.payments],
   }
 }
@@ -724,27 +719,6 @@ export function addCharge(
     to: String(charge.amount),
     note: charge.note,
     effectiveFrom: charge.dueOn,
-  })
-}
-
-export function removeCharge(
-  stored: Stored,
-  charge: Charge,
-  where: { building: string; room: string; label: string },
-  note: string,
-): Stored {
-  const next: Stored = {
-    ...stored,
-    charges: stored.charges.filter((c) => c.id !== charge.id),
-    removedCharges: [...stored.removedCharges, charge.id],
-  }
-  return log(next, {
-    building: where.building,
-    room: where.room,
-    action: 'charge-remove',
-    from: where.label,
-    to: String(charge.amount),
-    note,
   })
 }
 

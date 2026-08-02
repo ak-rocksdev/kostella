@@ -198,8 +198,13 @@ export function settle(charge: Charge, payments: Payment[], today: string): Sett
   const outstanding = Math.max(0, total - paid)
   const lateBy = daysBetween(charge.dueOn, today)
 
-  const status: ChargeStatus =
-    paid >= total ? 'lunas' : paid > 0 ? 'kurang' : lateBy > 0 ? 'terlambat' : 'belum'
+  function statusOf(): ChargeStatus {
+    if (paid >= total) return 'lunas'
+    if (paid > 0) return 'kurang'
+    return lateBy > 0 ? 'terlambat' : 'belum'
+  }
+
+  const status = statusOf()
 
   return { charge, total, paid, outstanding, status, lateBy, payments: mine }
 }
@@ -265,24 +270,21 @@ export function powerMonth(
   const allPaid =
     mine.length > 0 && mine.every((c) => settle(c, payments, today).status === 'lunas')
 
-  /* An empty room is not a pending task. Labelling it "belum ditagihkan" says
-     somebody forgot to bill; there is nobody to bill, and the money is simply
-     Kostella's. Saying so is the whole reason the PLN side is recorded. */
   const occupied = tenancies.some(
     (t) => t.building === building && t.room === room && isCurrent(t, today),
   )
 
-  const stage: PowerStage = !bill
-    ? 'belum-dicatat'
-    : !bill.paidOn
-      ? 'utang-pln'
-      : mine.length === 0
-        ? occupied
-          ? 'belum-ditagih'
-          : 'tanpa-penghuni'
-        : allPaid
-          ? 'selesai'
-          : 'menunggu-bayar'
+  /* Read top to bottom, in the order the money moves. An empty room is not a
+     pending task: "belum ditagihkan" would say somebody forgot to bill, when
+     there is nobody to bill and the money is simply Kostella's. */
+  function stageOf(): PowerStage {
+    if (!bill) return 'belum-dicatat'
+    if (!bill.paidOn) return 'utang-pln'
+    if (mine.length === 0) return occupied ? 'belum-ditagih' : 'tanpa-penghuni'
+    return allPaid ? 'selesai' : 'menunggu-bayar'
+  }
+
+  const stage = stageOf()
 
   return {
     building,

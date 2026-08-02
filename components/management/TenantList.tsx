@@ -298,23 +298,30 @@ function ActionRow({
   const u = urgencyOf({ overdueBy, leaving: leaving && !overdue, due })
   const Icon = u.icon
 
-  const job = overdue
-    ? {
+  /** What this row is about, and what to do about it. */
+  function jobOf(): { what: string; why: string; cta: string } {
+    if (overdue) {
+      return {
         what: `Kontrak habis ${formatDate(tenancy.leavingOn!)}`,
         why: 'Kamar masih terhitung terisi sampai keluarnya dikonfirmasi',
         cta: 'Konfirmasi keluar',
       }
-    : leaving
-      ? {
-          what: `Kontrak habis ${formatDate(tenancy.leavingOn!)}`,
-          why: `Kamar ${tenancy.room} bisa mulai ditawarkan · penghuni masih bisa memperpanjang`,
-          cta: 'Jadwalkan pengganti',
-        }
-      : {
-          what: `Jatuh tempo ${formatDate(nextDue(tenancy, today))}`,
-          why: `${formatRupiah(tenancy.agreedRent)} — ingatkan lewat WhatsApp`,
-          cta: 'Buka kamar',
-        }
+    }
+    if (leaving) {
+      return {
+        what: `Kontrak habis ${formatDate(tenancy.leavingOn!)}`,
+        why: `Kamar ${tenancy.room} bisa mulai ditawarkan · penghuni masih bisa memperpanjang`,
+        cta: 'Jadwalkan pengganti',
+      }
+    }
+    return {
+      what: `Jatuh tempo ${formatDate(nextDue(tenancy, today))}`,
+      why: `${formatRupiah(tenancy.agreedRent)} — ingatkan lewat WhatsApp`,
+      cta: 'Buka kamar',
+    }
+  }
+
+  const job = jobOf()
 
   return (
     <li

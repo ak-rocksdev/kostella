@@ -305,15 +305,12 @@ function OutstandingRow({
               className="min-h-11 w-full rounded-badge border border-line bg-paper px-3 text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum"
             />
             <span className="mt-1.5 block text-[12px] text-ink-soft">
-              {short ? (
+              {short && (
                 <span className="text-held">
                   Kurang {formatRupiah(owed - value)}. Dipakai untuk tagihan terlama dulu.
                 </span>
-              ) : items.length > 1 ? (
-                `Melunasi ${items.length} tagihan sekaligus.`
-              ) : (
-                ''
               )}
+              {!short && items.length > 1 && `Melunasi ${items.length} tagihan sekaligus.`}
             </span>
           </label>
           <div className="flex shrink-0 gap-2">

@@ -49,8 +49,6 @@ export function describe(entry: AuditEntry): string {
       return `Tagihan PLN ${entry.from} dibayar ke PLN ${formatDate(entry.to)}`
     case 'charge-add':
       return `${entry.from} ditagihkan — ${formatRupiah(Number(entry.to))}`
-    case 'charge-remove':
-      return `${entry.from} dibatalkan — ${formatRupiah(Number(entry.to))}`
     case 'payment-add':
       return `Pembayaran ${entry.from} — ${formatRupiah(Number(entry.to))}`
   }
@@ -70,7 +68,6 @@ export const ACTION_LABEL: Record<AuditEntry['action'], string> = {
   'pln-record': 'Tagihan PLN',
   'pln-paid': 'Bayar ke PLN',
   'charge-add': 'Biaya ditambah',
-  'charge-remove': 'Biaya dibatalkan',
   'payment-add': 'Pembayaran',
   'photo-add': 'Foto ditambah',
   'photo-remove': 'Foto dihapus',
