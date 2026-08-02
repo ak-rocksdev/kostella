@@ -149,11 +149,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               <UserRoundCheck size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
               Konfirmasi masuk lebih awal
             </Button>
-            <Button
-              variant="warn"
-              size="sm"
-              onClick={toggle('move-out', () => setDate(today))}
-            >
+            <Button variant="warn" size="sm" onClick={toggle('move-out', () => setDate(today))}>
               <CalendarX size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
               Batalkan
             </Button>
@@ -167,7 +163,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
             onClick={toggle('notice', () => setDate(addDays(today, 30)))}
           >
             <CalendarClock size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
-            Catat pemberitahuan keluar
+            Catat kontrak akan habis
           </Button>
         )}
 
@@ -181,17 +177,18 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               <DoorOpen size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
               Catat keluar
             </Button>
+            {/* Not "Batalkan pemberitahuan". A tenancy ending and a tenant
+                leaving are different things — most of the time they simply
+                renew, and that is what this records. */}
             <Button variant="restore" size="sm" onClick={toggle('notice-cancel')}>
               <UserRoundCheck size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
-              Batalkan pemberitahuan
+              Kontrak dilanjutkan
             </Button>
             {startCheck.ok && (
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={toggle('move-in', () =>
-                  setDate(addDays(tenant.leavingOn ?? today, 1)),
-                )}
+                onClick={toggle('move-in', () => setDate(addDays(tenant.leavingOn ?? today, 1)))}
               >
                 <UserRoundPlus size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
                 Jadwalkan pengganti
@@ -354,7 +351,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
           }}
         >
           <label className="flex-1 basis-52">
-            <span className={label}>{tenant.name} keluar tanggal</span>
+            <span className={label}>Kontrak {tenant.name} habis tanggal</span>
             <input
               type="date"
               required
@@ -365,8 +362,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               className={field}
             />
             <span className="mt-1.5 block text-[12px] text-ink-soft">
-              Kamar tetap terisi sampai keluarnya dikonfirmasi. Sementara itu bisa dijadwalkan
-              pengganti.
+              Kamar tetap terisi sampai keluarnya dikonfirmasi — penghuni masih bisa memperpanjang.
+              Sementara itu pengganti sudah boleh dijadwalkan.
             </span>
           </label>
           <Confirm onCancel={close} />
@@ -384,13 +381,13 @@ export function RoomActions({ building, room }: { building: Building; room: Room
           }}
         >
           <label className="min-w-0 flex-1 basis-60">
-            <span className={label}>Alasan batal keluar</span>
+            <span className={label}>Alasan lanjut</span>
             <input
               required
               autoFocus
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="mis. memperpanjang kontrak kerja"
+              placeholder="mis. kontrak kerjanya diperpanjang"
               className={field}
             />
           </label>
@@ -405,7 +402,14 @@ export function RoomActions({ building, room }: { building: Building; room: Room
             e.preventDefault()
             const going = tenant ?? incoming!
             const why = reason === 'Lainnya' ? note.trim() : reason
-            apply((s) => endTenancy(s, going, date, why + (note.trim() && reason !== 'Lainnya' ? ` — ${note.trim()}` : '')))
+            apply((s) =>
+              endTenancy(
+                s,
+                going,
+                date,
+                why + (note.trim() && reason !== 'Lainnya' ? ` — ${note.trim()}` : ''),
+              ),
+            )
             show(moveOutToast(ctx, room.room, going.name, date))
             close()
           }}
@@ -520,7 +524,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               className={field}
             />
             <span className="mt-1.5 block text-[12px] text-ink-soft">
-              Berlaku untuk penghuni berikutnya. {tenant ? `${tenant.name} tetap di ` : 'Tidak mengubah '}
+              Berlaku untuk penghuni berikutnya.{' '}
+              {tenant ? `${tenant.name} tetap di ` : 'Tidak mengubah '}
               {tenant ? formatRupiah(tenant.agreedRent) : 'sewa yang sedang berjalan'}.
             </span>
           </label>
@@ -572,8 +577,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
         <p className="mt-4 flex items-center gap-2 rounded-card bg-stone px-4 py-3 text-[13px]">
           <UserRoundPlus size={15} strokeWidth={1.9} aria-hidden className="shrink-0 text-plum" />
           <span>
-            <strong className="font-semibold">{incoming.name}</strong> menggantikan{' '}
-            {tenant.name}, masuk {formatDate(incoming.movedIn)}.
+            <strong className="font-semibold">{incoming.name}</strong> menggantikan {tenant.name},
+            masuk {formatDate(incoming.movedIn)}.
           </span>
         </p>
       )}

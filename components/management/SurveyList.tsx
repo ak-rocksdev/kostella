@@ -28,13 +28,7 @@ const TONE: Record<Survey['status'], string> = {
  * Cancelling asks why, for the same reason a price change does: it is the entry
  * somebody asks about a month later.
  */
-export function SurveyList({
-  surveys,
-  buildings,
-}: {
-  surveys: Survey[]
-  buildings: Building[]
-}) {
+export function SurveyList({ surveys, buildings }: { surveys: Survey[]; buildings: Building[] }) {
   const { apply, actor } = useManagement()
   const { show } = useToast()
   const [cancelling, setCancelling] = useState<string | null>(null)
@@ -131,7 +125,11 @@ export function SurveyList({
               !done && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {survey.status === 'baru' && (
-                    <Button variant="secondary" size="sm" onClick={() => move(survey, 'dikonfirmasi')}>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => move(survey, 'dikonfirmasi')}
+                    >
                       <CalendarCheck size={16} strokeWidth={1.75} aria-hidden className="mr-2" />
                       Konfirmasi
                     </Button>

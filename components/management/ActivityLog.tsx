@@ -26,7 +26,9 @@ export function ActivityLog() {
     (!building || e.building === building) && (!action || e.action === action)
 
   const visible = log.filter(matches)
-  const countWith = (o: Partial<{ building: string | null; action: AuditEntry['action'] | null }>) =>
+  const countWith = (
+    o: Partial<{ building: string | null; action: AuditEntry['action'] | null }>,
+  ) =>
     log.filter(
       (e) =>
         (!(o.building ?? building) || e.building === (o.building ?? building)) &&

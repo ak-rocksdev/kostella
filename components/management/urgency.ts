@@ -62,16 +62,17 @@ export function urgencyOf({
   if (overdueBy !== undefined) {
     return {
       level: 'late',
-      chip: overdueBy === 0 ? 'Keluar hari ini' : `Terlewat ${overdueBy} hari`,
+      chip: overdueBy === 0 ? 'Kontrak habis hari ini' : `Terlewat ${overdueBy} hari`,
       icon: TriangleAlert,
     }
   }
-  /* "Rencana", not "Akan". A tenant who has given notice can still change
-     their mind — the panel has a button for exactly that — so a label stating
-     the departure as settled says more than anyone knows.
-     Not "Kontrak akan habis" either: this kos lets monthly with no term, so
-     nothing expires. What happened is that somebody told us. */
-  if (leaving) return { level: 'soon', chip: 'Rencana keluar', icon: DoorOpen }
+  /* "Kontrak akan habis" is what a kos manager says, and it carries the right
+     amount of doubt: a tenancy ending is not the same as a tenant leaving,
+     because they may simply renew. "Akan keluar" claimed the departure was
+     settled. This is the operator's phrase, which outranks the model's — the
+     records hold no fixed term, but nobody says "pemberitahuan keluar" out
+     loud. */
+  if (leaving) return { level: 'soon', chip: 'Kontrak akan habis', icon: DoorOpen }
   if (due === null || due === undefined)
     return { level: 'soon', chip: 'Belum masuk', icon: CalendarClock }
   return {

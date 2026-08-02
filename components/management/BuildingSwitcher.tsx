@@ -2,11 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { Select } from '@/components/ui/Select'
-import {
-  buildingName,
-  occupancy,
-  type Building,
-} from '@/lib/content/management/buildings'
+import { buildingName, occupancy, type Building } from '@/lib/content/management/buildings'
 import { useManagement } from '@/lib/management/useManagement'
 
 /**

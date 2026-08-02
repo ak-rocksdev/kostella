@@ -321,7 +321,9 @@ function TenantLine({ tenant, incoming }: { tenant: Tenancy; incoming?: boolean 
       </span>
       <span>{formatRupiah(tenant.agreedRent)}/bulan</span>
       {tenant.leavingOn && (
-        <span className="font-semibold text-held">rencana keluar {formatDate(tenant.leavingOn)}</span>
+        <span className="font-semibold text-held">
+          kontrak habis {formatDate(tenant.leavingOn)}
+        </span>
       )}
       {/* The guardian lives here rather than on the tenant list. It is wanted in
           an emergency, about one person — and a room is where one person gets

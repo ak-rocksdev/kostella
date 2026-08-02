@@ -22,8 +22,7 @@ import { formatRupiah } from '@/lib/format'
  * they could check; "Kamar 105 · sewa jadi Rp1.800.000" is the fact they can.
  */
 
-const withRoom = (building: string, room: string, rest: string) =>
-  `Kamar ${room} · ${rest}`
+const withRoom = (building: string, room: string, rest: string) => `Kamar ${room} · ${rest}`
 
 const recorded = (actor: string): Pick<ToastInput, 'detail' | 'action'> => ({
   detail: `Tercatat atas ${actor}`,
@@ -56,9 +55,9 @@ export const noticeToast = (
   name: string,
   leavingOn: string,
 ): ToastInput => ({
-  title: withRoom(building, room, `${name} memberi tahu akan keluar ${formatDate(leavingOn)}`),
+  title: withRoom(building, room, `kontrak ${name} habis ${formatDate(leavingOn)}`),
   // Says the thing a manager acts on, not merely that a field changed.
-  detail: `Kamar masih terisi sampai dikonfirmasi · tercatat atas ${actor}`,
+  detail: `Kamar masih terisi sampai keluarnya dikonfirmasi · tercatat atas ${actor}`,
   icon: CalendarClock as LucideIcon,
   tone: 'attention',
   action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
@@ -69,7 +68,7 @@ export const noticeCancelledToast = (
   room: string,
   name: string,
 ): ToastInput => ({
-  title: withRoom(building, room, `${name} jadi tetap tinggal`),
+  title: withRoom(building, room, `kontrak ${name} dilanjutkan`),
   ...recorded(actor),
   icon: Check as LucideIcon,
   tone: 'success',
@@ -132,11 +131,7 @@ export const blockToast = (
   action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
 })
 
-export const facilityToast = (
-  { actor }: Args,
-  facility: string,
-  on: boolean,
-): ToastInput => ({
+export const facilityToast = ({ actor }: Args, facility: string, on: boolean): ToastInput => ({
   title: `${facility} ${on ? 'ditambahkan' : 'dihapus'}`,
   detail: `Kartu properti, hasil pencarian, dan filter ikut berubah · ${actor}`,
   icon: Check as LucideIcon,
@@ -144,10 +139,7 @@ export const facilityToast = (
   action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
 })
 
-export const tenancyToast = (
-  { actor }: Args,
-  to: string,
-): ToastInput => ({
+export const tenancyToast = ({ actor }: Args, to: string): ToastInput => ({
   title: `Tipe penghuni jadi ${to}`,
   detail: `Kartu properti dan filter pencarian ikut berubah · ${actor}`,
   icon: Check as LucideIcon,

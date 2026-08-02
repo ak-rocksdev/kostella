@@ -36,9 +36,9 @@ export function describe(entry: AuditEntry): string {
     case 'tenancy-start':
       return `${entry.to} masuk${entry.effectiveFrom ? ` ${formatDate(entry.effectiveFrom)}` : ''}`
     case 'tenancy-notice':
-      return `${entry.from} memberi tahu akan keluar ${formatDate(entry.to)}`
+      return `Kontrak ${entry.from} habis ${formatDate(entry.to)}`
     case 'tenancy-notice-cancel':
-      return `${entry.to} membatalkan pemberitahuan keluar`
+      return `Kontrak ${entry.to} dilanjutkan`
     case 'tenancy-end':
       return `${entry.from} keluar ${formatDate(entry.to)}`
     case 'tenancy-rent':
@@ -53,8 +53,8 @@ export const ACTION_LABEL: Record<AuditEntry['action'], string> = {
   facility: 'Fasilitas',
   tenancy: 'Tipe penghuni',
   'tenancy-start': 'Penghuni masuk',
-  'tenancy-notice': 'Pemberitahuan keluar',
-  'tenancy-notice-cancel': 'Pemberitahuan dibatalkan',
+  'tenancy-notice': 'Kontrak akan habis',
+  'tenancy-notice-cancel': 'Kontrak dilanjutkan',
   'tenancy-end': 'Penghuni keluar',
   'tenancy-rent': 'Sewa penghuni',
   'photo-add': 'Foto ditambah',

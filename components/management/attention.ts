@@ -139,10 +139,10 @@ export function attentionItems(buildings: Building[], today: string | null): Att
             id: `${building.number}-leaving-${room.room}`,
             tone: 'attention',
             icon: DoorOpen,
-            title: `${tenant.name} seharusnya sudah keluar`,
+            title: `Kontrak ${tenant.name} sudah habis`,
             detail: `${name} · kamar ${room.room} · ${
               late === 0 ? 'hari ini' : relativeDays(-late)
-            } — kamar masih terhitung terisi sampai dikonfirmasi`,
+            } — kamar masih terhitung terisi sampai keluarnya dikonfirmasi`,
             href,
           })
           continue

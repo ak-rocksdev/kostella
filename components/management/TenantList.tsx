@@ -263,9 +263,7 @@ export function TenantList() {
                         'block text-[12px] font-semibold',
                         LEVEL[
                           urgencyOf({
-                            overdueBy: overdue
-                              ? daysBetween(tenancy.leavingOn!, today)
-                              : undefined,
+                            overdueBy: overdue ? daysBetween(tenancy.leavingOn!, today) : undefined,
                             leaving: leaving && !overdue,
                             due: incoming ? null : due,
                           }).level
@@ -275,7 +273,7 @@ export function TenantList() {
                       {overdue
                         ? `terlewat ${daysBetween(tenancy.leavingOn!, today)} hari`
                         : leaving
-                          ? `rencana keluar ${formatDateShort(tenancy.leavingOn!)}`
+                          ? `kontrak habis ${formatDateShort(tenancy.leavingOn!)}`
                           : incoming
                             ? `masuk ${formatDateShort(tenancy.movedIn)}`
                             : relativeDays(due!)}
@@ -321,14 +319,14 @@ function ActionRow({
 
   const job = overdue
     ? {
-        what: `Seharusnya keluar ${formatDate(tenancy.leavingOn!)}`,
-        why: 'Kamar masih terhitung terisi sampai dikonfirmasi',
+        what: `Kontrak habis ${formatDate(tenancy.leavingOn!)}`,
+        why: 'Kamar masih terhitung terisi sampai keluarnya dikonfirmasi',
         cta: 'Konfirmasi keluar',
       }
     : leaving
       ? {
-          what: `Memberi tahu akan keluar ${formatDate(tenancy.leavingOn!)}`,
-          why: `Kamar ${tenancy.room} bisa mulai ditawarkan · rencana bisa berubah`,
+          what: `Kontrak habis ${formatDate(tenancy.leavingOn!)}`,
+          why: `Kamar ${tenancy.room} bisa mulai ditawarkan · penghuni masih bisa memperpanjang`,
           cta: 'Jadwalkan pengganti',
         }
       : {

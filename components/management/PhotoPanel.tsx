@@ -411,10 +411,13 @@ function DropZone({
         disabled && 'opacity-55',
       )}
     >
-      {empty && (
-        <p className="text-[15px] font-semibold">Belum ada foto gedung ini.</p>
-      )}
-      <p className={cn('text-[13px] leading-[1.6] text-ink-soft', empty && 'mx-auto mt-2 max-w-[42ch]')}>
+      {empty && <p className="text-[15px] font-semibold">Belum ada foto gedung ini.</p>}
+      <p
+        className={cn(
+          'text-[13px] leading-[1.6] text-ink-soft',
+          empty && 'mx-auto mt-2 max-w-[42ch]',
+        )}
+      >
         {disabled
           ? 'Batas foto tercapai. Hapus salah satu untuk menambah yang baru.'
           : empty
