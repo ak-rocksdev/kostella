@@ -110,11 +110,17 @@ export const receiptNote =
  * nothing else. Still derived from the room, so the total can never disagree
  * with the rent shown elsewhere on this page.
  *
- * NOTE: Beranda's example receipt (lib/content/beranda.ts) still lists a
- * Rp 1.500.000 deposit and totals Rp 3.150.000, and the section above it still
- * claims "100% deposit kembali". Those figures are hard-coded there and were
- * not part of this request, so the two screens currently disagree about whether
- * a deposit exists at all.
+ * These rows are the whole of what Kostella has committed to charging, so
+ * phase 4 may not invent a charge type that is not among them — the landing
+ * page's "0 biaya tersembunyi" is a promise the panel would be breaking:
+ *
+ *   Sewa bulanan     fixed, from the room
+ *   Listrik          "dihitung terpisah", per usage — so a reading, not a rate
+ *   Tamu menginap    Rp 100.000 per night — an event, not a monthly line
+ *   Parkir motor     free, so never a line at all
+ *
+ * Beranda derives its example from this function, so the two screens can no
+ * longer disagree about the deposit the way they did on 2026-07-31.
  */
 export function receiptFor(roomNumber: string) {
   const room = rooms[roomNumber]

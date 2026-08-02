@@ -55,7 +55,7 @@ Buildings and rooms come first because every other record points at a room.
 | 1 ✅ | **Buildings & rooms** — the data spine, the building switcher, room states, per-building facilities and tenancy, and the audit log every later phase writes to | `/management/buildings`, `/management/activity` | `2026-08-01-management-01-buildings-rooms.md` |
 | 2 ✅ | **Dashboard** — today's surveys, what needs attention, portfolio occupancy | `/management` | `2026-08-01-management-02-dashboard.md` |
 | 3 ✅ | **Tenants** — who is in which room, since when, what they agreed to pay, the monthly due date derived from their move-in, and notice of departure | `/management/tenants` | `2026-08-01-management-03-tenants.md` |
-| 4 | **Billing** — rent, electricity, laundry, other services, penalties; paid / unpaid / short-paid with the reason. Phase 3 gives the due date; this gives whether it was met | `/management/billing` | not written yet |
+| 4 | **Billing** — bills and payments **kept against the tenancy, not the room**, so a room changing hands never merges two people's financial histories. Rent, electricity per usage, guest nights, penalties; paid / unpaid / short-paid with the reason. Phase 3 gives the due date; this gives whether it was met | `/management/billing` | not written yet |
 | 5 | **Reports** — monthly income, occupancy, arrears for the manager | `/management/reports` | not written yet |
 | 6 | **Owner view** — its own shell, its own navigation; aggregates and trends, no individuals | `/owner` | not written yet |
 
@@ -92,6 +92,35 @@ Shell.tsx`.
 
 `docs/management/GUIDELINES.md` — the checklist every phase is measured
 against, and the reason for each rule.
+
+## Phase 4, as the client has framed it
+
+Recorded 2026-08-02, in their words: payment history is kept **per tenant per
+room they actually occupy**, so financial history and bills — electricity and
+other facilities included — are traceable.
+
+Three things follow, and they are why phase 3 came first:
+
+- **A bill belongs to a tenancy.** When 362/212 passes from one tenant to the
+  next, their histories must not merge. Phase 3 made a tenancy a record with an
+  identity, which is what makes this possible at all.
+- **The charge types are already fixed by the public site**, not open to
+  invention. `receiptFor()` commits to sewa bulanan, listrik "dihitung
+  terpisah", tamu menginap at Rp 100.000 a night, and free parking — beside a
+  headline reading "0 biaya tersembunyi". A charge the panel can raise that the
+  site never disclosed would make that line false.
+- **Not every charge is monthly.** A guest night is an event. The model needs
+  charges that attach to a period without being *of* it.
+
+Open, and needed before the spec:
+
+- **Does Kostella read an electricity meter per room?** "Sesuai pemakaian"
+  implies a reading, a rate and a period — a record type of its own, and real
+  work for a manager every month. Many kos instead sell tokens or charge a flat
+  amount. Which it is decides whether phase 4 has one record type or three.
+- **Deposit.** Still open, but smaller than stated on 2026-08-02: it is one
+  line item and one refund path, not the architecture. The spec can be written
+  with it excluded and named.
 
 ## Open with the client
 
