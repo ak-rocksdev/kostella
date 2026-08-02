@@ -74,6 +74,11 @@ export function PowerMonthTable({ buildings }: { buildings: Building[] }) {
   const unrecorded = rows.filter((r) => r.power.stage === 'belum-dicatat')
   const owedToPln = rows.filter((r) => r.power.stage === 'utang-pln')
   const unbilled = rows.filter((r) => r.power.stage === 'belum-ditagih' && r.tenant)
+  // "Selesai" includes an empty room: PLN is paid and there is nobody to bill,
+  // so there is no work left on it.
+  const done = rows.filter(
+    (r) => r.power.stage === 'selesai' || r.power.stage === 'tanpa-penghuni',
+  ).length
   const emptyCost = rows
     .filter((r) => r.power.bill && !r.tenant)
     .reduce((n, r) => n + r.power.bill!.amount, 0)
@@ -114,6 +119,38 @@ export function PowerMonthTable({ buildings }: { buildings: Building[] }) {
         </div>
       </div>
 
+      {/* A finish line. Per-building counts existed; nothing said the month
+          was done, so there was nothing to work towards. */}
+      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <div
+          className="h-1.5 min-w-40 flex-1 overflow-hidden rounded-full bg-stone"
+          role="progressbar"
+          aria-valuenow={done}
+          aria-valuemin={0}
+          aria-valuemax={rows.length}
+          aria-label="Kemajuan listrik bulan ini"
+        >
+          <div
+            className={cn('h-full rounded-full', done === rows.length ? 'bg-available' : 'bg-ink')}
+            style={{ width: `${rows.length ? (done / rows.length) * 100 : 0}%` }}
+          />
+        </div>
+        <p className="text-[13px] text-ink-soft">
+          {done === rows.length ? (
+            <span className="font-semibold text-available">
+              {rows.length} kamar selesai — tidak ada yang tertinggal bulan ini
+            </span>
+          ) : (
+            <>
+              <strong className="font-figure font-semibold text-ink">
+                {done}/{rows.length}
+              </strong>{' '}
+              kamar selesai
+            </>
+          )}
+        </p>
+      </div>
+
       {emptyCost > 0 && (
         // The figure this whole section exists to surface.
         <p className="mb-4 flex flex-wrap items-baseline gap-x-2 rounded-card bg-held-soft px-4 py-3 text-[13px] text-held">
@@ -139,7 +176,10 @@ export function PowerMonthTable({ buildings }: { buildings: Building[] }) {
                 </p>
               </div>
 
-              <table className="w-full border-collapse text-left">
+              {/* A five-column table clipped its most important column inside
+                  an overflow-hidden card at 500px — the one saying what is
+                  stuck, unreachable. Below lg it becomes stacked rows. */}
+              <table className="hidden w-full border-collapse text-left lg:table">
                 <thead>
                   <tr className="border-b border-line text-[12px] text-ink-soft">
                     <th className="px-5 py-2.5 font-medium">Kamar</th>
@@ -210,6 +250,50 @@ export function PowerMonthTable({ buildings }: { buildings: Building[] }) {
                   })}
                 </tbody>
               </table>
+
+              <ul className="lg:hidden">
+                {mine.map(({ room, power, tenant }) => {
+                  const key = `${b.number}/${room.room}`
+                  return (
+                    <li
+                      key={key}
+                      className={cn(
+                        'flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line px-4 py-3 last:border-0',
+                        power.bill && !tenant && 'bg-held-soft/30',
+                      )}
+                    >
+                      <span className="font-figure text-[15px] font-semibold">{room.room}</span>
+                      <span className="min-w-0 flex-1 truncate text-[13px] text-ink-soft">
+                        {tenant?.name ?? <span className="text-held">kosong</span>}
+                      </span>
+                      {power.bill ? (
+                        <span className="font-figure text-[14px] font-semibold">
+                          {formatRupiah(power.bill.amount)}
+                        </span>
+                      ) : (
+                        <input
+                          inputMode="numeric"
+                          placeholder="Rp —"
+                          aria-label={`Tagihan PLN kamar ${room.room}`}
+                          value={draft[key] ?? ''}
+                          onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+                          onBlur={() => saveDraft(key, b.number, room.room)}
+                          className="min-h-11 w-28 rounded-badge border border-line bg-canvas px-2.5 text-right font-figure text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum"
+                        />
+                      )}
+                      <span
+                        className={cn(
+                          'basis-full rounded-badge px-2 py-0.5 text-[12px] font-semibold',
+                          'inline-block w-fit',
+                          STAGE_TONE[power.stage],
+                        )}
+                      >
+                        {POWER_STAGE_LABEL[power.stage]}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ul>
 
               {(unpaid.length > 0 || billable.length > 0) && (
                 /* The two steps that apply to every recorded row at once. A

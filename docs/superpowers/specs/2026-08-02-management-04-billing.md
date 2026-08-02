@@ -293,6 +293,46 @@ coherent whenever it is opened.
 9. Contrast on any new tone; targets at a real 390px viewport; no console
    errors with the clock weeks ahead.
 
+### Results, 2026-08-02
+
+All nine pass. Four findings the checks produced, all fixed:
+
+**Rent periods drifted off the day of the month.** `rentPeriods` walked a month
+at a time from the period before it, so a 31st move-in clamped to 28 February
+and then stayed on the 28th for every month after — including the 31-day ones.
+Each period is now counted from the move-in itself. `nextDue` never had the bug
+because it already derived from `movedIn`; this is the cost of two functions
+answering nearly the same question.
+
+**The stage column was clipped on a phone.** Five columns in an
+`overflow-hidden` card at 500px cut off the one saying what is stuck, with no
+way to scroll to it — the column the section exists for. Below `lg` it is a
+stacked row now.
+
+**The outstanding list was charge-first, and the job is person-first.** A tenant
+owing rent and electricity appeared as two rows, read as two jobs, when it is
+one phone call. Grouped by person: the total leads, the lines below say what it
+is made of, and one recorded payment spreads across them oldest first — which
+is how a single transfer actually arrives.
+
+**The month had no finish line.** Per-building counts existed; nothing said the
+month was done across all six, so there was nothing to work towards.
+
+Measured:
+
+| Check | Result |
+|---|---|
+| 31st move-in across short months | 31 Des → 31 Jan → **28 Feb** → **31 Mar** → 30 Apr |
+| Leap year | 31 Jan 2028 → **29 Feb** → 31 Mar |
+| Rent rise vs settled months | +Rp 300.000: **0** settled months turned into arrears |
+| One payment, two charges | Rp 2.130.000 cleared both; header 6.137.000 → 4.007.000 |
+| Part payment | Note required, "Kurang Rp1.450.000" shown, status → kurang bayar |
+| History follows the person | 362/212: Putri 16 charges, Anisa 0 — different ids |
+| Totals by hand | Andi Nugroho: 3.500.000 − 3.320.000 = 180.000 ✓ |
+| Audit | `362/304 · Pembayaran … Rp500.000 · Pengelola 362 · "Sisanya menyusul gajian"` |
+| 500px | No overflow, nothing under 44px, table replaced by stacked rows |
+| Console, clock +71 days | No errors; screen moved to September, 11/30 done |
+
 ## Invented in this phase
 
 - **Where the electricity amount is entered.** The client said only the amount

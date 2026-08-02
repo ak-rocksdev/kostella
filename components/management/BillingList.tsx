@@ -66,11 +66,28 @@ export function BillingList() {
     }
   }
 
-  const outstanding = all
-    .filter(({ settlement }) => settlement.status !== 'lunas')
-    .sort((a, b) => b.settlement.lateBy - a.settlement.lateBy)
+  /* Grouped by person, not by charge.
+     A manager chases somebody, not a line item — one tenant owing rent and
+     electricity is one phone call, and listing them as two rows read as two
+     jobs. One transfer usually settles both, which is what the form does. */
+  const byTenant = new Map<string, { tenancy: Tenancy; items: Settlement[] }>()
+  for (const { tenancy, settlement } of all) {
+    if (settlement.status === 'lunas') continue
+    const entry = byTenant.get(tenancy.id) ?? { tenancy, items: [] }
+    entry.items.push(settlement)
+    byTenant.set(tenancy.id, entry)
+  }
 
-  const owedByTenants = outstanding.reduce((n, x) => n + x.settlement.outstanding, 0)
+  const outstanding = [...byTenant.values()]
+    .map((g) => ({
+      ...g,
+      items: g.items.sort((a, b) => a.charge.dueOn.localeCompare(b.charge.dueOn)),
+      owed: g.items.reduce((n, s) => n + s.outstanding, 0),
+      worst: Math.max(...g.items.map((s) => s.lateBy)),
+    }))
+    .sort((a, b) => b.worst - a.worst)
+
+  const owedByTenants = outstanding.reduce((n, x) => n + x.owed, 0)
   const owedToPln = billing.bills
     .filter((b) => !b.paidOn && scopedNumbers.has(b.building))
     .reduce((n, b) => n + b.amount, 0)
@@ -136,31 +153,41 @@ export function BillingList() {
           </p>
         ) : (
           <ul className="flex flex-col gap-2.5">
-            {outstanding.map(({ tenancy, settlement }) => (
+            {outstanding.map((group) => (
               <OutstandingRow
-                key={settlement.charge.id}
-                tenancy={tenancy}
-                settlement={settlement}
-                where={nameOf(tenancy.building)}
+                key={group.tenancy.id}
+                group={group}
+                where={nameOf(group.tenancy.building)}
                 onPay={(amount, method, note) => {
-                  apply((s) =>
-                    addPayment(
-                      s,
-                      {
-                        charge: settlement.charge.id,
-                        paidOn: today,
-                        amount,
-                        method,
-                        note,
-                        totalThen: settlement.total,
-                      },
-                      {
-                        building: tenancy.building,
-                        room: tenancy.room,
-                        label: `${tenancy.name} — ${chargeLabel(settlement.charge)}`,
-                      },
-                    ),
-                  )
+                  /* One transfer, spread across what is owed oldest first —
+                     which is how the money actually arrives. Allocating by hand
+                     would be arithmetic at the point of typing. */
+                  let left = amount
+                  apply((s) => {
+                    let next = s
+                    for (const item of group.items) {
+                      if (left <= 0) break
+                      const take = Math.min(left, item.outstanding)
+                      left -= take
+                      next = addPayment(
+                        next,
+                        {
+                          charge: item.charge.id,
+                          paidOn: today,
+                          amount: take,
+                          method,
+                          note,
+                          totalThen: item.total,
+                        },
+                        {
+                          building: group.tenancy.building,
+                          room: group.tenancy.room,
+                          label: `${group.tenancy.name} — ${chargeLabel(item.charge)}`,
+                        },
+                      )
+                    }
+                    return next
+                  })
                 }}
                 actor={actor}
               />
@@ -191,34 +218,30 @@ function chargeLabel(charge: Charge): string {
  * fields ends in nothing being recorded at all.
  */
 function OutstandingRow({
-  tenancy,
-  settlement,
+  group,
   where,
   onPay,
   actor,
 }: {
-  tenancy: Tenancy
-  settlement: Settlement
+  group: { tenancy: Tenancy; items: Settlement[]; owed: number; worst: number }
   where: string
   onPay: (amount: number, method: 'transfer' | 'tunai', note?: string) => void
   actor: string
 }) {
   const { show } = useToast()
+  const { tenancy, items, owed, worst } = group
   const [open, setOpen] = useState(false)
-  const [amount, setAmount] = useState(String(settlement.outstanding))
+  const [amount, setAmount] = useState(String(owed))
   const [method, setMethod] = useState<'transfer' | 'tunai'>('transfer')
   const [note, setNote] = useState('')
 
   const value = Number(String(amount).replace(/\D/g, ''))
-  const short = value > 0 && value < settlement.outstanding
-  const { charge, status, lateBy } = settlement
+  const short = value > 0 && value < owed
+  const late = worst > 0
 
   return (
     <li
-      className={cn(
-        'rounded-card bg-paper p-4 shadow-card sm:p-5',
-        status === 'terlambat' && 'ring-1 ring-held/50',
-      )}
+      className={cn('rounded-card bg-paper p-4 shadow-card sm:p-5', late && 'ring-1 ring-held/50')}
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
         <div className="min-w-0 flex-1 basis-60">
@@ -227,30 +250,29 @@ function OutstandingRow({
             <span
               className={cn(
                 'rounded-badge px-2 py-0.5 text-[12px] font-semibold whitespace-nowrap',
-                STATUS_TONE[status],
+                late ? 'bg-held-soft text-held' : 'bg-plum/10 text-plum',
               )}
             >
-              {status === 'terlambat'
-                ? `Terlambat ${lateBy} hari`
-                : status === 'kurang'
-                  ? 'Kurang bayar'
-                  : relativeDays(-lateBy)}
+              {late ? `Terlambat ${worst} hari` : relativeDays(-worst)}
             </span>
             <span className="text-[13px] text-ink-soft">
               {where} · kamar {tenancy.room}
             </span>
           </div>
-          <p className="mt-1.5 text-[14px] font-semibold">
-            {chargeLabel(charge)} · {formatRupiah(settlement.outstanding)}
-            {settlement.paid > 0 && (
-              <span className="ml-2 font-normal text-ink-soft">
-                sisa dari {formatRupiah(settlement.total)}
-              </span>
-            )}
-          </p>
-          <p className="mt-0.5 text-[13px] text-ink-soft">
-            Jatuh tempo {formatDate(charge.dueOn)} · {tenancy.phone}
-          </p>
+
+          {/* The total leads, because that is what gets asked for. The lines
+              below say what it is made of, so the answer to "for what" is
+              already on screen when the tenant asks. */}
+          <p className="mt-1.5 font-figure text-[18px] font-bold">{formatRupiah(owed)}</p>
+          <ul className="mt-0.5 flex flex-wrap gap-x-4 gap-y-0.5 text-[13px] text-ink-soft">
+            {items.map((item) => (
+              <li key={item.charge.id}>
+                {chargeLabel(item.charge)} {formatRupiah(item.outstanding)}
+                {item.paid > 0 && ` (sisa dari ${formatRupiah(item.total)})`}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-[13px] text-ink-soft">{tenancy.phone}</p>
         </div>
 
         <Button variant={open ? 'ghost' : 'secondary'} size="sm" onClick={() => setOpen(!open)}>
@@ -266,7 +288,10 @@ function OutstandingRow({
             onPay(value, method, note.trim() || undefined)
             show({
               title: `${tenancy.name} bayar ${formatRupiah(value)}`,
-              detail: `${chargeLabel(charge)} · ${method} · tercatat atas ${actor}`,
+              detail:
+                items.length > 1 && value >= owed
+                  ? `${items.length} tagihan lunas · ${method} · tercatat atas ${actor}`
+                  : `${chargeLabel(items[0].charge)} · ${method} · tercatat atas ${actor}`,
               tone: 'success',
               action: { label: 'Lihat di Aktivitas', href: '/management/activity' },
             })
@@ -281,7 +306,7 @@ function OutstandingRow({
               autoFocus
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-badge border border-line bg-paper px-3 py-2.5 text-right font-figure text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum"
+              className="min-h-11 w-full rounded-badge border border-line bg-paper px-3 text-right font-figure text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum"
             />
           </label>
           <label className="basis-36">
@@ -306,15 +331,19 @@ function OutstandingRow({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={short ? 'kenapa kurang dari tagihan' : ''}
-              className="w-full rounded-badge border border-line bg-paper px-3 py-2.5 text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum"
+              className="min-h-11 w-full rounded-badge border border-line bg-paper px-3 text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum"
             />
-            {/* A short payment is the entry somebody asks about later, so it
-                says why — the same rule a price change follows. */}
-            {short && (
-              <span className="mt-1.5 block text-[12px] text-held">
-                Kurang {formatRupiah(settlement.outstanding - value)} dari yang ditagihkan.
-              </span>
-            )}
+            <span className="mt-1.5 block text-[12px] text-ink-soft">
+              {short ? (
+                <span className="text-held">
+                  Kurang {formatRupiah(owed - value)}. Dipakai untuk tagihan terlama dulu.
+                </span>
+              ) : items.length > 1 ? (
+                `Melunasi ${items.length} tagihan sekaligus.`
+              ) : (
+                ''
+              )}
+            </span>
           </label>
           <div className="flex shrink-0 gap-2">
             <Button size="sm" type="submit">

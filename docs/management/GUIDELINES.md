@@ -255,6 +255,19 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] **Composite translucent colours through a canvas before reporting
       contrast.** `bg-plum/10` measured 1,58:1 by naive parsing and 11,01:1
       when the browser actually painted it.
+- [ ] **A worklist groups by whoever gets contacted, not by record.** One
+      person owing two things is one phone call; two rows read as two jobs.
+      *The billing list showed rent and electricity separately until it was
+      grouped by tenant, with one payment spread across both.*
+- [ ] **Two functions answering nearly the same question will disagree.**
+      *`nextDue` derived each due date from the move-in; `rentPeriods` walked a
+      month at a time from the period before, so a 31st move-in clamped to the
+      28th in February and never came back. Only one of them was wrong, which
+      is how it survived review.*
+- [ ] **A table inside an `overflow-hidden` card does not scroll — it
+      disappears.** Measure the widest column at 500px, not just the page.
+      *The electricity stage column, the one the section exists for, was cut
+      off with no way to reach it.*
 - [ ] **Detail wanted rarely, about one record, belongs on that record's page.**
       *The guardian contact sat on all 22 rows for something needed in an
       emergency about one person; it lives on the room now.*

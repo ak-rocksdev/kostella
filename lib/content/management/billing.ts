@@ -146,12 +146,14 @@ export function daysInMonthOf(month: string): number {
  */
 export function rentPeriods(tenancy: Tenancy, today: string): string[] {
   const out: string[] = []
-  let start = tenancy.movedIn
-  // Guard: a tenancy that has not begun has no periods.
-  while (daysBetween(start, today) >= 0) {
+  /* Each period is counted from the move-in, never from the period before it.
+     Walking month by month loses the day of the month permanently the first
+     time it clamps: a 31st move-in became 28 February and then stayed on the
+     28th for every month after, including the 31-day ones. */
+  for (let n = 0; n < 600; n += 1) {
+    const start = addMonths(tenancy.movedIn, n)
+    if (daysBetween(start, today) < 0) break
     out.push(start)
-    start = addMonths(start, 1)
-    if (out.length > 600) break // 50 years; a seed error would otherwise hang
   }
   return out.reverse()
 }
