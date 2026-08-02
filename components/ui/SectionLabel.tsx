@@ -9,12 +9,6 @@ import { cn } from '@/lib/cn'
  * built on hairlines; here a label is a label, set in the same sentence case as
  * everything else and separated from what follows by space alone.
  */
-export function SectionLabel({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) {
+export function SectionLabel({ children, className }: { children: ReactNode; className?: string }) {
   return <p className={cn('text-[13px] font-semibold text-ink-soft', className)}>{children}</p>
 }

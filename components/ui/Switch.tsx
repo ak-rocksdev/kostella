@@ -30,7 +30,9 @@ export function Switch({
       onClick={() => onChange(!checked)}
       className={cn(
         'inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2.5 rounded-full border px-4 py-2 text-[14px] font-medium whitespace-nowrap transition-colors duration-200',
-        checked ? 'border-ink bg-ink text-stone' : 'border-line bg-paper text-ink hover:border-ink-soft',
+        checked
+          ? 'border-ink bg-ink text-stone'
+          : 'border-line bg-paper text-ink hover:border-ink-soft',
       )}
     >
       <span
@@ -49,7 +51,10 @@ export function Switch({
       </span>
       {children}
       {count != null && (
-        <span aria-hidden className={cn('font-figure text-[13px]', checked ? 'text-stone/70' : 'text-ink-soft')}>
+        <span
+          aria-hidden
+          className={cn('font-figure text-[13px]', checked ? 'text-stone/70' : 'text-ink-soft')}
+        >
           {count}
         </span>
       )}

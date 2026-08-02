@@ -62,7 +62,10 @@ export function Segmented<T extends string | number | null>({
               {option.label}
               <span
                 aria-hidden
-                className={cn('font-figure text-[13px]', selected ? 'text-stone/70' : 'text-ink-soft')}
+                className={cn(
+                  'font-figure text-[13px]',
+                  selected ? 'text-stone/70' : 'text-ink-soft',
+                )}
               >
                 {option.count}
               </span>

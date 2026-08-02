@@ -81,7 +81,10 @@ export function Select<T extends string>({
     const width = Math.max(r.width, 240)
     setPosition({
       top: r.bottom + 8,
-      left: align === 'end' ? Math.max(8, r.right - width) : Math.min(r.left, window.innerWidth - width - 8),
+      left:
+        align === 'end'
+          ? Math.max(8, r.right - width)
+          : Math.min(r.left, window.innerWidth - width - 8),
       minWidth: width,
     })
   }, [align])
@@ -165,15 +168,16 @@ export function Select<T extends string>({
           className,
         )}
       >
-        {variant === 'pill' && (
-          <span className="whitespace-nowrap text-ink-soft">{label}</span>
-        )}
+        {variant === 'pill' && <span className="whitespace-nowrap text-ink-soft">{label}</span>}
         <span className="truncate font-semibold">{selected?.label}</span>
         <ChevronDown
           size={15}
           strokeWidth={2}
           aria-hidden
-          className={cn('shrink-0 text-ink-soft transition-transform duration-200', open && 'rotate-180')}
+          className={cn(
+            'shrink-0 text-ink-soft transition-transform duration-200',
+            open && 'rotate-180',
+          )}
         />
       </button>
 

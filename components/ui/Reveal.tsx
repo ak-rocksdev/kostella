@@ -41,7 +41,11 @@ export function Reveal({
   }, [])
 
   return (
-    <div ref={ref} style={{ '--reveal-delay': `${delay}ms` } as CSSProperties} className={className}>
+    <div
+      ref={ref}
+      style={{ '--reveal-delay': `${delay}ms` } as CSSProperties}
+      className={className}
+    >
       {children}
     </div>
   )

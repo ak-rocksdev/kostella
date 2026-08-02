@@ -154,6 +154,30 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] Nothing in the UI implies a backend, a login, or multi-user sync that
       does not exist.
 
+## Forms
+
+- [ ] **A public control is not an admin input.** The search filter's seven
+      price steps exist so every option reaches inventory; reused for setting a
+      price they could not express five of Kostella's seven room rents, so the
+      control opened showing Rp 1.200.000 for a room let at Rp 1.950.000 and
+      saving without touching it cut the price by three quarters of a million.
+- [ ] **Amounts are typed, with grouping applied as they are typed.** A
+      seven-figure number without separators cannot be checked at a glance, and
+      checking it is the reason it is being typed.
+- [ ] **A row of fields aligns by shared rows, never by `items-end`.** A column
+      carrying a hint is taller, so its label and its field both sit lower than
+      the ones beside it. `Field` and `FieldRow` do this with `subgrid`.
+- [ ] **A required reason has to still be earned.** *The room-price reason was
+      required from phase 1, when a room's rent was also the tenant's. Once a
+      tenant carried their own agreed rent with its own logged action, changing
+      the asking price affected nobody's money — and a mandatory sentence for it
+      only produced sentences typed to get past the form.* Required stays where
+      the change moves real money or removes a room from the public site.
+- [ ] **A panel that opens animates both ways.** Closing instantly reads as the
+      page jumping. Exit animation means the content must outlive the state that
+      opened it — see `Disclosure`, which also stops a form re-rendering against
+      a guard that has just become false.
+
 ## Design system
 
 - [ ] The panel uses the **same tokens and components** as the public site.

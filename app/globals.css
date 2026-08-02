@@ -311,3 +311,51 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* A form unfolding under the button that summoned it, and folding away again —
+   see components/ui/Disclosure.tsx. Clipped rather than height-animated: the
+   content's height is not known, and a guessed one is wrong the moment a field
+   wraps onto a second line. */
+@keyframes kst-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes kst-fold {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes kst-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kst-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

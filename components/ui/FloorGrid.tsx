@@ -128,10 +128,7 @@ export function FloorGrid({ floors, selectedRoom, onSelect, compact, animate }: 
   return (
     <div className="flex flex-col gap-4">
       {floors.map((floor, floorIndex) => (
-        <div
-          key={floor.label}
-          className="grid items-start gap-2 sm:grid-cols-[90px_1fr] sm:gap-5"
-        >
+        <div key={floor.label} className="grid items-start gap-2 sm:grid-cols-[90px_1fr] sm:gap-5">
           <h3 className="text-[13px] font-semibold text-ink-soft sm:pt-3">{floor.label}</h3>
           <ul className="flex flex-wrap gap-2">
             {floor.rooms.map((room, roomIndex) => (
