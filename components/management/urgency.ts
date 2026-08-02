@@ -66,7 +66,12 @@ export function urgencyOf({
       icon: TriangleAlert,
     }
   }
-  if (leaving) return { level: 'soon', chip: 'Akan keluar', icon: DoorOpen }
+  /* "Rencana", not "Akan". A tenant who has given notice can still change
+     their mind — the panel has a button for exactly that — so a label stating
+     the departure as settled says more than anyone knows.
+     Not "Kontrak akan habis" either: this kos lets monthly with no term, so
+     nothing expires. What happened is that somebody told us. */
+  if (leaving) return { level: 'soon', chip: 'Rencana keluar', icon: DoorOpen }
   if (due === null || due === undefined)
     return { level: 'soon', chip: 'Belum masuk', icon: CalendarClock }
   return {

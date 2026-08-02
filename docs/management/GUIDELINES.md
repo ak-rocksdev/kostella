@@ -18,6 +18,15 @@ Check this list before opening a pull request, and again before demoing.
       "Tagihan", "Penghuni" while its route reads `/management/billing`.
 - [ ] `admin` is not used for this panel. It is reserved for the Kostella HQ
       tier that will later manage users, tariffs and all 31 buildings.
+- [ ] **A label states what is known, not what is expected.** A tenant who has
+      given notice may still stay — the panel has a button for exactly that —
+      so "Akan keluar" claimed more than anyone knew. "Rencana keluar" for the
+      state, "Memberi tahu akan keluar 12 Agustus" for what actually happened.
+- [ ] **Do not name something the system does not model.** "Kontrak akan habis"
+      was proposed for the same chip and reads naturally, but this kos lets
+      monthly with no term: nothing expires, and the due-date column beside it
+      says rent recurs forever. A label that invents a concept sends whoever
+      inherits the app looking for a field that is not there.
 - [ ] **A label uses the operator's vocabulary, never the builder's.** Words
       like *dimodelkan*, *entitas*, *status sinkron* describe how the thing was
       made; a pengelola names what they manage. If a label needs the reader to

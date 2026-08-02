@@ -275,7 +275,7 @@ export function TenantList() {
                       {overdue
                         ? `terlewat ${daysBetween(tenancy.leavingOn!, today)} hari`
                         : leaving
-                          ? `keluar ${formatDateShort(tenancy.leavingOn!)}`
+                          ? `rencana keluar ${formatDateShort(tenancy.leavingOn!)}`
                           : incoming
                             ? `masuk ${formatDateShort(tenancy.movedIn)}`
                             : relativeDays(due!)}
@@ -327,8 +327,8 @@ function ActionRow({
       }
     : leaving
       ? {
-          what: `Akan keluar ${formatDate(tenancy.leavingOn!)}`,
-          why: `Kamar ${tenancy.room} bisa mulai ditawarkan sekarang`,
+          what: `Memberi tahu akan keluar ${formatDate(tenancy.leavingOn!)}`,
+          why: `Kamar ${tenancy.room} bisa mulai ditawarkan · rencana bisa berubah`,
           cta: 'Jadwalkan pengganti',
         }
       : {

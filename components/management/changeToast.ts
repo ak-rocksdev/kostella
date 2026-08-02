@@ -56,7 +56,7 @@ export const noticeToast = (
   name: string,
   leavingOn: string,
 ): ToastInput => ({
-  title: withRoom(building, room, `${name} akan keluar ${formatDate(leavingOn)}`),
+  title: withRoom(building, room, `${name} memberi tahu akan keluar ${formatDate(leavingOn)}`),
   // Says the thing a manager acts on, not merely that a field changed.
   detail: `Kamar masih terisi sampai dikonfirmasi · tercatat atas ${actor}`,
   icon: CalendarClock as LucideIcon,
