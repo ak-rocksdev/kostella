@@ -167,6 +167,10 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] **A row of fields aligns by shared rows, never by `items-end`.** A column
       carrying a hint is taller, so its label and its field both sit lower than
       the ones beside it. `Field` and `FieldRow` do this with `subgrid`.
+- [ ] **When a layout flaw is reported, fix every instance of the pattern.**
+      *The misalignment was reported twice, on two different forms, before it
+      was searched for — all seven had it. Auditing the pattern took less time
+      than the second report did.*
 - [ ] **A required reason has to still be earned.** *The room-price reason was
       required from phase 1, when a room's rent was also the tenant's. Once a
       tenant carried their own agreed rent with its own logged action, changing

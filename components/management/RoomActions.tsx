@@ -47,8 +47,6 @@ import { formatRupiah } from '@/lib/format'
 const field =
   'w-full rounded-badge border border-line bg-paper px-3 py-2.5 text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum'
 
-const label = 'mb-1.5 block text-[13px] font-semibold'
-
 /**
  * Why someone left. A list rather than a required sentence.
  *
@@ -263,9 +261,14 @@ export function RoomActions({ building, room }: { building: Building; room: Room
             close()
           }}
         >
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label>
-              <span className={label}>Nama penghuni</span>
+          {/* Explicit rows, because RupiahInput aligns by subgrid — dropped
+              into a plain grid it would take three implicit rows of its own and
+              sit out of step with the fields beside it. */}
+          <div
+            className="grid gap-x-3 gap-y-1 sm:grid-cols-2"
+            style={{ gridTemplateRows: 'repeat(4, auto auto auto)' }}
+          >
+            <Field label="Nama penghuni">
               <input
                 required
                 autoFocus
@@ -273,9 +276,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 onChange={(e) => setWho({ ...who, name: e.target.value })}
                 className={field}
               />
-            </label>
-            <label>
-              <span className={label}>Nomor HP</span>
+            </Field>
+            <Field label="Nomor HP">
               <input
                 required
                 value={who.phone}
@@ -283,18 +285,16 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 placeholder="0812 xxxx 3456"
                 className={field}
               />
-            </label>
-            <label>
-              <span className={label}>Nama orang tua / wali</span>
+            </Field>
+            <Field label="Nama orang tua / wali">
               <input
                 required
                 value={who.guardianName}
                 onChange={(e) => setWho({ ...who, guardianName: e.target.value })}
                 className={field}
               />
-            </label>
-            <label>
-              <span className={label}>HP orang tua / wali</span>
+            </Field>
+            <Field label="HP orang tua / wali">
               <input
                 required
                 value={who.guardianPhone}
@@ -302,9 +302,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 placeholder="0813 xxxx 5432"
                 className={field}
               />
-            </label>
-            <label>
-              <span className={label}>Pekerjaan / kampus</span>
+            </Field>
+            <Field label="Pekerjaan / kampus">
               <input
                 required
                 value={who.occupation}
@@ -312,9 +311,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 placeholder="mis. Mahasiswa Untar"
                 className={field}
               />
-            </label>
-            <label>
-              <span className={label}>Tanggal masuk</span>
+            </Field>
+            <Field label="Tanggal masuk">
               <input
                 type="date"
                 required
@@ -325,7 +323,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               <span className="mt-1.5 block text-[12px] text-ink-soft">
                 Jatuh tempo tiap bulan mengikuti tanggal ini.
               </span>
-            </label>
+            </Field>
             <RupiahInput
               label="Sewa disepakati"
               value={rent}
@@ -339,14 +337,21 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               {note}
             </p>
           )}
-          <Confirm onCancel={close} className="mt-4" />
+          <div className="mt-4 flex shrink-0 gap-2">
+            <Button size="sm" type="submit">
+              Simpan
+            </Button>
+            <Button variant="ghost" size="sm" onClick={close}>
+              Batal
+            </Button>
+          </div>
         </form>
       </Disclosure>
 
       <Disclosure open={open === 'notice' && Boolean(tenant)}>
         {tenant && (
-          <form
-            className="mt-4 flex flex-wrap items-end gap-3 rounded-card bg-canvas p-4"
+          <FieldRow
+            className="sm:grid-cols-[1fr_auto]"
             onSubmit={(e) => {
               e.preventDefault()
               apply((s) => giveNotice(s, tenant, date))
@@ -354,8 +359,10 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               close()
             }}
           >
-            <label className="flex-1 basis-52">
-              <span className={label}>Kontrak {tenant.name} habis tanggal</span>
+            <Field
+              label={`Kontrak ${tenant.name} habis tanggal`}
+              hint="Kamar tetap terisi sampai keluarnya dikonfirmasi — penghuni masih bisa memperpanjang. Sementara itu pengganti sudah boleh dijadwalkan."
+            >
               <input
                 type="date"
                 required
@@ -365,20 +372,23 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 onChange={(e) => setDate(e.target.value)}
                 className={field}
               />
-              <span className="mt-1.5 block text-[12px] text-ink-soft">
-                Kamar tetap terisi sampai keluarnya dikonfirmasi — penghuni masih bisa
-                memperpanjang. Sementara itu pengganti sudah boleh dijadwalkan.
-              </span>
-            </label>
-            <Confirm onCancel={close} />
-          </form>
+            </Field>
+            <FieldActions>
+              <Button size="sm" type="submit">
+                Simpan
+              </Button>
+              <Button variant="ghost" size="sm" onClick={close}>
+                Batal
+              </Button>
+            </FieldActions>
+          </FieldRow>
         )}
       </Disclosure>
 
       <Disclosure open={open === 'notice-cancel' && Boolean(tenant)}>
         {tenant && (
-          <form
-            className="mt-4 flex flex-wrap items-end gap-3 rounded-card bg-canvas p-4"
+          <FieldRow
+            className="sm:grid-cols-[1fr_auto]"
             onSubmit={(e) => {
               e.preventDefault()
               apply((s) => cancelNotice(s, tenant, note.trim()))
@@ -386,8 +396,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               close()
             }}
           >
-            <label className="min-w-0 flex-1 basis-60">
-              <span className={label}>Alasan lanjut</span>
+            <Field label="Alasan lanjut">
               <input
                 required
                 autoFocus
@@ -396,16 +405,23 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 placeholder="mis. kontrak kerjanya diperpanjang"
                 className={field}
               />
-            </label>
-            <Confirm onCancel={close} />
-          </form>
+            </Field>
+            <FieldActions>
+              <Button size="sm" type="submit">
+                Simpan
+              </Button>
+              <Button variant="ghost" size="sm" onClick={close}>
+                Batal
+              </Button>
+            </FieldActions>
+          </FieldRow>
         )}
       </Disclosure>
 
       <Disclosure open={open === 'move-out' && Boolean(tenant || incoming)}>
         {(tenant || incoming) && (
-          <form
-            className="mt-4 flex flex-wrap items-end gap-3 rounded-card bg-canvas p-4"
+          <FieldRow
+            className="sm:grid-cols-[10rem_12rem_1fr_auto]"
             onSubmit={(e) => {
               e.preventDefault()
               const going = tenant ?? incoming!
@@ -466,8 +482,7 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               close()
             }}
           >
-            <label className="basis-44">
-              <span className={label}>Tanggal keluar</span>
+            <Field label="Tanggal keluar">
               <input
                 type="date"
                 required
@@ -475,9 +490,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 onChange={(e) => setDate(e.target.value)}
                 className={field}
               />
-            </label>
-            <label className="basis-48">
-              <span className={label}>Alasan</span>
+            </Field>
+            <Field label="Alasan">
               <Select
                 variant="field"
                 label="Alasan keluar"
@@ -485,65 +499,67 @@ export function RoomActions({ building, room }: { building: Building; room: Room
                 onChange={setReason}
                 options={LEAVING_REASONS.map((r) => ({ value: r, label: r }))}
               />
-            </label>
-            <label className="min-w-0 flex-1 basis-52">
-              <span className={label}>Catatan {reason === 'Lainnya' ? '' : '(opsional)'}</span>
+            </Field>
+            <Field
+              label={`Catatan ${reason === 'Lainnya' ? '' : '(opsional)'}`}
+              hint="Kamar jadi kosong terhitung tanggal keluar."
+            >
               <input
                 required={reason === 'Lainnya'}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 className={field}
               />
-              <span className="mt-1.5 block text-[12px] text-ink-soft">
-                Kamar jadi kosong terhitung tanggal keluar.
-              </span>
-            </label>
+            </Field>
+            <FieldActions>
+              <Button size="sm" type="submit">
+                Simpan
+              </Button>
+              <Button variant="ghost" size="sm" onClick={close}>
+                Batal
+              </Button>
+            </FieldActions>
 
             {/* Electricity, settled here and nowhere else.
                 PLN invoices this room after the month ends, by which time the
                 tenant has gone — no deposit to hold it back from, no next rent to
                 deduct it from. The only certain moment to collect is while they
                 are still standing here. */}
+            {/* Its own row across the whole form: this is a second decision,
+                not a fourth field, and it carries the money that is lost if it
+                is skipped. */}
             {tenant && (
-              <div className="basis-full rounded-card border border-line bg-paper p-3">
-                <label className="flex flex-wrap items-end gap-3">
-                  <span className="min-w-0 flex-1 basis-56">
-                    <span className={label}>Listrik sampai tanggal keluar</span>
-                    <span className="flex items-center gap-2">
-                      <input
-                        inputMode="numeric"
-                        disabled={!chargePower}
-                        value={power}
-                        onChange={(e) => setPower(e.target.value)}
-                        placeholder={estimate ? String(estimate.amount) : 'ketik jumlahnya'}
-                        className={cn(
-                          field,
-                          'text-right font-figure',
-                          !chargePower && 'opacity-40',
-                        )}
-                      />
-                    </span>
-                    <span className="mt-1.5 block text-[12px] text-ink-soft">
-                      {estimate
-                        ? `Taksiran ${estimate.days}/${daysInMonthOf(monthOf(date || today))} × ${formatRupiah(estimate.basis.amount)} bulan lalu. Timpa kalau meteran sudah dibaca.`
-                        : 'Belum ada tagihan bulan sebelumnya untuk ditaksir — isi dari meteran.'}
-                    </span>
-                  </span>
-                  <span className="flex shrink-0 items-center gap-2 pb-2.5">
+              <div className="col-span-full mt-2 grid items-start gap-x-3 gap-y-1 rounded-card border border-line bg-paper p-3 sm:grid-cols-[16rem_auto]">
+                <RupiahInput
+                  label="Listrik sampai tanggal keluar"
+                  value={
+                    Number(String(power).replace(/\D/g, '')) ||
+                    (chargePower ? (estimate?.amount ?? 0) : 0)
+                  }
+                  onChange={(n) => setPower(String(n))}
+                  hint={
+                    estimate
+                      ? `Taksiran ${estimate.days}/${daysInMonthOf(monthOf(date || today))} × ${formatRupiah(estimate.basis.amount)} bulan lalu. Timpa kalau meteran sudah dibaca.`
+                      : 'Belum ada tagihan bulan sebelumnya untuk ditaksir — isi dari meteran.'
+                  }
+                  className={cn(!chargePower && 'opacity-40')}
+                />
+                <label className="row-span-3 grid grid-rows-subgrid content-start">
+                  <span />
+                  <span className="flex min-h-11 items-center gap-2 text-[13px]">
                     <input
                       type="checkbox"
                       checked={!chargePower}
                       onChange={(e) => setChargePower(!e.target.checked)}
                       className="size-4 accent-plum"
                     />
-                    <span className="text-[13px]">Tidak ditagihkan</span>
+                    Tidak ditagihkan
                   </span>
+                  <span />
                 </label>
               </div>
             )}
-
-            <Confirm onCancel={close} />
-          </form>
+          </FieldRow>
         )}
       </Disclosure>
 
@@ -638,8 +654,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
       </Disclosure>
 
       <Disclosure open={open === 'block'}>
-        <form
-          className="mt-4 flex flex-wrap items-end gap-3 rounded-card bg-canvas p-4"
+        <FieldRow
+          className="sm:grid-cols-[1fr_auto]"
           onSubmit={(e) => {
             e.preventDefault()
             apply((s) =>
@@ -655,8 +671,16 @@ export function RoomActions({ building, room }: { building: Building; room: Room
             close()
           }}
         >
-          <label className="min-w-0 flex-1 basis-60">
-            <span className={label}>Alasan</span>
+          {/* Required, and it earns it: blocking takes a room off the public
+              site entirely. */}
+          <Field
+            label="Alasan"
+            hint={
+              room.blocked
+                ? 'Kamar kembali tampil di halaman publik.'
+                : 'Kamar hilang dari halaman publik, tapi tetap terhitung di sini.'
+            }
+          >
             <input
               required
               autoFocus
@@ -667,14 +691,16 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               }
               className={field}
             />
-            <span className="mt-1.5 block text-[12px] text-ink-soft">
-              {room.blocked
-                ? 'Kamar kembali tampil di halaman publik.'
-                : 'Kamar hilang dari halaman publik, tapi tetap terhitung di sini.'}
-            </span>
-          </label>
-          <Confirm onCancel={close} />
-        </form>
+          </Field>
+          <FieldActions>
+            <Button size="sm" type="submit">
+              Simpan
+            </Button>
+            <Button variant="ghost" size="sm" onClick={close}>
+              Batal
+            </Button>
+          </FieldActions>
+        </FieldRow>
       </Disclosure>
 
       {incoming && tenant && (
@@ -686,19 +712,6 @@ export function RoomActions({ building, room }: { building: Building; room: Room
           </span>
         </p>
       )}
-    </div>
-  )
-}
-
-function Confirm({ onCancel, className }: { onCancel: () => void; className?: string }) {
-  return (
-    <div className={`flex shrink-0 gap-2 ${className ?? ''}`}>
-      <Button size="sm" type="submit">
-        Simpan
-      </Button>
-      <Button variant="ghost" size="sm" onClick={onCancel}>
-        Batal
-      </Button>
     </div>
   )
 }
