@@ -97,12 +97,27 @@ against, and the reason for each rule.
 
 Carried forward and re-asked as each phase makes it concrete:
 
-- Does Kostella still charge a deposit? The public site currently says the
-  first payment is one month's rent and nothing else.
-- Which building numbers are real — Beranda shows 360 and 2C, the search
-  screen and footer show 361 and 2A3.
-- Real data for the four invented buildings (358, 355, 364, 2A).
-- Real photographs. Three shipped images are Cove's product photography.
+- Does Kostella still charge a deposit? The public site says the first payment
+  is one month's rent and nothing else, and phase 3 left deposit out on that
+  basis. Phase 4 cannot start without the answer — a bill either has the row or
+  it does not.
+- Which building numbers are real. Beranda lists **2C** and **2A**; the search
+  screen lists **2A3**. Three names for what may be one or two buildings on
+  Jl. Dr. Susilo 2A, inherited from the design bundle and left visible rather
+  than resolved in one direction. *(Re-checked 2026-08-02: the 360-vs-361
+  conflict this line used to also claim no longer exists — both screens say
+  360.)*
+- Real data for the four invented buildings (358, 355, 364, 2A) — addresses,
+  rents, facilities and vacancy counts are all mine. They carry
+  `placeholder: true`; deleting those records removes them and every derived
+  figure follows.
+- **"Central Park 0,2 km"** appears on Beranda and `/detail`. The mall is about
+  1,5 km away. The figure came from the brief and is the one factual claim on
+  the public site I believe to be wrong.
+- **Real photographs.** Three of the five shipped images are Cove's product
+  photography with the watermark still legible, and they are live on
+  kostella.hyperscore.cloud. This is the one on the list that is awkward in the
+  room rather than merely unresolved.
 - What a manager actually does in a day that this panel is missing.
 - **Does Kostella raise rent on a sitting tenant, or only for the next one?**
   Phase 3 assumes the latter and stores an agreed rent per tenant, because the
