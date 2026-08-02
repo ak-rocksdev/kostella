@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, CalendarClock, CircleCheck, DoorOpen, MessageCircle } from 'lucide-react'
+import { ArrowRight, CircleCheck, MessageCircle } from 'lucide-react'
 import { Select } from '@/components/ui/Select'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { cn } from '@/lib/cn'
@@ -18,6 +18,7 @@ import {
 import { useManagement } from '@/lib/management/useManagement'
 import { daysBetween, formatDate, formatDateShort, relativeDays } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
+import { LEVEL, urgencyOf } from './urgency'
 
 const ALL = '__all__'
 
@@ -170,7 +171,10 @@ export function TenantList() {
             </thead>
             <tbody>
               {everyone.map(({ tenancy, incoming, leaving, overdue, due }) => (
-                <tr key={tenancy.id} className="border-b border-line last:border-0">
+                <tr
+                  key={tenancy.id}
+                  className={cn('border-b border-line last:border-0', overdue && 'bg-held-soft/30')}
+                >
                   <td className="px-5 py-3">
                     <span className="block text-[15px] font-semibold">{tenancy.name}</span>
                     <span className="block text-[12px] text-ink-soft">{tenancy.occupation}</span>
@@ -188,32 +192,37 @@ export function TenantList() {
                   <td className="px-5 py-3 text-right font-figure text-[14px] font-semibold whitespace-nowrap">
                     {formatRupiah(tenancy.agreedRent)}
                   </td>
-                  <td
-                    className={cn(
-                      'px-5 py-3 text-right text-[13px] whitespace-nowrap',
-                      due !== null && due <= DUE_SOON ? 'font-semibold text-ink' : 'text-ink-soft',
-                    )}
-                  >
-                    {due === null ? (
-                      '—'
-                    ) : (
-                      <>
+                  <td className="px-5 py-3 text-right text-[13px] whitespace-nowrap">
+                    {due !== null && (
+                      <span className="text-ink-soft">
                         {formatDateShort(nextDue(tenancy, today))}
-                        <span className="ml-1.5 font-normal text-ink-soft">
-                          {relativeDays(due)}
-                        </span>
-                      </>
-                    )}
-                    {leaving && (
-                      <span
-                        className={cn(
-                          'mt-0.5 block text-[12px] font-semibold',
-                          overdue ? 'text-held' : 'text-ink-soft',
-                        )}
-                      >
-                        keluar {formatDateShort(tenancy.leavingOn!)}
                       </span>
                     )}
+                    {/* The same chip the section above uses, and only where a
+                        row is genuinely near: twenty-two chips would rank
+                        nothing. A row shouting here shouts there in the same
+                        words and the same colour. */}
+                    {(() => {
+                      const overdueBy = overdue ? daysBetween(tenancy.leavingOn!, today) : undefined
+                      const near =
+                        overdue || leaving || (due !== null && due <= DUE_SOON) || incoming
+                      if (!near) return null
+                      const u = urgencyOf({
+                        overdueBy,
+                        leaving: leaving && !overdue,
+                        due: incoming ? null : due,
+                      })
+                      return (
+                        <span
+                          className={cn(
+                            'ml-2 inline-block rounded-badge px-2 py-0.5 text-[12px] font-semibold',
+                            LEVEL[u.level].chip,
+                          )}
+                        >
+                          {u.chip}
+                        </span>
+                      )
+                    })()}
                   </td>
                   <td className="py-3 pr-4 text-right">
                     <Link
@@ -246,21 +255,30 @@ export function TenantList() {
                     <span className="block font-figure text-[13px] font-semibold">
                       {formatRupiah(tenancy.agreedRent)}
                     </span>
+                    {/* The same three-step scale as the table and the section
+                        above, carried by text colour rather than a chip — a
+                        chip would cost width this row does not have. */}
                     <span
                       className={cn(
-                        'block text-[12px]',
-                        overdue
-                          ? 'font-semibold text-held'
-                          : due !== null && due <= DUE_SOON
-                            ? 'font-semibold text-ink'
-                            : 'text-ink-soft',
+                        'block text-[12px] font-semibold',
+                        LEVEL[
+                          urgencyOf({
+                            overdueBy: overdue
+                              ? daysBetween(tenancy.leavingOn!, today)
+                              : undefined,
+                            leaving: leaving && !overdue,
+                            due: incoming ? null : due,
+                          }).level
+                        ].mark,
                       )}
                     >
-                      {leaving
-                        ? `keluar ${formatDateShort(tenancy.leavingOn!)}`
-                        : incoming
-                          ? `masuk ${formatDateShort(tenancy.movedIn)}`
-                          : relativeDays(due!)}
+                      {overdue
+                        ? `terlewat ${daysBetween(tenancy.leavingOn!, today)} hari`
+                        : leaving
+                          ? `keluar ${formatDateShort(tenancy.leavingOn!)}`
+                          : incoming
+                            ? `masuk ${formatDateShort(tenancy.movedIn)}`
+                            : relativeDays(due!)}
                     </span>
                   </span>
                   <ArrowRight
@@ -296,62 +314,64 @@ function ActionRow({
   nameOf: (n: string) => string
 }) {
   const { tenancy, leaving, overdue, due } = row
+  const overdueBy = overdue ? daysBetween(tenancy.leavingOn!, today) : undefined
+  const u = urgencyOf({ overdueBy, leaving: leaving && !overdue, due })
+  const tone = LEVEL[u.level]
+  const Icon = u.icon
 
   const job = overdue
     ? {
-        icon: DoorOpen,
-        tone: 'attention' as const,
         what: `Seharusnya keluar ${formatDate(tenancy.leavingOn!)}`,
         why: 'Kamar masih terhitung terisi sampai dikonfirmasi',
         cta: 'Konfirmasi keluar',
       }
     : leaving
       ? {
-          icon: DoorOpen,
-          tone: 'muted' as const,
           what: `Akan keluar ${formatDate(tenancy.leavingOn!)}`,
           why: `Kamar ${tenancy.room} bisa mulai ditawarkan sekarang`,
           cta: 'Jadwalkan pengganti',
         }
       : {
-          icon: CalendarClock,
-          tone: 'muted' as const,
-          what: `Jatuh tempo ${formatDate(nextDue(tenancy, today))} · ${relativeDays(due!)}`,
+          what: `Jatuh tempo ${formatDate(nextDue(tenancy, today))}`,
           why: `${formatRupiah(tenancy.agreedRent)} — ingatkan lewat WhatsApp`,
           cta: 'Buka kamar',
         }
-
-  const Icon = job.icon
 
   return (
     <li
       className={cn(
         'flex flex-wrap items-center gap-x-4 gap-y-3 rounded-card bg-paper p-4 shadow-card sm:p-5',
-        overdue && 'ring-1 ring-held/50',
+        tone.ring,
       )}
     >
       <span
         aria-hidden
         className={cn(
           'inline-flex size-9 shrink-0 items-center justify-center rounded-full',
-          job.tone === 'attention' ? 'bg-held-soft text-held' : 'bg-stone text-ink-soft',
+          tone.icon,
         )}
       >
         <Icon size={16} strokeWidth={1.9} />
       </span>
 
       <span className="min-w-0 flex-1 basis-60">
-        <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="text-[16px] font-semibold">{tenancy.name}</span>
+          {/* The word rides with the colour, so the level survives being read
+              in greyscale or by somebody who cannot separate the two. */}
+          <span
+            className={cn(
+              'rounded-badge px-2 py-0.5 text-[12px] font-semibold whitespace-nowrap',
+              tone.chip,
+            )}
+          >
+            {u.chip}
+          </span>
           <span className="text-[13px] text-ink-soft">
             {nameOf(tenancy.building)} · kamar {tenancy.room}
           </span>
         </span>
-        <span
-          className={cn('mt-1 block text-[14px] font-semibold', overdue ? 'text-held' : 'text-ink')}
-        >
-          {job.what}
-        </span>
+        <span className={cn('mt-1.5 block text-[14px] font-semibold', tone.mark)}>{job.what}</span>
         <span className="mt-0.5 flex flex-wrap items-center gap-x-3 text-[13px] text-ink-soft">
           {job.why}
           <span
@@ -366,7 +386,14 @@ function ActionRow({
 
       <Link
         href={`/management/buildings/${tenancy.building}`}
-        className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-line px-4 text-[13px] font-semibold text-plum transition-colors hover:border-plum hover:bg-stone"
+        className={cn(
+          'inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition-colors',
+          // Only the row that is already wrong gets a filled button. Four filled
+          // buttons in a column would rank nothing.
+          u.level === 'late'
+            ? 'bg-held text-white hover:bg-held/90'
+            : 'border border-line text-plum hover:border-plum hover:bg-stone',
+        )}
       >
         {job.cta}
         <ArrowRight size={14} strokeWidth={1.9} aria-hidden />

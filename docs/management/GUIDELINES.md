@@ -228,6 +228,22 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] **A repeated control is not an affordance.** The same words on every row —
       "Buka kamar" ×22 — say nothing about why to go there. Name the job, or
       remove it.
+- [ ] **Seed the loudest state, or the design cannot be judged.** A tone that
+      never occurs in the demo data renders every row identical.
+      *The tenant list shipped with two tones and seeded data in which the
+      urgent one never fired: 0 of 4 rows. It looked flat because it was — the
+      same failure as an insight that never fires, one screen later.*
+- [ ] **Urgency is a scale, not a flag.** "Besok" and "3 hari lagi" reading
+      alike means the reader still has to do the sorting. Three steps is
+      usually enough: already wrong, today, later.
+- [ ] **Colour follows urgency, not category.** A departure and a payment at the
+      same distance should look alike, because to the person working the list
+      they are the same amount of "not yet".
+- [ ] **One filled button per list, at most.** Four filled buttons in a column
+      rank nothing.
+- [ ] **Composite translucent colours through a canvas before reporting
+      contrast.** `bg-plum/10` measured 1,58:1 by naive parsing and 11,01:1
+      when the browser actually painted it.
 - [ ] **Detail wanted rarely, about one record, belongs on that record's page.**
       *The guardian contact sat on all 22 rows for something needed in an
       emergency about one person; it lives on the room now.*

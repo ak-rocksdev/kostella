@@ -306,6 +306,12 @@ const SEED: Seed[] = [
     dueIn: 7,
     monthsHere: 11,
     agreedRent: 1_550_000,
+    /* Said he would leave two days ago and nobody has confirmed it. The room
+       still counts as occupied — which is the point — and the panel has to say
+       so loudly. Seeded because a state that never appears cannot be judged,
+       and this one is the whole argument for recording notice at all. */
+    leavingIn: -2,
+    note: 'Pindah kerja ke Surabaya',
   },
   {
     id: 't7',
