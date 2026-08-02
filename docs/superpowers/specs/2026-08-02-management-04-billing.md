@@ -114,50 +114,79 @@ against. See *Frozen once paid*.
 
 ## The records
 
+Three stored types. Rent is not among them — it derives.
+
 ```ts
-/** A charge somebody added to a period. Rent is never one of these. */
-export type BillLine = {
+/** What PLN charged one room's meter for one calendar month, and whether
+ *  Kostella has paid it. This is a payable: money leaving. */
+export type PlnBill = {
+  /** `362/212/2026-08` — one per room per month, so it cannot be duplicated. */
   id: string
-  /** Which tenancy and which period, so history follows the person. */
-  tenancy: string
-  /** The period's first day, as derived. Identifies the period. */
-  period: string
-  kind: 'listrik' | 'tamu' | 'denda' | 'lainnya'
+  building: string
+  room: string
+  /** `2026-08`. */
+  month: string
   amount: number
-  /** Required for `lainnya`. An unlabelled charge is the hidden fee the public
+  /** When Kostella paid PLN. Absent means Kostella still owes it. */
+  paidOn?: string
+}
+
+/** Anything charged to a tenant that is not their rent. A receivable. */
+export type Charge = {
+  id: string
+  /** The tenancy, never the room — history follows the person. */
+  tenancy: string
+  kind: 'listrik' | 'tamu' | 'denda' | 'lainnya'
+  /** `2026-08` for electricity; the period start for the rest. */
+  period: string
+  amount: number
+  dueOn: string
+  /**
+   * Which days this covers, when it is not the whole month.
+   *
+   * Only set where somebody left mid-month, which is the one case a room-month
+   * carries two charges. Ordinary months leave it empty and never show a split.
+   */
+  days?: { from: number; to: number }
+  /** True where the amount was estimated at handover, before PLN invoiced. */
+  estimated?: boolean
+  /** Required for `lainnya`: an unlabelled charge is the hidden fee the public
    *  site says does not exist. */
   note?: string
 }
 
 export type Payment = {
   id: string
-  tenancy: string
-  period: string
-  /** ISO date received — not when it was recorded. */
+  /** The charge settled. Rent charges have derived ids — see `rentChargeId`. */
+  charge: string
+  /** ISO date received, not when it was typed in. */
   paidOn: string
   amount: number
   method: 'transfer' | 'tunai'
   note?: string
   /**
-   * What the period totalled when this payment was accepted.
+   * What the charge totalled when this payment was accepted.
    *
-   * Frozen deliberately. Rent is derived from the tenancy's agreed rent, so
-   * raising it would otherwise rewrite every past bill and turn settled months
-   * into arrears. See `Frozen once paid`.
+   * Frozen deliberately, and only rent needs it: rent derives from the
+   * tenancy\'s agreed rent, so raising it would otherwise rewrite every past
+   * bill. See below.
    */
   totalThen: number
 }
 ```
 
+Rent charges are derived and carry a deterministic id, `sewa:<tenancy>:<period>`,
+so a payment can point at one without it being stored.
+
 ### Frozen once paid
 
-A period with no payment recomputes freely — that is the point of deriving it.
-A period with a payment keeps the total it had when the payment was taken.
+A charge with no payment recomputes freely — that is the point of deriving it.
+A charge with a payment keeps the total it had when the payment was taken.
 
 Without this, `Ubah sewa penghuni` — an action phase 3 already ships — silently
-turns two years of settled months into a shortfall. That is not a hypothetical:
-three seeded tenants pay below their room's current asking price precisely
-because rents have moved.
+turns two years of settled months into a shortfall. Not hypothetical: three
+seeded tenants pay below their room\'s current asking price precisely because
+rents have moved.
 
 ### Status, derived
 

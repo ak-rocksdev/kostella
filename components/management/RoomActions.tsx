@@ -26,6 +26,7 @@ import { budgetSteps } from '@/lib/content/beranda'
 import type { Building, RoomState } from '@/lib/content/management/buildings'
 import { canStart, hasNotice } from '@/lib/content/management/tenancies'
 import {
+  addCharge,
   cancelNotice,
   endTenancy,
   giveNotice,
@@ -36,7 +37,9 @@ import {
   startTenancy,
 } from '@/lib/management/store'
 import { useManagement } from '@/lib/management/useManagement'
-import { addDays, formatDate } from '@/lib/dates'
+import { addDays, formatDate, parseDate } from '@/lib/dates'
+import { cn } from '@/lib/cn'
+import { daysInMonthOf, estimatePower, monthOf } from '@/lib/content/management/billing'
 import { formatRupiah } from '@/lib/format'
 
 const field =
@@ -78,7 +81,7 @@ const LEAVING_REASONS = [
  * and a scroll lock to be correct, and buys nothing here.
  */
 export function RoomActions({ building, room }: { building: Building; room: RoomState }) {
-  const { apply, actor, tenancies, today } = useManagement()
+  const { apply, actor, tenancies, billing, today } = useManagement()
   const { show } = useToast()
   const ctx = { building: building.number, actor }
 
@@ -88,6 +91,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
   const [date, setDate] = useState('')
   const [rent, setRentValue] = useState(room.rent)
   const [reason, setReason] = useState(LEAVING_REASONS[0])
+  const [power, setPower] = useState('')
+  const [chargePower, setChargePower] = useState(true)
   const [who, setWho] = useState({
     name: '',
     phone: '',
@@ -105,6 +110,8 @@ export function RoomActions({ building, room }: { building: Building; room: Room
     setNote('')
     setDate('')
     setReason(LEAVING_REASONS[0])
+    setPower('')
+    setChargePower(true)
     setRentValue(room.rent)
     setWho({ name: '', phone: '', guardianName: '', guardianPhone: '', occupation: '' })
   }
@@ -124,6 +131,9 @@ export function RoomActions({ building, room }: { building: Building; room: Room
   }
 
   const startCheck = canStart(tenancies, building.number, room.room, addDays(today, 1), today)
+  const estimate = tenant
+    ? estimatePower(building.number, room.room, date || today, billing.bills)
+    : null
 
   return (
     <div className="mt-5 border-t border-line pt-5">
@@ -446,6 +456,46 @@ export function RoomActions({ building, room }: { building: Building; room: Room
               Kamar jadi kosong terhitung tanggal keluar.
             </span>
           </label>
+
+          {/* Electricity, settled here and nowhere else.
+              PLN invoices this room after the month ends, by which time the
+              tenant has gone — no deposit to hold it back from, no next rent to
+              deduct it from. The only certain moment to collect is while they
+              are still standing here. */}
+          {tenant && (
+            <div className="basis-full rounded-card border border-line bg-paper p-3">
+              <label className="flex flex-wrap items-end gap-3">
+                <span className="min-w-0 flex-1 basis-56">
+                  <span className={label}>Listrik sampai tanggal keluar</span>
+                  <span className="flex items-center gap-2">
+                    <input
+                      inputMode="numeric"
+                      disabled={!chargePower}
+                      value={power}
+                      onChange={(e) => setPower(e.target.value)}
+                      placeholder={estimate ? String(estimate.amount) : 'ketik jumlahnya'}
+                      className={cn(field, 'text-right font-figure', !chargePower && 'opacity-40')}
+                    />
+                  </span>
+                  <span className="mt-1.5 block text-[12px] text-ink-soft">
+                    {estimate
+                      ? `Taksiran ${estimate.days}/${daysInMonthOf(monthOf(date || today))} × ${formatRupiah(estimate.basis.amount)} bulan lalu. Timpa kalau meteran sudah dibaca.`
+                      : 'Belum ada tagihan bulan sebelumnya untuk ditaksir — isi dari meteran.'}
+                  </span>
+                </span>
+                <span className="flex shrink-0 items-center gap-2 pb-2.5">
+                  <input
+                    type="checkbox"
+                    checked={!chargePower}
+                    onChange={(e) => setChargePower(!e.target.checked)}
+                    className="size-4 accent-plum"
+                  />
+                  <span className="text-[13px]">Tidak ditagihkan</span>
+                </span>
+              </label>
+            </div>
+          )}
+
           <Confirm onCancel={close} />
         </form>
       )}

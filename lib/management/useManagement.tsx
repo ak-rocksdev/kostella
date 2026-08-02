@@ -35,11 +35,16 @@ export function useManagement() {
   const buildings = useMemo(() => store.merge(stored, today), [stored, today])
   const surveys = useMemo(() => store.mergeSurveys(stored), [stored])
   const tenancies = useMemo(() => store.mergeTenancies(stored, today), [stored, today])
+  const billing = useMemo(
+    () => store.mergeBilling(stored, tenancies, today),
+    [stored, tenancies, today],
+  )
 
   return {
     buildings,
     surveys,
     tenancies,
+    billing,
     today,
     log: stored.log,
     actor: stored.actor,

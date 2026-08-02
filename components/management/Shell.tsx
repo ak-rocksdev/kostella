@@ -15,6 +15,7 @@ const NAV = [
   { href: '/management', label: 'Hari ini', exact: true },
   { href: '/management/buildings', label: 'Gedung' },
   { href: '/management/tenants', label: 'Penghuni' },
+  { href: '/management/billing', label: 'Tagihan' },
   { href: '/management/activity', label: 'Aktivitas' },
 ]
 

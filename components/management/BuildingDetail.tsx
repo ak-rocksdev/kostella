@@ -19,6 +19,7 @@ import { BuildingSwitcher } from './BuildingSwitcher'
 import { FacilitiesPanel } from './FacilitiesPanel'
 import { PhotoPanel } from './PhotoPanel'
 import { RoomActions } from './RoomActions'
+import { TenantLedger } from './TenantLedger'
 import type { Tenancy } from '@/lib/content/management/tenancies'
 import { MetricNote } from './MetricNote'
 import { RoomHistory } from './RoomHistory'
@@ -209,6 +210,7 @@ export function BuildingDetail({ number }: { number: string }) {
                 )}
               </div>
               <RoomActions building={building} room={room} />
+              {room.tenant && <TenantLedger tenant={room.tenant} />}
               <RoomHistory building={building.number} room={room.room} />
             </>
           ) : (

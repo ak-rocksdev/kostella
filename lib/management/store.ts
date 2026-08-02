@@ -20,8 +20,19 @@ import {
   type RoomState,
   type TenancyId,
 } from '@/lib/content/management/buildings'
-import { surveys as SEED_SURVEYS, type Survey, type SurveyStatus } from '@/lib/content/management/surveys'
+import {
+  surveys as SEED_SURVEYS,
+  type Survey,
+  type SurveyStatus,
+} from '@/lib/content/management/surveys'
 import { seedTenancies, type Tenancy } from '@/lib/content/management/tenancies'
+import {
+  plnBillId,
+  seedBilling,
+  type Charge,
+  type Payment,
+  type PlnBill,
+} from '@/lib/content/management/billing'
 
 /**
  * One key, one version. A stored blob whose version does not match is
@@ -32,8 +43,8 @@ import { seedTenancies, type Tenancy } from '@/lib/content/management/tenancies'
  * predictable and recoverable, which is the right trade here and the wrong one
  * once this stops being a prototype.
  */
-const KEY = 'kostella.management.v2'
-const VERSION = 2
+const KEY = 'kostella.management.v3'
+const VERSION = 3
 
 export type AuditAction =
   | 'rent'
@@ -51,6 +62,11 @@ export type AuditAction =
   | 'tenancy-notice-cancel'
   | 'tenancy-end'
   | 'tenancy-rent'
+  | 'pln-record'
+  | 'pln-paid'
+  | 'charge-add'
+  | 'charge-remove'
+  | 'payment-add'
 
 export type AuditEntry = {
   id: string
@@ -92,6 +108,12 @@ type Stored = {
   tenancies: Record<string, TenancyOverride>
   /** Tenants recorded in this browser. Seeded ones are never copied here. */
   added: Tenancy[]
+  /** Money. Rent is derived and never appears here — only what somebody added. */
+  pln: Record<string, PlnBill>
+  charges: Charge[]
+  payments: Payment[]
+  /** Charge ids removed from the seed, so a deletion survives a reload. */
+  removedCharges: string[]
   log: AuditEntry[]
 }
 
@@ -122,6 +144,10 @@ const empty = (): Stored => ({
   surveys: {},
   tenancies: {},
   added: [],
+  pln: {},
+  charges: [],
+  payments: [],
+  removedCharges: [],
   log: [],
 })
 
@@ -624,3 +650,122 @@ export function setTenancy(
 
 export type { Stored }
 export { write }
+
+/* ── Money ────────────────────────────────────────────────────────────────
+   Rent never appears here: it derives from the tenancy, and only what somebody
+   added is stored. See `lib/content/management/billing.ts`. */
+
+/** Seeded bills and payments with anything recorded here applied on top. */
+export function mergeBilling(stored: Stored, tenancies: Tenancy[], today: string | null) {
+  const seed = seedBilling(tenancies, today ?? REFERENCE_DAY)
+  const removed = new Set(stored.removedCharges)
+
+  return {
+    bills: [...seed.bills.filter((b) => !stored.pln[b.id]), ...Object.values(stored.pln)],
+    charges: [...seed.charges.filter((c) => !removed.has(c.id)), ...stored.charges],
+    payments: [...seed.payments, ...stored.payments],
+  }
+}
+
+let moneyCounter = 0
+const moneyId = (p: string) => `${p}-${(moneyCounter += 1)}`
+
+/** What PLN invoiced for one room's meter. Kostella owes it from here. */
+export function recordPln(
+  stored: Stored,
+  building: string,
+  room: string,
+  month: string,
+  amount: number,
+): Stored {
+  const id = plnBillId(building, room, month)
+  const next: Stored = {
+    ...stored,
+    pln: { ...stored.pln, [id]: { ...stored.pln[id], id, building, room, month, amount } },
+  }
+  return log(next, {
+    building,
+    room,
+    action: 'pln-record',
+    from: month,
+    to: String(amount),
+  })
+}
+
+/** Kostella has paid PLN. The payable side closes; the tenant's side does not. */
+export function markPlnPaid(stored: Stored, bill: PlnBill, paidOn: string): Stored {
+  const next: Stored = {
+    ...stored,
+    pln: { ...stored.pln, [bill.id]: { ...bill, paidOn } },
+  }
+  return log(next, {
+    building: bill.building,
+    room: bill.room,
+    action: 'pln-paid',
+    from: bill.month,
+    to: paidOn,
+  })
+}
+
+export function addCharge(
+  stored: Stored,
+  charge: Omit<Charge, 'id'>,
+  where: { building: string; room: string; label: string },
+): Stored {
+  const next: Stored = {
+    ...stored,
+    charges: [...stored.charges, { ...charge, id: moneyId('chg') }],
+  }
+  return log(next, {
+    building: where.building,
+    room: where.room,
+    action: 'charge-add',
+    from: where.label,
+    to: String(charge.amount),
+    note: charge.note,
+    effectiveFrom: charge.dueOn,
+  })
+}
+
+export function removeCharge(
+  stored: Stored,
+  charge: Charge,
+  where: { building: string; room: string; label: string },
+  note: string,
+): Stored {
+  const next: Stored = {
+    ...stored,
+    charges: stored.charges.filter((c) => c.id !== charge.id),
+    removedCharges: [...stored.removedCharges, charge.id],
+  }
+  return log(next, {
+    building: where.building,
+    room: where.room,
+    action: 'charge-remove',
+    from: where.label,
+    to: String(charge.amount),
+    note,
+  })
+}
+
+/** Money in. `totalThen` freezes what was owed, so a later rent change cannot
+ *  turn a settled month into arrears. */
+export function addPayment(
+  stored: Stored,
+  payment: Omit<Payment, 'id'>,
+  where: { building: string; room: string; label: string },
+): Stored {
+  const next: Stored = {
+    ...stored,
+    payments: [...stored.payments, { ...payment, id: moneyId('pay') }],
+  }
+  return log(next, {
+    building: where.building,
+    room: where.room,
+    action: 'payment-add',
+    from: where.label,
+    to: String(payment.amount),
+    note: payment.note,
+    effectiveFrom: payment.paidOn,
+  })
+}
