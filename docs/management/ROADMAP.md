@@ -112,15 +112,23 @@ Three things follow, and they are why phase 3 came first:
 - **Not every charge is monthly.** A guest night is an event. The model needs
   charges that attach to a period without being *of* it.
 
-Open, and needed before the spec:
+**Electricity is a typed amount, answered 2026-08-02.** PLN invoices Kostella
+per building and a manager enters what the tenant owes — no meter numbers, no
+split rule, no PLN record. Their words: *"hanya harga bayarnya saja yang di
+input, biar ga terlalu kompleks."*
 
-- **Does Kostella read an electricity meter per room?** "Sesuai pemakaian"
-  implies a reading, a rate and a period — a record type of its own, and real
-  work for a manager every month. Many kos instead sell tokens or charge a flat
-  amount. Which it is decides whether phase 4 has one record type or three.
-- **Deposit.** Still open, but smaller than stated on 2026-08-02: it is one
-  line item and one refund path, not the architecture. The spec can be written
-  with it excluded and named.
+That settles the question of whether phase 4 needs one record type or three: one.
+Electricity is a line on a bill with an amount somebody typed.
+
+A proposal to store the building's PLN invoice — so the panel could show what
+common areas cost Kostella each month — was made and withdrawn. It is real
+money and currently invisible, but it is analysis, and this is a prototype for
+a pitch. Worth raising again at phase 5 if reports are ever built.
+
+Still open:
+
+- **Deposit.** One line item and one refund path, not the architecture. The
+  spec is written with it excluded and named.
 
 ## Open with the client
 
