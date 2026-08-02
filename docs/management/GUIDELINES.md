@@ -213,6 +213,25 @@ Check this list before opening a pull request, and again before demoing.
       measured before it is written.
 - [ ] Each phase ships with its own verification notes in the spec.
 
+## Screens that list things
+
+- [ ] **Ask what proportion of the rows demand anything today.** If most demand
+      nothing, the screen is a register pretending to be a worklist.
+      *The tenant list rendered 22 identical cards of which 18 asked nothing —
+      82%. The strip announced "3 jatuh tempo, 1 akan keluar" and then made a
+      manager hunt the list to find which four.*
+- [ ] **One screen, two jobs, two treatments.** "What must I do today" wants a
+      short list with the job named on each row. "Where is Rina" wants a table
+      with aligned columns. Giving both the same uniform cards serves neither.
+- [ ] **A worklist has to be able to empty.** If it looks identical tomorrow
+      there is no finishing it, and it stops being read.
+- [ ] **A repeated control is not an affordance.** The same words on every row —
+      "Buka kamar" ×22 — say nothing about why to go there. Name the job, or
+      remove it.
+- [ ] **Detail wanted rarely, about one record, belongs on that record's page.**
+      *The guardian contact sat on all 22 rows for something needed in an
+      emergency about one person; it lives on the room now.*
+
 ## Scope
 
 - [ ] One phase per spec. A phase is shippable on its own and leaves the site

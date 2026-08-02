@@ -2,15 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {
-  ArrowRight,
-  CalendarClock,
-  ChevronRight,
-  DoorOpen,
-  MessageCircle,
-  UserRound,
-} from 'lucide-react'
+import { ArrowRight, CalendarClock, CircleCheck, DoorOpen, MessageCircle } from 'lucide-react'
 import { Select } from '@/components/ui/Select'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { cn } from '@/lib/cn'
 import { buildingName } from '@/lib/content/management/buildings'
 import {
@@ -27,18 +21,40 @@ import { formatRupiah } from '@/lib/format'
 
 const ALL = '__all__'
 
+/** How near a due date has to be before it is today's problem. */
+const DUE_SOON = 3
+
+type Row = {
+  tenancy: Tenancy
+  incoming: boolean
+  /** Announced a departure and still here. */
+  leaving: boolean
+  /** The leaving date has arrived and nobody has confirmed it. */
+  overdue: boolean
+  /** Days until rent is due. Null for someone who has not moved in. */
+  due: number | null
+}
+
 /**
- * Everyone currently in a room, and everyone about to be.
+ * Who is in which room.
  *
- * **Sorted by next due date, nearest first.** That ordering is the reason to
- * open this in the morning; by name or by room it would be a filing cabinet.
- * Two things jump the queue, in this order: a leaving date that has arrived and
- * needs confirming, then someone whose rent is due within days. Both are work
- * that stops if nobody does it today.
+ * This screen answers two different questions and used to answer both the same
+ * way: twenty-two identical cards, of which eighteen asked nothing of anybody.
+ * The strip announced "3 jatuh tempo, 1 akan keluar" and then made a manager
+ * hunt the whole list to find which four.
  *
- * Past tenants are deliberately absent. `RoomHistory` already shows a room's
- * audit entries, and every action here writes one, so a room's history lives
- * where somebody would look for it rather than in a second list.
+ * Split by the job:
+ *
+ * - **Perlu tindakan hari ini** — the handful that need something, with the
+ *   thing named. It empties as the work gets done, which is the only way this
+ *   screen can ever say "finished".
+ * - **Semua penghuni** — a table. For "where is Rina", aligned columns let the
+ *   eye run down one axis; the prose rows this replaced ran four kinds of data
+ *   together in a sentence.
+ *
+ * The guardian contact moved to the room page. It sat on all twenty-two rows
+ * for something wanted perhaps twice a year, in an emergency, about one person
+ * — and a room is where you look one person up.
  */
 export function TenantList() {
   const { buildings, tenancies, today } = useManagement()
@@ -46,25 +62,38 @@ export function TenantList() {
 
   if (!today) return <div className="wrap-wide py-8 sm:py-10" />
 
-  const inScope = (t: Tenancy) => scope === ALL || t.building === scope
-  const rows = tenancies
-    .filter((t) => (isCurrent(t, today) || isIncoming(t, today)) && inScope(t))
+  const rows: Row[] = tenancies
+    .filter(
+      (t) =>
+        (isCurrent(t, today) || isIncoming(t, today)) && (scope === ALL || t.building === scope),
+    )
     .map((tenancy) => {
       const incoming = isIncoming(tenancy, today)
       const leaving = hasNotice(tenancy, today)
-      const overdue = leaving && daysBetween(tenancy.leavingOn!, today) >= 0
-      const due = incoming ? null : daysUntilDue(tenancy, today)
-      return { tenancy, incoming, leaving, overdue, due }
+      return {
+        tenancy,
+        incoming,
+        leaving,
+        overdue: leaving && daysBetween(tenancy.leavingOn!, today) >= 0,
+        due: incoming ? null : daysUntilDue(tenancy, today),
+      }
     })
-    .sort((a, b) => rank(a) - rank(b))
+
+  const needsAction = rows
+    .filter((r) => r.overdue || r.leaving || (r.due !== null && r.due <= DUE_SOON))
+    .sort((a, b) => weight(a) - weight(b))
+
+  const everyone = [...rows].sort(
+    (a, b) => (a.due ?? 9999) - (b.due ?? 9999) || a.tenancy.name.localeCompare(b.tenancy.name),
+  )
+
+  const living = rows.filter((r) => !r.incoming).length
+  const arriving = rows.filter((r) => r.incoming).length
 
   const nameOf = (number: string) => {
     const b = buildings.find((x) => x.number === number)
     return b ? buildingName(b, buildings) : `Kostella ${number}`
   }
-
-  const leavingSoon = rows.filter((r) => r.leaving).length
-  const dueSoon = rows.filter((r) => r.due !== null && r.due <= 3).length
 
   return (
     <div className="wrap-wide py-8 sm:py-10">
@@ -72,7 +101,8 @@ export function TenantList() {
         <div>
           <h1 className="text-[28px] leading-[1.2] font-semibold tracking-[-0.02em]">Penghuni</h1>
           <p className="mt-2 text-[15px] text-ink-soft">
-            Urut dari jatuh tempo terdekat. Yang akan keluar naik ke atas.
+            {living} orang menempati kamar
+            {arriving > 0 && `, ${arriving} lagi akan masuk`}.
           </p>
         </div>
 
@@ -92,164 +122,258 @@ export function TenantList() {
         />
       </div>
 
-      <dl className="mt-6 grid grid-cols-2 overflow-hidden rounded-card bg-paper shadow-card sm:grid-cols-3">
-        {[
-          {
-            label: 'Penghuni',
-            value: rows.filter((r) => !r.incoming).length,
-            detail: 'sedang menempati',
-          },
-          {
-            label: 'Jatuh tempo ≤ 3 hari',
-            value: dueSoon,
-            detail: dueSoon ? 'perlu diingatkan' : 'tidak ada yang mendesak',
-          },
-          {
-            label: 'Akan keluar',
-            value: leavingSoon,
-            detail: leavingSoon ? 'kamar bisa mulai ditawarkan' : 'belum ada pemberitahuan',
-          },
-        ].map((item, i) => (
-          <div
-            key={item.label}
-            className={cn(
-              'grid grid-rows-subgrid row-span-3 content-start px-5 py-4',
-              i % 2 === 1 && 'border-l border-line',
-              i >= 2 && 'border-t border-line',
-              'sm:border-t-0',
-              i > 0 && 'sm:border-l sm:border-line',
-            )}
-          >
-            <dt className="text-[13px] text-ink-soft">{item.label}</dt>
-            <dd className="mt-1 font-figure text-[26px] leading-none font-bold tracking-[-0.02em]">
-              {item.value}
-            </dd>
-            <dd className="mt-1.5 text-[12px] leading-[1.4] text-ink-soft">{item.detail}</dd>
-          </div>
-        ))}
-      </dl>
+      {/* ── The work ─────────────────────────────────────────────────────── */}
+      <section className="mt-8">
+        <SectionLabel className="mb-4">Perlu tindakan hari ini</SectionLabel>
 
-      {rows.length === 0 ? (
-        <p className="mt-8 rounded-card border border-dashed border-line px-5 py-10 text-center text-[14px] text-ink-soft">
-          Belum ada penghuni tercatat di lingkup ini. Catat lewat kisi kamar di halaman gedung.
-        </p>
-      ) : (
-        <ul className="mt-6 flex flex-col gap-2.5">
-          {rows.map(({ tenancy, incoming, leaving, overdue, due }) => (
-            <li
-              key={tenancy.id}
-              className={cn(
-                'rounded-card bg-paper p-4 shadow-card sm:p-5',
-                overdue && 'ring-1 ring-held/50',
-              )}
-            >
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="inline-flex items-center gap-2 text-[16px] font-semibold">
-                  <UserRound size={16} strokeWidth={1.9} aria-hidden className="text-ink-soft" />
-                  {tenancy.name}
-                </span>
-                <span className="text-[13px] text-ink-soft">
-                  {nameOf(tenancy.building)} · kamar {tenancy.room}
-                </span>
-                <span className="text-[13px] text-ink-soft">{tenancy.occupation}</span>
+        {needsAction.length === 0 ? (
+          // Says the check ran, and gives the day a finish line.
+          <p className="flex items-center gap-3 rounded-card border border-dashed border-line px-5 py-8 text-[14px] text-ink-soft">
+            <CircleCheck
+              size={18}
+              strokeWidth={1.9}
+              aria-hidden
+              className="shrink-0 text-available"
+            />
+            Tidak ada yang jatuh tempo dalam {DUE_SOON} hari, dan tidak ada yang menunggu
+            dikonfirmasi keluar.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2.5">
+            {needsAction.map((row) => (
+              <ActionRow key={row.tenancy.id} row={row} today={today} nameOf={nameOf} />
+            ))}
+          </ul>
+        )}
+      </section>
 
-                {/* One target per card, at the size a thumb needs.
-                    The building and room used to be the link, and measured 20px
-                    tall at 390px — a control below the 44px floor these
-                    guidelines set, dressed as running text. Plain text now
-                    says where the tenant is; this says where to go. */}
-                <Link
-                  href={`/management/buildings/${tenancy.building}`}
-                  className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-plum transition-colors hover:bg-stone hover:text-ink"
-                >
-                  Buka kamar
-                  <ArrowRight size={14} strokeWidth={1.9} aria-hidden />
-                </Link>
-              </div>
+      {/* ── The register ─────────────────────────────────────────────────── */}
+      <section className="mt-10">
+        <SectionLabel className="mb-4">Semua penghuni</SectionLabel>
 
-              <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13px] text-ink-soft">
-                <span>
-                  {incoming ? 'Masuk' : 'Sejak'} {formatDate(tenancy.movedIn)}
-                </span>
-                <span className="font-figure font-semibold text-ink">
-                  {formatRupiah(tenancy.agreedRent)}
-                  <span className="font-body font-normal text-ink-soft">/bulan</span>
-                </span>
-
-                {due !== null && (
-                  <span
+        <div className="overflow-hidden rounded-card bg-paper shadow-card">
+          {/* A table from lg up, where columns have room to line up. Below that
+              a stacked row: a data table on a phone needs a deliberate
+              small-screen form, not a horizontal scrollbar. */}
+          <table className="hidden w-full border-collapse text-left lg:table">
+            <thead>
+              <tr className="border-b border-line text-[12px] text-ink-soft">
+                <th className="px-5 py-3 font-medium">Penghuni</th>
+                <th className="px-5 py-3 font-medium">Gedung · kamar</th>
+                <th className="px-5 py-3 font-medium">Sejak</th>
+                <th className="px-5 py-3 text-right font-medium">Sewa / bulan</th>
+                <th className="px-5 py-3 text-right font-medium">Jatuh tempo</th>
+                <th className="px-5 py-3">
+                  <span className="sr-only">Buka kamar</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {everyone.map(({ tenancy, incoming, leaving, overdue, due }) => (
+                <tr key={tenancy.id} className="border-b border-line last:border-0">
+                  <td className="px-5 py-3">
+                    <span className="block text-[15px] font-semibold">{tenancy.name}</span>
+                    <span className="block text-[12px] text-ink-soft">{tenancy.occupation}</span>
+                  </td>
+                  <td className="px-5 py-3 text-[13px] text-ink-soft">
+                    {nameOf(tenancy.building)} · {tenancy.room}
+                  </td>
+                  <td className="px-5 py-3 text-[13px] text-ink-soft">
+                    {incoming
+                      ? `masuk ${formatDateShort(tenancy.movedIn)}`
+                      : formatDate(tenancy.movedIn)}
+                  </td>
+                  {/* Ranged right so a column of figures reads straight down —
+                      the reason a table beats the prose rows it replaced. */}
+                  <td className="px-5 py-3 text-right font-figure text-[14px] font-semibold whitespace-nowrap">
+                    {formatRupiah(tenancy.agreedRent)}
+                  </td>
+                  <td
                     className={cn(
-                      'inline-flex items-center gap-1.5',
-                      due <= 3 && 'font-semibold text-ink',
+                      'px-5 py-3 text-right text-[13px] whitespace-nowrap',
+                      due !== null && due <= DUE_SOON ? 'font-semibold text-ink' : 'text-ink-soft',
                     )}
                   >
-                    <CalendarClock size={14} strokeWidth={1.9} aria-hidden />
-                    Jatuh tempo {formatDateShort(nextDue(tenancy, today))} · {relativeDays(due)}
+                    {due === null ? (
+                      '—'
+                    ) : (
+                      <>
+                        {formatDateShort(nextDue(tenancy, today))}
+                        <span className="ml-1.5 font-normal text-ink-soft">
+                          {relativeDays(due)}
+                        </span>
+                      </>
+                    )}
+                    {leaving && (
+                      <span
+                        className={cn(
+                          'mt-0.5 block text-[12px] font-semibold',
+                          overdue ? 'text-held' : 'text-ink-soft',
+                        )}
+                      >
+                        keluar {formatDateShort(tenancy.leavingOn!)}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3 pr-4 text-right">
+                    <Link
+                      href={`/management/buildings/${tenancy.building}`}
+                      aria-label={`Buka kamar ${tenancy.room} — ${tenancy.name}`}
+                      className="inline-flex size-11 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-stone hover:text-ink"
+                    >
+                      <ArrowRight size={16} strokeWidth={1.9} aria-hidden />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <ul className="lg:hidden">
+            {everyone.map(({ tenancy, incoming, leaving, overdue, due }) => (
+              <li key={tenancy.id} className="border-b border-line last:border-0">
+                <Link
+                  href={`/management/buildings/${tenancy.building}`}
+                  className="flex min-h-11 items-center gap-3 px-4 py-3 transition-colors hover:bg-canvas"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[15px] font-semibold">{tenancy.name}</span>
+                    <span className="block truncate text-[12px] text-ink-soft">
+                      {nameOf(tenancy.building)} · {tenancy.room} · {tenancy.occupation}
+                    </span>
                   </span>
-                )}
-
-                {/* WhatsApp, not a call. It is how a kos manager reaches a
-                    tenant here, so the verb has to match. The number is masked
-                    in a public repository, which the title says outright rather
-                    than letting a dead link look broken. */}
-                <span
-                  title="Nomor disamarkan di prototipe ini"
-                  className="inline-flex items-center gap-1.5"
-                >
-                  <MessageCircle size={14} strokeWidth={1.9} aria-hidden />
-                  {tenancy.phone}
-                </span>
-              </div>
-
-              {leaving && (
-                <p
-                  className={cn(
-                    'mt-2.5 flex items-center gap-2 rounded-badge px-3 py-2 text-[13px]',
-                    overdue ? 'bg-held-soft font-semibold text-held' : 'bg-stone text-ink',
-                  )}
-                >
-                  <DoorOpen size={15} strokeWidth={1.9} aria-hidden className="shrink-0" />
-                  {overdue
-                    ? `Seharusnya keluar ${formatDate(tenancy.leavingOn!)} — konfirmasi agar kamar jadi kosong`
-                    : `Akan keluar ${formatDate(tenancy.leavingOn!)} · kamar bisa mulai ditawarkan`}
-                </p>
-              )}
-
-              {/* Guardian sits behind a disclosure rather than in the row:
-                  wanted in an emergency, not while scanning nineteen names.
-                  The marker is there so it reads as something to open — the
-                  first version was bare text that looked like a stray label. */}
-              <details className="group mt-1 text-[13px]">
-                <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 text-ink-soft hover:text-ink [&::-webkit-details-marker]:hidden">
-                  <ChevronRight
-                    size={14}
-                    strokeWidth={2}
+                  <span className="shrink-0 text-right">
+                    <span className="block font-figure text-[13px] font-semibold">
+                      {formatRupiah(tenancy.agreedRent)}
+                    </span>
+                    <span
+                      className={cn(
+                        'block text-[12px]',
+                        overdue
+                          ? 'font-semibold text-held'
+                          : due !== null && due <= DUE_SOON
+                            ? 'font-semibold text-ink'
+                            : 'text-ink-soft',
+                      )}
+                    >
+                      {leaving
+                        ? `keluar ${formatDateShort(tenancy.leavingOn!)}`
+                        : incoming
+                          ? `masuk ${formatDateShort(tenancy.movedIn)}`
+                          : relativeDays(due!)}
+                    </span>
+                  </span>
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={1.9}
                     aria-hidden
-                    className="transition-[rotate] duration-200 group-open:rotate-90"
+                    className="shrink-0 text-ink-soft"
                   />
-                  Kontak orang tua / wali
-                </summary>
-                <p className="pb-1 pl-5 text-ink-soft">
-                  {tenancy.guardianName} · {tenancy.guardianPhone}
-                </p>
-              </details>
-            </li>
-          ))}
-        </ul>
-      )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
     </div>
   )
 }
 
-/** Overdue departures, then notices, then by how soon rent is due. */
-function rank(row: {
-  incoming: boolean
-  leaving: boolean
-  overdue: boolean
-  due: number | null
-}): number {
-  if (row.overdue) return -2000
-  if (row.leaving) return -1000
-  if (row.incoming) return 1000
-  return row.due ?? 0
+/**
+ * One thing to do, with the thing named.
+ *
+ * The label states the job — konfirmasi keluar, jadwalkan pengganti — rather
+ * than "Buka kamar", which was the same three words on all twenty-two rows and
+ * said nothing about why a manager was being sent there.
+ */
+function ActionRow({
+  row,
+  today,
+  nameOf,
+}: {
+  row: Row
+  today: string
+  nameOf: (n: string) => string
+}) {
+  const { tenancy, leaving, overdue, due } = row
+
+  const job = overdue
+    ? {
+        icon: DoorOpen,
+        tone: 'attention' as const,
+        what: `Seharusnya keluar ${formatDate(tenancy.leavingOn!)}`,
+        why: 'Kamar masih terhitung terisi sampai dikonfirmasi',
+        cta: 'Konfirmasi keluar',
+      }
+    : leaving
+      ? {
+          icon: DoorOpen,
+          tone: 'muted' as const,
+          what: `Akan keluar ${formatDate(tenancy.leavingOn!)}`,
+          why: `Kamar ${tenancy.room} bisa mulai ditawarkan sekarang`,
+          cta: 'Jadwalkan pengganti',
+        }
+      : {
+          icon: CalendarClock,
+          tone: 'muted' as const,
+          what: `Jatuh tempo ${formatDate(nextDue(tenancy, today))} · ${relativeDays(due!)}`,
+          why: `${formatRupiah(tenancy.agreedRent)} — ingatkan lewat WhatsApp`,
+          cta: 'Buka kamar',
+        }
+
+  const Icon = job.icon
+
+  return (
+    <li
+      className={cn(
+        'flex flex-wrap items-center gap-x-4 gap-y-3 rounded-card bg-paper p-4 shadow-card sm:p-5',
+        overdue && 'ring-1 ring-held/50',
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          'inline-flex size-9 shrink-0 items-center justify-center rounded-full',
+          job.tone === 'attention' ? 'bg-held-soft text-held' : 'bg-stone text-ink-soft',
+        )}
+      >
+        <Icon size={16} strokeWidth={1.9} />
+      </span>
+
+      <span className="min-w-0 flex-1 basis-60">
+        <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+          <span className="text-[16px] font-semibold">{tenancy.name}</span>
+          <span className="text-[13px] text-ink-soft">
+            {nameOf(tenancy.building)} · kamar {tenancy.room}
+          </span>
+        </span>
+        <span
+          className={cn('mt-1 block text-[14px] font-semibold', overdue ? 'text-held' : 'text-ink')}
+        >
+          {job.what}
+        </span>
+        <span className="mt-0.5 flex flex-wrap items-center gap-x-3 text-[13px] text-ink-soft">
+          {job.why}
+          <span
+            className="inline-flex items-center gap-1.5"
+            title="Nomor disamarkan di prototipe ini"
+          >
+            <MessageCircle size={13} strokeWidth={1.9} aria-hidden />
+            {tenancy.phone}
+          </span>
+        </span>
+      </span>
+
+      <Link
+        href={`/management/buildings/${tenancy.building}`}
+        className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-line px-4 text-[13px] font-semibold text-plum transition-colors hover:border-plum hover:bg-stone"
+      >
+        {job.cta}
+        <ArrowRight size={14} strokeWidth={1.9} aria-hidden />
+      </Link>
+    </li>
+  )
 }
+
+/** Overdue departures first, then announced ones, then by how soon rent falls. */
+const weight = (r: Row) => (r.overdue ? -2000 : r.leaving ? -1000 : (r.due ?? 0))

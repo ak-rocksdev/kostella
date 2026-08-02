@@ -8,6 +8,7 @@ import {
   Layers,
   TrendingUp,
   UserRound,
+  Users,
   UsersRound,
   Wrench,
 } from 'lucide-react'
@@ -322,6 +323,13 @@ function TenantLine({ tenant, incoming }: { tenant: Tenancy; incoming?: boolean 
       {tenant.leavingOn && (
         <span className="font-semibold text-held">keluar {formatDate(tenant.leavingOn)}</span>
       )}
+      {/* The guardian lives here rather than on the tenant list. It is wanted in
+          an emergency, about one person — and a room is where one person gets
+          looked up. On the list it repeated on all twenty-two rows. */}
+      <span className="inline-flex items-center gap-1.5">
+        <Users size={13} strokeWidth={1.9} aria-hidden className="shrink-0" />
+        {tenant.guardianName} · {tenant.guardianPhone}
+      </span>
     </p>
   )
 }
