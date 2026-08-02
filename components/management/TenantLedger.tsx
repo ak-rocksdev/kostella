@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/lib/cn'
+import { StatusChip } from '@/components/ui/StatusChip'
 import {
   monthLabel,
   rentCharge,
@@ -13,11 +13,12 @@ import { useManagement } from '@/lib/management/useManagement'
 import { formatDate, formatDateShort } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
 
-const TONE = {
-  terlambat: 'bg-held-soft text-held',
-  kurang: 'bg-held-soft text-held',
-  belum: 'bg-plum/10 text-plum',
-  lunas: 'bg-available/10 text-available',
+/** Charge status onto the panel's three-step scale plus done. */
+const STATUS_TONE = {
+  terlambat: 'late',
+  kurang: 'late',
+  belum: 'now',
+  lunas: 'done',
 } as const
 
 const LABEL = {
@@ -75,14 +76,7 @@ export function TenantLedger({ tenant }: { tenant: Tenancy }) {
           >
             <span className="min-w-40 font-medium">{periodLabel(r.charge)}</span>
             <span className="font-figure font-semibold">{formatRupiah(r.total)}</span>
-            <span
-              className={cn(
-                'rounded-badge px-2 py-0.5 text-[12px] font-semibold whitespace-nowrap',
-                TONE[r.status],
-              )}
-            >
-              {LABEL[r.status]}
-            </span>
+            <StatusChip tone={STATUS_TONE[r.status]}>{LABEL[r.status]}</StatusChip>
             {r.payments.length > 0 && (
               <span className="text-ink-soft">
                 dibayar {formatDate(r.payments[0].paidOn)} · {r.payments[0].method}

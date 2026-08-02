@@ -1,5 +1,8 @@
 import { CalendarClock, DoorOpen, TriangleAlert, type LucideIcon } from 'lucide-react'
 import { relativeDays } from '@/lib/dates'
+import type { Tone } from '@/components/ui/StatusChip'
+
+export type { Tone }
 
 /**
  * How loud a row is allowed to be.

@@ -19,15 +19,16 @@ import { addCharge, markPlnPaid, recordPln } from '@/lib/management/store'
 import { useManagement } from '@/lib/management/useManagement'
 import { addDays, addMonths, formatDateShort } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
+import { StatusChip, type Tone } from '@/components/ui/StatusChip'
 
-/** Where each stage sits on the panel's urgency scale. */
-const STAGE_TONE: Record<PowerStage, string> = {
-  'belum-dicatat': 'bg-stone text-ink-soft',
-  'utang-pln': 'bg-held-soft text-held',
-  'tanpa-penghuni': 'bg-stone text-ink-soft',
-  'belum-ditagih': 'bg-held-soft text-held',
-  'menunggu-bayar': 'bg-plum/10 text-plum',
-  selesai: 'bg-available/10 text-available',
+/** Where each stage sits on the panel's scale. */
+const STAGE_TONE: Record<PowerStage, Tone> = {
+  'belum-dicatat': 'soon',
+  'utang-pln': 'late',
+  'tanpa-penghuni': 'soon',
+  'belum-ditagih': 'late',
+  'menunggu-bayar': 'now',
+  selesai: 'done',
 }
 
 /**
@@ -236,14 +237,9 @@ export function PowerMonthTable({ buildings }: { buildings: Building[] }) {
                           {power.charges.length ? formatRupiah(power.chargedTotal) : '—'}
                         </td>
                         <td className="px-5 py-2.5">
-                          <span
-                            className={cn(
-                              'inline-block rounded-badge px-2 py-0.5 text-[12px] font-semibold',
-                              STAGE_TONE[power.stage],
-                            )}
-                          >
+                          <StatusChip tone={STAGE_TONE[power.stage]}>
                             {POWER_STAGE_LABEL[power.stage]}
-                          </span>
+                          </StatusChip>
                         </td>
                       </tr>
                     )
@@ -281,15 +277,9 @@ export function PowerMonthTable({ buildings }: { buildings: Building[] }) {
                           className="min-h-11 w-28 rounded-badge border border-line bg-canvas px-2.5 text-right font-figure text-[14px] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plum"
                         />
                       )}
-                      <span
-                        className={cn(
-                          'basis-full rounded-badge px-2 py-0.5 text-[12px] font-semibold',
-                          'inline-block w-fit',
-                          STAGE_TONE[power.stage],
-                        )}
-                      >
+                      <StatusChip tone={STAGE_TONE[power.stage]} className="basis-full">
                         {POWER_STAGE_LABEL[power.stage]}
-                      </span>
+                      </StatusChip>
                     </li>
                   )
                 })}

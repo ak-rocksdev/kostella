@@ -217,6 +217,13 @@ Check this list before opening a pull request, and again before demoing.
 
 ## Verification
 
+- [ ] **Verify the effect, not the appearance.** A form that renders is not a
+      form that works.
+      *The move-out electricity field was checked by confirming it appeared.
+      It collected the amount and threw it away — the call that stored it had
+      been lost to a failed edit, and only an unused-import warning caught it.*
+- [ ] An "unused import" warning after an edit means a call went missing, not
+      that the import is surplus. Find the call before deleting the import.
 - [ ] Behaviour is checked **in the browser**, not inferred from the build log.
       *The search filters looked finished and filtered nothing; the deploy
       script's own health check would have rolled back every good deploy.*

@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { ArrowRight, CircleCheck } from 'lucide-react'
-import { Select } from '@/components/ui/Select'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { cn } from '@/lib/cn'
-import { buildingName, portfolio } from '@/lib/content/management/buildings'
+import { portfolio } from '@/lib/content/management/buildings'
 import { surveysToday } from '@/lib/content/management/surveys'
+import { ALL_BUILDINGS, ScopeSelect } from './ScopeSelect'
 import { useManagement } from '@/lib/management/useManagement'
 import { useToday } from '@/lib/management/today'
 import { parseDate } from '@/lib/dates'
@@ -17,8 +17,6 @@ import { PortfolioBar } from './PortfolioBar'
 import { SurveyList } from './SurveyList'
 
 const jt = (n: number) => `Rp ${(n / 1_000_000).toFixed(1).replace('.', ',')} jt`
-
-const ALL = '__all__'
 
 /**
  * What needs a manager today.
@@ -37,13 +35,15 @@ const ALL = '__all__'
 export function Dashboard() {
   const { buildings, surveys, log } = useManagement()
   const today = useToday()
-  const [scope, setScope] = useState<string>(ALL)
+  const [scope, setScope] = useState<string>(ALL_BUILDINGS)
 
-  const inScope = scope === ALL ? buildings : buildings.filter((b) => b.number === scope)
+  const inScope = scope === ALL_BUILDINGS ? buildings : buildings.filter((b) => b.number === scope)
   const totals = portfolio(inScope)
-  const surveysDueToday = surveysToday(surveys).filter((s) => scope === ALL || s.building === scope)
+  const surveysDueToday = surveysToday(surveys).filter(
+    (s) => scope === ALL_BUILDINGS || s.building === scope,
+  )
   const attention = attentionItems(inScope, today)
-  const recent = log.filter((e) => scope === ALL || e.building === scope).slice(0, 5)
+  const recent = log.filter((e) => scope === ALL_BUILDINGS || e.building === scope).slice(0, 5)
 
   /* Empty until the browser reports a date. The build cannot know which day
      this will be read on, and pretending otherwise is what made the panel throw
@@ -68,20 +68,7 @@ export function Dashboard() {
           <p className="mt-2 min-h-6 text-[15px] text-ink-soft">{dated}</p>
         </div>
 
-        <Select
-          label="Lingkup"
-          align="end"
-          value={scope}
-          onChange={setScope}
-          options={[
-            { value: ALL, label: 'Semua gedung', detail: `${buildings.length} gedung` },
-            ...buildings.map((b) => ({
-              value: b.number,
-              label: buildingName(b, buildings),
-              detail: b.district,
-            })),
-          ]}
-        />
+        <ScopeSelect buildings={buildings} value={scope} onChange={setScope} />
       </div>
 
       <div className="mt-6">

@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, CircleCheck, MessageCircle } from 'lucide-react'
-import { Select } from '@/components/ui/Select'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { cn } from '@/lib/cn'
 import { buildingName } from '@/lib/content/management/buildings'
@@ -15,12 +14,12 @@ import {
   nextDue,
   type Tenancy,
 } from '@/lib/content/management/tenancies'
+import { ALL_BUILDINGS, ScopeSelect } from './ScopeSelect'
 import { useManagement } from '@/lib/management/useManagement'
 import { daysBetween, formatDate, formatDateShort, relativeDays } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
-import { LEVEL, urgencyOf } from './urgency'
-
-const ALL = '__all__'
+import { urgencyOf } from './urgency'
+import { RING_LATE, StatusChip, TEXT_TONE, TONE_BG } from '@/components/ui/StatusChip'
 
 /** How near a due date has to be before it is today's problem. */
 const DUE_SOON = 3
@@ -59,14 +58,15 @@ type Row = {
  */
 export function TenantList() {
   const { buildings, tenancies, today } = useManagement()
-  const [scope, setScope] = useState<string>(ALL)
+  const [scope, setScope] = useState<string>(ALL_BUILDINGS)
 
   if (!today) return <div className="wrap-wide py-8 sm:py-10" />
 
   const rows: Row[] = tenancies
     .filter(
       (t) =>
-        (isCurrent(t, today) || isIncoming(t, today)) && (scope === ALL || t.building === scope),
+        (isCurrent(t, today) || isIncoming(t, today)) &&
+        (scope === ALL_BUILDINGS || t.building === scope),
     )
     .map((tenancy) => {
       const incoming = isIncoming(tenancy, today)
@@ -107,20 +107,7 @@ export function TenantList() {
           </p>
         </div>
 
-        <Select
-          label="Lingkup"
-          align="end"
-          value={scope}
-          onChange={setScope}
-          options={[
-            { value: ALL, label: 'Semua gedung', detail: `${buildings.length} gedung` },
-            ...buildings.map((b) => ({
-              value: b.number,
-              label: buildingName(b, buildings),
-              detail: b.district,
-            })),
-          ]}
-        />
+        <ScopeSelect buildings={buildings} value={scope} onChange={setScope} />
       </div>
 
       {/* ── The work ─────────────────────────────────────────────────────── */}
@@ -213,14 +200,9 @@ export function TenantList() {
                         due: incoming ? null : due,
                       })
                       return (
-                        <span
-                          className={cn(
-                            'ml-2 inline-block rounded-badge px-2 py-0.5 text-[12px] font-semibold',
-                            LEVEL[u.level].chip,
-                          )}
-                        >
+                        <StatusChip tone={u.level} className="ml-2">
                           {u.chip}
-                        </span>
+                        </StatusChip>
                       )
                     })()}
                   </td>
@@ -261,13 +243,13 @@ export function TenantList() {
                     <span
                       className={cn(
                         'block text-[12px] font-semibold',
-                        LEVEL[
+                        TEXT_TONE[
                           urgencyOf({
                             overdueBy: overdue ? daysBetween(tenancy.leavingOn!, today) : undefined,
                             leaving: leaving && !overdue,
                             due: incoming ? null : due,
                           }).level
-                        ].mark,
+                        ],
                       )}
                     >
                       {overdue
@@ -314,7 +296,6 @@ function ActionRow({
   const { tenancy, leaving, overdue, due } = row
   const overdueBy = overdue ? daysBetween(tenancy.leavingOn!, today) : undefined
   const u = urgencyOf({ overdueBy, leaving: leaving && !overdue, due })
-  const tone = LEVEL[u.level]
   const Icon = u.icon
 
   const job = overdue
@@ -339,14 +320,14 @@ function ActionRow({
     <li
       className={cn(
         'flex flex-wrap items-center gap-x-4 gap-y-3 rounded-card bg-paper p-4 shadow-card sm:p-5',
-        tone.ring,
+        u.level === 'late' && RING_LATE,
       )}
     >
       <span
         aria-hidden
         className={cn(
           'inline-flex size-9 shrink-0 items-center justify-center rounded-full',
-          tone.icon,
+          TONE_BG[u.level],
         )}
       >
         <Icon size={16} strokeWidth={1.9} />
@@ -357,19 +338,14 @@ function ActionRow({
           <span className="text-[16px] font-semibold">{tenancy.name}</span>
           {/* The word rides with the colour, so the level survives being read
               in greyscale or by somebody who cannot separate the two. */}
-          <span
-            className={cn(
-              'rounded-badge px-2 py-0.5 text-[12px] font-semibold whitespace-nowrap',
-              tone.chip,
-            )}
-          >
-            {u.chip}
-          </span>
+          <StatusChip tone={u.level}>{u.chip}</StatusChip>
           <span className="text-[13px] text-ink-soft">
             {nameOf(tenancy.building)} · kamar {tenancy.room}
           </span>
         </span>
-        <span className={cn('mt-1.5 block text-[14px] font-semibold', tone.mark)}>{job.what}</span>
+        <span className={cn('mt-1.5 block text-[14px] font-semibold', TEXT_TONE[u.level])}>
+          {job.what}
+        </span>
         <span className="mt-0.5 flex flex-wrap items-center gap-x-3 text-[13px] text-ink-soft">
           {job.why}
           <span

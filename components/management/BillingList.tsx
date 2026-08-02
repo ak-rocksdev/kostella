@@ -7,7 +7,6 @@ import { Select } from '@/components/ui/Select'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { useToast } from '@/components/ui/Toast'
 import { cn } from '@/lib/cn'
-import { buildingName } from '@/lib/content/management/buildings'
 import {
   CHARGE_LABEL,
   monthLabel,
@@ -20,18 +19,11 @@ import {
 import { isCurrent, type Tenancy } from '@/lib/content/management/tenancies'
 import { addPayment } from '@/lib/management/store'
 import { useManagement } from '@/lib/management/useManagement'
-import { formatDate, formatDateShort, relativeDays } from '@/lib/dates'
+import { formatDateShort, relativeDays } from '@/lib/dates'
 import { formatRupiah } from '@/lib/format'
 import { PowerMonthTable } from './PowerMonthTable'
-
-const ALL = '__all__'
-
-const STATUS_TONE = {
-  terlambat: 'bg-held-soft text-held',
-  kurang: 'bg-held-soft text-held',
-  belum: 'bg-plum/10 text-plum',
-  lunas: 'bg-available/10 text-available',
-} as const
+import { StatusChip } from '@/components/ui/StatusChip'
+import { ALL_BUILDINGS, ScopeSelect, buildingNamer } from './ScopeSelect'
 
 /**
  * What money is outstanding, and where it is stuck.
@@ -46,11 +38,11 @@ const STATUS_TONE = {
  */
 export function BillingList() {
   const { buildings, tenancies, billing, apply, actor, today } = useManagement()
-  const [scope, setScope] = useState<string>(ALL)
+  const [scope, setScope] = useState<string>(ALL_BUILDINGS)
 
   if (!today) return <div className="wrap-wide py-8 sm:py-10" />
 
-  const inScope = buildings.filter((b) => scope === ALL || b.number === scope)
+  const inScope = buildings.filter((b) => scope === ALL_BUILDINGS || b.number === scope)
   const scopedNumbers = new Set(inScope.map((b) => b.number))
   const living = tenancies.filter((t) => isCurrent(t, today) && scopedNumbers.has(t.building))
 
@@ -92,10 +84,7 @@ export function BillingList() {
     .filter((b) => !b.paidOn && scopedNumbers.has(b.building))
     .reduce((n, b) => n + b.amount, 0)
 
-  const nameOf = (number: string) => {
-    const b = buildings.find((x) => x.number === number)
-    return b ? buildingName(b, buildings) : `Kostella ${number}`
-  }
+  const nameOf = buildingNamer(buildings)
 
   return (
     <div className="wrap-wide py-8 sm:py-10">
@@ -122,20 +111,7 @@ export function BillingList() {
           </p>
         </div>
 
-        <Select
-          label="Lingkup"
-          align="end"
-          value={scope}
-          onChange={setScope}
-          options={[
-            { value: ALL, label: 'Semua gedung', detail: `${buildings.length} gedung` },
-            ...buildings.map((b) => ({
-              value: b.number,
-              label: buildingName(b, buildings),
-              detail: b.district,
-            })),
-          ]}
-        />
+        <ScopeSelect buildings={buildings} value={scope} onChange={setScope} />
       </div>
 
       <section className="mt-8">
@@ -247,14 +223,9 @@ function OutstandingRow({
         <div className="min-w-0 flex-1 basis-60">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="text-[16px] font-semibold">{tenancy.name}</span>
-            <span
-              className={cn(
-                'rounded-badge px-2 py-0.5 text-[12px] font-semibold whitespace-nowrap',
-                late ? 'bg-held-soft text-held' : 'bg-plum/10 text-plum',
-              )}
-            >
+            <StatusChip tone={late ? 'late' : 'now'}>
               {late ? `Terlambat ${worst} hari` : relativeDays(-worst)}
-            </span>
+            </StatusChip>
             <span className="text-[13px] text-ink-soft">
               {where} · kamar {tenancy.room}
             </span>

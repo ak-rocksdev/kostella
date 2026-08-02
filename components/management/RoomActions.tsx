@@ -412,14 +412,54 @@ export function RoomActions({ building, room }: { building: Building; room: Room
             e.preventDefault()
             const going = tenant ?? incoming!
             const why = reason === 'Lainnya' ? note.trim() : reason
-            apply((s) =>
-              endTenancy(
+            const owed = Number(String(power || estimate?.amount || 0).replace(/\D/g, ''))
+
+            apply((s) => {
+              let next = endTenancy(
                 s,
                 going,
                 date,
                 why + (note.trim() && reason !== 'Lainnya' ? ` — ${note.trim()}` : ''),
-              ),
-            )
+              )
+              if (!tenant) return next
+
+              /* Electricity is settled here or not at all: PLN invoices this
+                 room after the month ends, by which time this person has gone
+                 and there is nothing left to deduct it from. */
+              if (chargePower && owed > 0) {
+                next = addCharge(
+                  next,
+                  {
+                    tenancy: going.id,
+                    kind: 'listrik',
+                    period: monthOf(date),
+                    amount: owed,
+                    dueOn: date,
+                    days: { from: 1, to: parseDate(date).getDate() },
+                    // Untouched means the pro-rata figure stood, which is a
+                    // guess and says so on the record.
+                    estimated: !power,
+                  },
+                  { building: building.number, room: room.room, label: 'Listrik sampai keluar' },
+                )
+              } else if (!chargePower) {
+                // Declining is a choice somebody will be asked about later, so
+                // it is logged rather than simply absent.
+                next = addCharge(
+                  next,
+                  {
+                    tenancy: going.id,
+                    kind: 'listrik',
+                    period: monthOf(date),
+                    amount: 0,
+                    dueOn: date,
+                    note: 'Tidak ditagihkan saat keluar',
+                  },
+                  { building: building.number, room: room.room, label: 'Listrik tidak ditagihkan' },
+                )
+              }
+              return next
+            })
             show(moveOutToast(ctx, room.room, going.name, date))
             close()
           }}
