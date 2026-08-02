@@ -6,9 +6,10 @@
  * closes the loop between the two sides. The public button does not write here
  * yet; see the phase 2 spec for why that is named rather than assumed.
  *
- * EVERY RECORD BELOW IS INVENTED. Names are obviously fictional and numbers are
- * masked, because this repository is public and the bundle's own mockup carries
- * a full phone number verbatim. Kostella's real process — whether a viewing is
+ * EVERY RECORD BELOW IS INVENTED, and this repository is public. The names are
+ * Indonesia's stock example names, which read as people without being
+ * mistakable for real prospects; numbers stay masked. The bundle's own mockup
+ * carries a full phone number verbatim, which is what this avoids. Kostella's real process — whether a viewing is
  * confirmed by phone, whether a no-show is tracked — is unknown, and the four
  * states here are my guess at it.
  */
@@ -61,7 +62,7 @@ export const surveys: Survey[] = [
     room: '211',
     dayOffset: 0,
     hour: 10,
-    name: 'Calon penyewa A',
+    name: 'Maya Kartika',
     phone: '0812 xxxx 7890',
     status: 'baru',
     note: 'Menanyakan kamar lantai 2',
@@ -72,7 +73,7 @@ export const surveys: Survey[] = [
     dayOffset: 0,
     hour: 13,
     minute: 30,
-    name: 'Orang tua calon penyewa B',
+    name: 'Bu Herawati — orang tua calon penyewa',
     phone: '0813 xxxx 5432',
     status: 'dikonfirmasi',
     note: 'Datang bersama anak',
@@ -83,7 +84,7 @@ export const surveys: Survey[] = [
     room: '102',
     dayOffset: 0,
     hour: 16,
-    name: 'Calon penyewa C',
+    name: 'Rangga Aditya',
     phone: '0857 xxxx 3344',
     status: 'baru',
   },
@@ -92,7 +93,7 @@ export const surveys: Survey[] = [
     building: '360',
     dayOffset: 0,
     hour: 9,
-    name: 'Calon penyewa D',
+    name: 'Intan Puspita',
     phone: '0811 xxxx 2210',
     status: 'selesai',
     note: 'Sudah lihat, menimbang dulu',
@@ -103,7 +104,7 @@ export const surveys: Survey[] = [
     building: '2A3',
     dayOffset: 2,
     hour: 11,
-    name: 'Calon penyewa E',
+    name: 'Bayu Nugraha',
     phone: '0878 xxxx 9001',
     status: 'dikonfirmasi',
   },

@@ -75,8 +75,18 @@ Check this list before opening a pull request, and again before demoing.
 
 ## Personal data
 
-- [ ] Tenant and prospect names are **obviously fictional**. Phone numbers are
-      masked (`0812 xxxx 3456`).
+- [ ] Tenant and prospect names are **Indonesia's stock example names** — Budi,
+      Siti, Dewi, Bambang, the ones that fill every form sample. Phone numbers
+      are masked (`0812 xxxx 3456`).
+      *This repository is public and Kostella is a real company at a real
+      address, so a name must not be mistakable for one of their tenants. A
+      stock example name is read as "contoh" the way an English reader takes
+      John Doe, while still reading as a person.*
+- [ ] **Not letters.** The rule was "obviously fictional" and produced
+      "Penghuni A" through "Penghuni V", which is safe and looks like an
+      unfinished wireframe — the wrong trade for the screen a client is shown.
+      A convincingly real invented name is the opposite mistake: "Amelia
+      Wijaya" beside a room number at a real Grogol address reads as a leak.
       *This repository is public. The bundle's dashboard mockup contains
       "Nadia Putri — 0812 3456 7890" verbatim.*
 - [ ] Real tenant data never enters the repository, gitignored or not.
