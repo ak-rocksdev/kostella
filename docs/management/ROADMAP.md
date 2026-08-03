@@ -56,8 +56,8 @@ Buildings and rooms come first because every other record points at a room.
 | 2 ✅ | **Dashboard** — today's surveys, what needs attention, portfolio occupancy | `/management` | `2026-08-01-management-02-dashboard.md` |
 | 3 ✅ | **Tenants** — who is in which room, since when, what they agreed to pay, the monthly due date derived from their move-in, and notice of departure | `/management/tenants` | `2026-08-01-management-03-tenants.md` |
 | 4 ✅ | **Billing** — bills and payments **kept against the tenancy, not the room**, so a room changing hands never merges two people's financial histories. Rent, electricity per usage, guest nights, penalties; paid / unpaid / short-paid with the reason. Phase 3 gives the due date; this gives whether it was met | `/management/billing` | `2026-08-02-management-04-billing.md` |
-| 5 | **Reports** — monthly income, occupancy, arrears for the manager | `/management/reports` | not written yet |
-| 6 | **Owner view** — its own shell, its own navigation; aggregates and trends, no individuals | `/owner` | not written yet |
+| 5 | **Reports** — written after phase 6, so it can be shaped by what an owner actually asked for rather than guessed. Original text: — monthly income, occupancy, arrears for the manager | `/management/reports` | not written yet |
+| 6 | **Owner view** — its own shell, its own navigation; aggregates and trends, no individuals | `/owner` | `2026-08-03-management-06-owner.md` |
 
 A later phase's spec is written when the phase before it has shipped, so it can
 be written against code that exists rather than code that was imagined.
