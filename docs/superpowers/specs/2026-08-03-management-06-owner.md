@@ -119,6 +119,29 @@ Out of scope:
 6. Contrast measured on any new tone; targets at a real 390px viewport; no
    console errors with the clock weeks ahead.
 
+### Results, 2026-08-03
+
+All six pass.
+
+The check that mattered — no identity reaching the page — is automated rather
+than eyeballed, and run against the rendered DOM rather than the props: all 22
+seeded names, five guardians, five occupations, and the masked-phone pattern,
+searched in both `innerText` and `outerHTML`. None present, and none after
+switching buildings.
+
+| Check | Result |
+|---|---|
+| No tenant name, guardian, occupation or phone in the DOM | none, before and after switching |
+| Links to `/management` from the owner shell | **zero links on the page at all** |
+| Figures match the manager's screens | 5/8 · 63% · Rp 9.150.000 · Rp 14.550.000 · Rp 3.545.000, identical both paths |
+| Trend from real records | six months of actual payments, 13,4 → 27,2 jt |
+| Contrast, targets, overflow | nothing under AA, nothing under 44px, no overflow |
+| Console, clock +61 days | no errors; the date renders as the shifted day |
+
+The zero-links result is worth stating plainly: the owner shell has no
+navigation because there is nowhere else for an owner to go, so the "no route
+to `/management`" check passes by construction rather than by filtering.
+
 ## Invented in this phase
 
 - **That an owner sees arrears at all.** Defensible either way — it is their
