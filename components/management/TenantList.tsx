@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, CircleCheck, MessageCircle } from 'lucide-react'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { ActionBanner } from './ActionBanner'
 import { cn } from '@/lib/cn'
 import { buildingName } from '@/lib/content/management/buildings'
 import {
@@ -88,6 +89,7 @@ export function TenantList() {
     (a, b) => (a.due ?? 9999) - (b.due ?? 9999) || a.tenancy.name.localeCompare(b.tenancy.name),
   )
 
+  const overdueCount = needsAction.filter((r) => r.overdue).length
   const living = rows.filter((r) => !r.incoming).length
   const arriving = rows.filter((r) => r.incoming).length
 
@@ -110,33 +112,23 @@ export function TenantList() {
         <ScopeSelect buildings={buildings} value={scope} onChange={setScope} />
       </div>
 
-      {/* ── The work ─────────────────────────────────────────────────────── */}
-      <section className="mt-8">
-        <SectionLabel className="mb-4">Perlu tindakan hari ini</SectionLabel>
-
-        {needsAction.length === 0 ? (
-          // Says the check ran, and gives the day a finish line.
-          <p className="flex items-center gap-3 rounded-card border border-dashed border-line px-5 py-8 text-[14px] text-ink-soft">
-            <CircleCheck
-              size={18}
-              strokeWidth={1.9}
-              aria-hidden
-              className="shrink-0 text-available"
-            />
-            Tidak ada yang jatuh tempo dalam {DUE_SOON} hari, dan tidak ada yang menunggu
-            dikonfirmasi keluar.
-          </p>
-        ) : (
+      {/* ── The warning ──────────────────────────────────────────────────── */}
+      <div className="mt-6">
+        <ActionBanner
+          count={needsAction.length}
+          summary={summarise(needsAction)}
+          urgent={overdueCount > 0}
+        >
           <ul className="flex flex-col gap-2.5">
             {needsAction.map((row) => (
               <ActionRow key={row.tenancy.id} row={row} today={today} nameOf={nameOf} />
             ))}
           </ul>
-        )}
-      </section>
+        </ActionBanner>
+      </div>
 
-      {/* ── The register ─────────────────────────────────────────────────── */}
-      <section className="mt-10">
+      {/* ── The subject ──────────────────────────────────────────────────── */}
+      <section className="mt-6">
         <SectionLabel className="mb-4">Semua penghuni</SectionLabel>
 
         <div className="overflow-hidden rounded-card bg-paper shadow-card">
@@ -385,3 +377,23 @@ function ActionRow({
 
 /** Overdue departures first, then announced ones, then by how soon rent falls. */
 const weight = (r: Row) => (r.overdue ? -2000 : r.leaving ? -1000 : (r.due ?? 0))
+
+/**
+ * What is inside the banner, without opening it.
+ *
+ * A bare count makes somebody expand it to learn whether it matters. Naming the
+ * kinds usually answers that on the line itself.
+ */
+function summarise(rows: Row[]): string {
+  const late = rows.filter((r) => r.overdue).length
+  const leaving = rows.filter((r) => r.leaving && !r.overdue).length
+  const due = rows.filter((r) => !r.leaving && r.due !== null && r.due <= DUE_SOON).length
+
+  return [
+    late > 0 && `${late} terlewat`,
+    leaving > 0 && `${leaving} kontrak akan habis`,
+    due > 0 && `${due} jatuh tempo`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}

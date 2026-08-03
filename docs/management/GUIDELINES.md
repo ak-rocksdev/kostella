@@ -269,6 +269,14 @@ Check this list before opening a pull request, and again before demoing.
 - [ ] **One screen, two jobs, two treatments.** "What must I do today" wants a
       short list with the job named on each row. "Where is Rina" wants a table
       with aligned columns. Giving both the same uniform cards serves neither.
+- [ ] **Ranking a worklist first is not the same as giving it the page.** The
+      screen's heading names its subject, and the subject has to be visible.
+      *"Perlu tindakan" opened as five expanded cards — 613px before the tenant
+      table appeared, on a page titled Penghuni. It is a collapsed banner now:
+      44px, and the register starts underneath it.*
+- [ ] **A collapsed warning names what is inside it.** A bare count makes
+      somebody open it to find out whether it matters; "1 terlewat · 1 kontrak
+      akan habis · 3 jatuh tempo" usually answers that on the line itself.
 - [ ] **A worklist has to be able to empty.** If it looks identical tomorrow
       there is no finishing it, and it stops being read.
 - [ ] **A repeated control is not an affordance.** The same words on every row —
