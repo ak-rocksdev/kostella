@@ -153,6 +153,15 @@ Check this list before opening a pull request, and again before demoing.
       prototype. A client must never leave the demo believing data persists.
 - [ ] Nothing in the UI implies a backend, a login, or multi-user sync that
       does not exist.
+- [ ] **A demo aid says it is one, and never borrows a product surface to do
+      its job.** The three faces needed a way between them for pitching, and a
+      "Masuk pengelola" link in the public footer would have read as a claim
+      that Kostella has accounts. `DemoSwitcher` is labelled *Demo* on its face
+      and says in words that there is no login. *It is also the first thing to
+      delete when authentication arrives.*
+- [ ] **Every face has a way out.** `/owner` shipped with zero links because a
+      real owner has nowhere else to go — which made it a dead end nobody could
+      leave without editing the address bar.
 
 ## Forms
 

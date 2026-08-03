@@ -26,6 +26,13 @@ const nextConfig: NextConfig = {
 
   /** Directory-style URLs, so nginx can serve /pencarian/index.html cleanly. */
   trailingSlash: true,
+
+  /**
+   * Dev-only, and only about where a badge sits: Next's indicator defaults to
+   * the bottom-left corner, which is where the demo switcher lives. They
+   * overlapped on `npm run dev`. Nothing in the exported build is affected.
+   */
+  devIndicators: { position: 'top-left' },
 }
 
 export default nextConfig

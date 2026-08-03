@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Archivo, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
+import { DemoSwitcher } from '@/components/ui/DemoSwitcher'
 import { positioningSentence } from '@/lib/content/company'
 
 /* Archivo carries the brand twice over, distinguished by width rather than by
@@ -29,7 +30,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className={`${archivo.variable} ${jakarta.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* A presentation aid, not a product surface — see the component.
+            Nothing linked the public site, the panel and the owner's view
+            before this, and /owner had no way out at all. */}
+        <DemoSwitcher />
+      </body>
     </html>
   )
 }
