@@ -18,29 +18,9 @@ export type { Tone }
  *
  * Colour never carries it alone. Every level puts a word in the chip.
  */
-export type Level = 'late' | 'now' | 'soon'
-
-export const LEVEL: Record<Level, { chip: string; mark: string; icon: string; ring?: string }> = {
-  /* Something is already wrong. The only level that marks the whole card. */
-  late: {
-    chip: 'bg-held-soft text-held',
-    mark: 'text-held',
-    icon: 'bg-held-soft text-held',
-    ring: 'ring-1 ring-held/50',
-  },
-  /* Today or tomorrow — the panel's action colour, because it is an action. */
-  now: {
-    chip: 'bg-plum/10 text-plum',
-    mark: 'text-plum',
-    icon: 'bg-plum/10 text-plum',
-  },
-  /* Days away. Deliberately quiet: if everything shouts, nothing does. */
-  soon: {
-    chip: 'bg-stone text-ink-soft',
-    mark: 'text-ink-soft',
-    icon: 'bg-stone text-ink-soft',
-  },
-}
+/** The three steps a row can sit on. `Tone` also carries `done`, which nothing
+ *  urgent ever is — the colours themselves live in `StatusChip`. */
+export type Level = Extract<Tone, 'late' | 'now' | 'soon'>
 
 export type Urgency = {
   level: Level

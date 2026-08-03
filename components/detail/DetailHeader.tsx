@@ -10,7 +10,10 @@ export function DetailHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-canvas">
       <div className="wrap flex h-16 items-center justify-between gap-4">
-        <Link href={routes.beranda} className="text-[20px] font-semibold tracking-[-0.01em]">
+        <Link
+          href={routes.beranda}
+          className="min-h-11 inline-flex items-center text-[20px] font-semibold tracking-[-0.01em]"
+        >
           Kostella
         </Link>
         <Link

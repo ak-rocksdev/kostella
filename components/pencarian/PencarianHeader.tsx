@@ -15,7 +15,10 @@ export function PencarianHeader() {
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-canvas">
       <div className="wrap-wide flex h-16 items-center gap-4 sm:gap-8">
-        <Link href={routes.beranda} className="text-[20px] font-semibold tracking-[-0.01em]">
+        <Link
+          href={routes.beranda}
+          className="min-h-11 inline-flex items-center text-[20px] font-semibold tracking-[-0.01em]"
+        >
           Kostella
         </Link>
         <p className="hidden text-[14px] text-ink-soft sm:block">

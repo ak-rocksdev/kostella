@@ -70,9 +70,10 @@ export function ActionBanner({
         <span className={cn('text-[14px] font-semibold', urgent && 'text-held')}>
           {count} perlu tindakan hari ini
         </span>
-        <span className={cn('text-[13px]', urgent ? 'text-held/80' : 'text-ink-soft')}>
-          {summary}
-        </span>
+        {/* Full colour, not dimmed. Hierarchy comes from weight — the count is
+            semibold and this is not — because `text-held/80` on the amber
+            surface measured 3,53:1, under the floor for 13px. */}
+        <span className={cn('text-[13px]', urgent ? 'text-held' : 'text-ink-soft')}>{summary}</span>
         <span
           className={cn(
             'ml-auto inline-flex items-center gap-1 text-[13px] font-semibold',

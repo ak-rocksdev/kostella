@@ -10,6 +10,7 @@ import { surveysToday } from '@/lib/content/management/surveys'
 import { ALL_BUILDINGS, ScopeSelect } from './ScopeSelect'
 import { useManagement } from '@/lib/management/useManagement'
 import { useToday } from '@/lib/management/today'
+import { TONE_BG } from '@/components/ui/StatusChip'
 import { parseDate } from '@/lib/dates'
 import { attentionItems } from './attention'
 import { describe, when } from './log'
@@ -125,9 +126,7 @@ export function Dashboard() {
                         aria-hidden
                         className={cn(
                           'mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full',
-                          item.tone === 'attention'
-                            ? 'bg-held-soft text-held'
-                            : 'bg-stone text-ink-soft',
+                          TONE_BG[item.tone === 'attention' ? 'late' : 'soon'],
                         )}
                       >
                         <Icon size={15} strokeWidth={1.9} />

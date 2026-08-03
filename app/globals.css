@@ -35,7 +35,12 @@
   --color-held-soft: #f5e3d7;
   --color-occupied: #9a9892;
   --color-occupied-soft: #e7e5e0;
-  --color-occupied-faded: #b7b5af; /* room number on a taken cell — grey fill, faded text */
+  /* Room number on a taken cell. Was #b7b5af, chosen to make a taken room
+     recede — and it did, to 1,63:1 against the fill behind it, which is not
+     recessive but unreadable. The number is content: a manager clicks that cell
+     to change what is in the room. 5,2:1 here, still visibly quieter than an
+     available cell's white-on-green. */
+  --color-occupied-faded: #605d58;
 
   /* Typefaces — the underlying vars are assigned by next/font in app/layout.tsx.
      Two families, three roles. Archivo does double duty: Expanded for the big
@@ -358,4 +363,18 @@
   to {
     opacity: 0;
   }
+}
+
+/* Leaflet ships 30px zoom buttons. This project's floor is 44 — a map on a
+   phone is exactly where a small target is hardest to hit.
+   Leaflet's own stylesheet is imported from the component, so it lands after
+   this file; the doubled class outranks it without needing !important. */
+.leaflet-touch .leaflet-control-zoom a.leaflet-control-zoom-in,
+.leaflet-touch .leaflet-control-zoom a.leaflet-control-zoom-out,
+.leaflet-control-zoom a.leaflet-control-zoom-in,
+.leaflet-control-zoom a.leaflet-control-zoom-out {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 20px;
 }

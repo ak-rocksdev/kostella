@@ -43,7 +43,7 @@ export function SiteFooter({ wide }: { wide?: boolean }) {
                   by hand. Plum on hover because dialling is an action. */}
               <a
                 href={footer.phoneHref}
-                className="mt-3 inline-flex items-center gap-2.5 font-figure text-[22px] leading-none font-semibold tracking-[-0.01em] transition-colors hover:text-plum"
+                className="mt-3 inline-flex min-h-11 items-center gap-2.5 font-figure text-[22px] leading-none font-semibold tracking-[-0.01em] transition-colors hover:text-plum"
               >
                 <Phone size={19} strokeWidth={1.75} aria-hidden className="text-plum" />
                 <span className="whitespace-nowrap">{footer.phone}</span>

@@ -201,6 +201,18 @@ Check this list before opening a pull request, and again before demoing.
       padding. *`Button` computed to 35px at `sm` and 38px at `md` for weeks
       under this very rule, because nobody read the box.*
 - [ ] Contrast ≥ 4.5:1 for body text, measured — not eyeballed.
+- [ ] **Sweep the public pages too, not only the screen being built.** *A
+      full-site pass found four targets under 44px on Beranda, pencarian and
+      detail — the footer's phone link at 22px, the filter's radio pills at 36,
+      the wordmark at 30, and Leaflet's zoom buttons at 30 — none of them
+      touched by the management work and none ever measured.*
+- [ ] **A third-party stylesheet imported from a component lands after
+      `globals.css`.** Matching its specificity is not enough.
+      *Leaflet's 30px zoom controls survived a same-specificity override.*
+- [ ] **"Recessive" is not a licence to be unreadable.** *The room number on a
+      taken cell was set to a faded grey deliberately and measured 1,63:1 — on
+      a cell a manager clicks to change what is in the room. It is 5,2:1 now
+      and still visibly quieter than an available cell.*
 - [ ] Status is never carried by colour alone; a word accompanies every hue.
 - [ ] Works down to 390px. A data table gets a deliberate small-screen form,
       not a horizontal scrollbar by accident.

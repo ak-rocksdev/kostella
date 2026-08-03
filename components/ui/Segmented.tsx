@@ -46,7 +46,7 @@ export function Segmented<T extends string | number | null>({
             <label
               key={String(option.value)}
               className={cn(
-                'inline-flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-[14px] font-medium whitespace-nowrap transition-colors duration-200',
+                'inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-[14px] font-medium whitespace-nowrap transition-colors duration-200',
                 'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-plum',
                 selected ? 'bg-ink text-stone' : 'text-ink hover:bg-stone',
                 option.count === 0 && !selected && 'opacity-45',
